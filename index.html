@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>OBJImg</title>
+	<style type="text/css">
+
+		* {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+
+		html {
+			background-color: #222222;
+		}
+
+	</style>
+	<script type="text/javascript" src="three-js/build/three.js"></script>
+	<script type="text/javascript" src="objimg.js"></script>
+	<script type="text/javascript">
+
+		window.onload = function(){
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+			var aspect = width / height;
+
+			var renderer = new THREE.WebGLRenderer({
+				precision: "highp",
+				premultipliedAlpha: true,
+				alpha: true,
+				antialias: true
+			});
+
+			renderer.setSize(width, height);
+
+			document.body.appendChild(renderer.domElement);
+
+			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 5000);
+			camera.position.set(0, 0, 5);
+
+			var scene = new THREE.Scene();
+
+			var ambient = new THREE.AmbientLight(0x000000);
+			scene.add(ambient);
+
+			// Get image
+
+			var image = new Image();
+
+			image.onload = function( event ){
+
+				var datas = new OBJImg(this);
+
+				var geometry = new THREE.Geometry();
+
+				for( var vertex = 0, length = datas.vertices.length; vertex < length; vertex++ ){
+
+					geometry.vertices.push(new THREE.Vector3(datas.vertices[vertex].x, datas.vertices[vertex].y, datas.vertices[vertex].z));
+				
+				};
+
+				var material = new THREE.PointCloudMaterial({
+					color: 0xFF0000,
+					size: 0.1
+				});
+
+				var mesh = new THREE.PointCloud(geometry, material);
+
+				scene.add(mesh);
+
+				console.log(mesh);
+
+			};
+
+			image.src = "face.png";
+
+			function render( now ){
+
+				window.requestAnimationFrame(render);
+
+				renderer.render(scene, camera);
+
+			};
+
+			window.requestAnimationFrame(render);
+
+		};
+
+	</script>
+</head>
+<body></body>
+</html>
