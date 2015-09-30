@@ -16,9 +16,15 @@
 			background-color: #222222;
 		}
 
-		canvas {
+		canvas:first-child {
 			width: 100%;
 			height: 100%;
+		}
+
+		canvas:last-child {
+			position: absolute;
+			top: 0;
+			left: 0;
 		}
 
 	</style>
@@ -44,7 +50,7 @@
 			document.body.appendChild(renderer.domElement);
 
 			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 5000);
-			camera.position.set(0, 0, 5);
+			camera.position.set(0, 0, 200);
 
 			window.addEventListener("resize", function( event ){
 
@@ -67,6 +73,12 @@
 
 			var generatedObject = new Object();
 
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "models/sphere.obj", false);
+			xhr.send(null);
+
+			OBJImg.generateImg(xhr.responseText);
+
 			image.onload = function( event ){
 
 				generatedObject.datas = new OBJImg(this);
@@ -79,6 +91,12 @@
 				
 				};
 
+				generatedObject.geometry.computeBoundingBox();
+
+				var size = Math.abs(generatedObject.geometry.boundingBox.min.x - generatedObject.geometry.boundingBox.max.x);
+
+				camera.position.set(0, 0, size * 2);
+
 				generatedObject.material = new THREE.PointCloudMaterial({
 					color: 0xFF0000,
 					size: 0.1
@@ -90,7 +108,7 @@
 
 			};
 
-			image.src = "models/cube.png";
+			image.src = "models/sphere.png";
 
 			function render( now ){
 
