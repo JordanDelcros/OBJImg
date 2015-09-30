@@ -13,12 +13,12 @@
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2d");
 
-			canvas.width = image.width;
-			canvas.height = image.height;
+			canvas.width = image.naturalWidth;
+			canvas.height = image.naturalHeight;
 
-			context.drawImage(image, 0, 0, image.width, image.height);
+			context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
 
-			var datas = context.getImageData(0, 0, image.width, image.height);
+			var datas = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight);
 
 			var vertices = new Array();
 
@@ -35,7 +35,7 @@
 				}
 			};
 
-			for( var pixel = 0, length = datas.data.length; pixel < length; pixel += (datas.width * datas.height) ){
+			for( var pixel = 0, length = datas.data.length; pixel < length; pixel += 4 ){
 
 				var red = datas.data[pixel];
 				var green = datas.data[pixel + 1];
