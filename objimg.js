@@ -10,6 +10,8 @@
 		constructor: OBJImg,
 		init: function( image ){
 
+			console.info("IMPORT");
+
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2d");
 
@@ -20,12 +22,20 @@
 
 			this.pixels = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
 
-			var vertices = new Array(this.getPixelValue(0));
-			var textures = new Array(this.getPixelValue(1));
-			var normals = new Array(this.getPixelValue(2));
-			var faces = new Array(this.getPixelValue(3));
+			var pixelIndex = 0;
 
-			console.log("vertices:", vertices.length, "textures:", textures.length, "normals:", normals.length, "faces:", faces.length);
+			var vertices = new Array(this.getPixelValue(pixelIndex++));
+			var textures = new Array(this.getPixelValue(pixelIndex++));
+			var normals = new Array(this.getPixelValue(pixelIndex++));
+			var faces = new Array(this.getPixelValue(pixelIndex++));
+			var multiplicator = this.getPixelValue(pixelIndex++);
+			var pivot = {
+				x: this.getPixelValue(pixelIndex++) / multiplicator,
+				y: this.getPixelValue(pixelIndex++) / multiplicator,
+				z: this.getPixelValue(pixelIndex++) / multiplicator
+			};
+
+			console.log("vertices:", vertices.length, "textures:", textures.length, "normals:", normals.length, "faces:", faces.length, "multi:", multiplicator, "pivot", pivot);
 
 			var bounds = {
 				min: {
@@ -40,13 +50,11 @@
 				}
 			};
 
-			pixelIndex = 4;
-
 			for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex+= 3 ){
 
-				var x = this.getPixelValue(pixelIndex) ;
-				var y = this.getPixelValue(pixelIndex + 1) ;
-				var z = this.getPixelValue(pixelIndex + 2) ;
+				var x = this.getPixelValue(pixelIndex) / multiplicator;
+				var y = this.getPixelValue(pixelIndex + 1) / multiplicator;
+				var z = this.getPixelValue(pixelIndex + 2) / multiplicator;
 
 				if( x < bounds.min.x ){
 
@@ -92,17 +100,29 @@
 
 			};
 
-			var center = {
-				x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
-				y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
-				z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
+			// var center = {
+			// 	x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
+			// 	y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
+			// 	z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
+			// };
+
+			// for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
+
+			// 	vertices[vertex].x -=  center.x;
+			// 	vertices[vertex].y -=  center.y;
+			// 	vertices[vertex].z -=  center.z;
+
+			// };
+
+			for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex++ ){
+
 			};
 
-			for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
+			for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex++ ){
 
-				vertices[vertex].x -=  center.x;
-				vertices[vertex].y -=  center.y;
-				vertices[vertex].z -=  center.z;
+			};
+
+			for( var face = 0, length = faces.length; face < length; face++, pixelIndex++ ){
 
 			};
 
@@ -127,6 +147,26 @@
 
 			return color.r * color.g + color.b;
 
+		},
+		getColorFromValue: function( value ){
+
+			var r = 255;
+			var g = Math.floor(value / 255);
+			var b = Math.floor(value - (r * g));
+			var a = 1;
+
+			return {
+				r: r,
+				g: g,
+				b: b,
+				a: a
+			};
+
+		},
+		getValueFromColor: function( r, g, b, a ){
+
+			return r * g + b;
+
 		}
 	};
 
@@ -138,6 +178,8 @@
 	};
 
 	OBJImg.generateImg = function( obj, format ){
+
+		console.info("GENERATE");
 
 		var lines = obj.split(/\n/g);
 
@@ -168,9 +210,9 @@
 
 			if( type == "v" ){
 
-				var x = parseFloat(datas[1] );
-				var y = parseFloat(datas[2] );
-				var z = parseFloat(datas[3] );
+				var x = parseFloat(datas[1]);
+				var y = parseFloat(datas[2]);
+				var z = parseFloat(datas[3]);
 
 				if( x < bounds.min.x ){
 
@@ -263,11 +305,13 @@
 		bounds.min.w = Math.min(bounds.min.x, bounds.min.y, bounds.min.z);
 		bounds.max.w = Math.max(bounds.max.x, bounds.max.y, bounds.max.z);
 
-		var center = {
-			x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
-			y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
-			z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
-		};
+		// console.log(bounds);
+
+		// var center = {
+		// 	x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
+		// 	y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
+		// 	z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
+		// };
 
 		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
@@ -277,43 +321,86 @@
 		//
 
 		var pixelIndex = 0;
-		var pixelCount = 5 + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + (faces.length * 9);
-		
+
+		var pixelCount = 8 + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + (faces.length * 9);
 		var square = Math.ceil(Math.sqrt(pixelCount)); 
 
 		canvas.width = canvas.height = square;
 
-		context.fillStyle = "rgba(255, " + ((vertices.length - (vertices.length % 255)) / 255) + ", " + (vertices.length % 255) + ", 1)";
-		context.fillRect(0, 0, 1, 1);
+		var vertexColor = OBJImg.fn.getColorFromValue(vertices.length);
+
+		context.fillStyle = "rgba(" + vertexColor.r + ", " + vertexColor.g + ", " + vertexColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
 		pixelIndex++;
 
-		context.fillStyle = "rgba(255, " + ((textures.length - (textures.length % 255)) / 255) + ", " + (textures.length % 255) + ", 1)";
-		context.fillRect(1, 0, 1, 1);
+		var textureColor = OBJImg.fn.getColorFromValue(textures.length);
+
+		context.fillStyle = "rgba(" + textureColor.r + ", " + textureColor.g + ", " + textureColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
 		pixelIndex++;
 
-		context.fillStyle = "rgba(255, " + ((normals.length - (normals.length % 255)) / 255) + ", " + (normals.length % 255) + ", 1)";
-		context.fillRect(2, 0, 1, 1);
+		var normalColor = OBJImg.fn.getColorFromValue(normals.length);
+
+		context.fillStyle = "rgba(" + normalColor.r + ", " + normalColor.g + ", " + normalColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
 		pixelIndex++;
 
-		context.fillStyle = "rgba(255, " + ((faces.length - (faces.length % 255)) / 255) + ", " + (faces.length % 255) + ", 1)";
-		context.fillRect(3, 0, 1, 1);
+		var faceColor = OBJImg.fn.getColorFromValue(faces.length);
+
+		context.fillStyle = "rgba(" + faceColor.r + ", " + faceColor.g + ", " + faceColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
+		pixelIndex++;
+
+		var multiplicatorColor = OBJImg.fn.getColorFromValue((255 * 255 + 255) / (bounds.max.w + Math.abs(bounds.min.w)));
+		var multiplicator = multiplicatorColor.r * multiplicatorColor.g + multiplicatorColor.b;
+
+		context.fillStyle = "rgba(" + multiplicatorColor.r + ", " + multiplicatorColor.g + ", " + multiplicatorColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
+		pixelIndex++;
+
+		var pivot = {
+			x: Math.abs(bounds.min.x) * multiplicator,
+			y: Math.abs(bounds.min.y) * multiplicator,
+			z: Math.abs(bounds.min.z) * multiplicator
+		};
+
+		var pivotXColor = OBJImg.fn.getColorFromValue(pivot.x);
+
+		context.fillStyle = "rgba(" + pivotXColor.r + ", " + pivotXColor.g + ", " + pivotXColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
+		pixelIndex++;
+
+		var pivotYColor = OBJImg.fn.getColorFromValue(pivot.y);
+
+		context.fillStyle = "rgba(" + pivotYColor.r + ", " + pivotYColor.g + ", " + pivotYColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
+		pixelIndex++;
+
+		var pivotZColor = OBJImg.fn.getColorFromValue(pivot.z);
+
+		console.log("find", pivotYColor)
+
+		context.fillStyle = "rgba(" + pivotZColor.r + ", " + pivotZColor.g + ", " + pivotZColor.b + ", 1)";
+		context.fillRect(pixelIndex, 0, 1, 1);
 		pixelIndex++;
 
 		for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
 
-			var x = Math.round(vertices[vertex].x + Math.abs(bounds.min.x));
-			var y = Math.round(vertices[vertex].y + Math.abs(bounds.min.y));
-			var z = Math.round(vertices[vertex].z + Math.abs(bounds.min.z));
+			var xColor = OBJImg.fn.getColorFromValue((vertices[vertex].x + Math.abs(bounds.min.x)) * multiplicator);
 
-			context.fillStyle = "rgba(255, " + ((x - (x % 255)) / 255) + ", " + (x % 255) + ", 1)";
+			context.fillStyle = "rgba(" + xColor.r + ", " + xColor.g + ", " + xColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
-			context.fillStyle = "rgba(255, " + ((y - (y % 255)) / 255) + ", " + (y % 255) + ", 1)";
+			var yColor = OBJImg.fn.getColorFromValue((vertices[vertex].y + Math.abs(bounds.min.y)) * multiplicator);
+
+			context.fillStyle = "rgba(" + yColor.r + ", " + yColor.g + ", " + yColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
-			context.fillStyle = "rgba(255, " + ((z - (z % 255)) / 255) + ", " + (z % 255) + ", 1)";
+			var zColor = OBJImg.fn.getColorFromValue((vertices[vertex].z + Math.abs(bounds.min.z)) * multiplicator);
+
+			context.fillStyle = "rgba(" + zColor.r + ", " + zColor.g + ", " + zColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
