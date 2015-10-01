@@ -74,8 +74,8 @@
 
 			var generatedObject = new Object();
 
-			var imageFile = "tree";
-			var objFile = "tree";
+			var imageFile = "cube";
+			var objFile = "cube";
 
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "models/" + objFile + ".obj", false);
@@ -97,13 +97,27 @@
 				
 				};
 
+				for( var face = 0, length = generatedObject.datas.faces.length; face < length; face++ ){
+
+					var vertexA = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.a/*]*/;
+					var vertexB = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.b/*]*/;
+					var vertexC = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.c/*]*/;
+
+					console.log(vertexA, vertexB, vertexC)
+
+					generatedObject.geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC));
+
+				};
+
+				console.log( generatedObject )
+
 				generatedObject.geometry.computeBoundingBox();
 
 				var size = Math.abs(generatedObject.geometry.boundingBox.min.x - generatedObject.geometry.boundingBox.max.x);
 
 				console.log(size);
 
-				camera.position.set(0, 0, 20);
+				camera.position.set(0, 0, size * 2);
 
 				generatedObject.material = new THREE.PointCloudMaterial({
 					color: 0xFF0000,
@@ -114,6 +128,10 @@
 				generatedObject.mesh = new THREE.PointCloud(generatedObject.geometry, generatedObject.material);
 
 				scene.add(generatedObject.mesh);
+
+				generatedObject.meshBis = new THREE.Mesh(generatedObject.geometry.clone(), new THREE.MeshBasicMaterial({
+					color: 0xFF0000
+				}));
 
 				// Source
 
