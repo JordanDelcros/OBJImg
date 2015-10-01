@@ -106,13 +106,13 @@
 			// 	z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
 			// };
 
-			// for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
+			for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
 
-			// 	vertices[vertex].x -=  center.x;
-			// 	vertices[vertex].y -=  center.y;
-			// 	vertices[vertex].z -=  center.z;
+				vertices[vertex].x -= pivot.x;
+				vertices[vertex].y -= pivot.y;
+				vertices[vertex].z -= pivot.z;
 
-			// };
+			};
 
 			for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex++ ){
 
