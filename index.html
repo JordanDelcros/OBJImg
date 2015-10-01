@@ -49,7 +49,7 @@
 
 			document.body.appendChild(renderer.domElement);
 
-			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 5000);
+			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 10000);
 			camera.position.set(0, 0, 200);
 
 			window.addEventListener("resize", function( event ){
@@ -74,7 +74,7 @@
 			var generatedObject = new Object();
 
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "models/sphere.obj", false);
+			xhr.open("GET", "models/teapot.obj", false);
 			xhr.send(null);
 
 			OBJImg.generateImg(xhr.responseText);
@@ -99,7 +99,7 @@
 
 				generatedObject.material = new THREE.PointCloudMaterial({
 					color: 0xFF0000,
-					size: 0.1
+					size: size / 10
 				});
 
 				generatedObject.mesh = new THREE.PointCloud(generatedObject.geometry, generatedObject.material);
@@ -108,7 +108,7 @@
 
 			};
 
-			image.src = "models/sphere.png";
+			image.src = "models/cube.png";
 
 			function render( now ){
 

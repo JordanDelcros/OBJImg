@@ -25,7 +25,7 @@
 			var normals = new Array(this.getPixelValue(2));
 			var faces = new Array(this.getPixelValue(3));
 
-			console.log(vertices.length, textures.length, normals.length, faces.length);
+			console.log("vertices:", vertices.length, "textures:", textures.length, "normals:", normals.length, "faces:", faces.length);
 
 			var bounds = {
 				min: {
@@ -44,9 +44,9 @@
 
 			for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex+= 3 ){
 
-				var x = this.getPixelValue(pixelIndex) / 1000;
-				var y = this.getPixelValue(pixelIndex + 1) / 1000;
-				var z = this.getPixelValue(pixelIndex + 2) / 1000;
+				var x = this.getPixelValue(pixelIndex) ;
+				var y = this.getPixelValue(pixelIndex + 1) ;
+				var z = this.getPixelValue(pixelIndex + 2) ;
 
 				if( x < bounds.min.x ){
 
@@ -150,12 +150,14 @@
 			min: {
 				x: Infinity,
 				y: Infinity,
-				z: Infinity
+				z: Infinity,
+				w: Infinity
 			},
 			max: {
 				x: -Infinity,
 				y: -Infinity,
-				z: -Infinity
+				z: -Infinity,
+				w: -Infinity
 			}
 		};
 
@@ -166,16 +168,17 @@
 
 			if( type == "v" ){
 
-				var x = parseFloat(datas[1] * 1000);
-				var y = parseFloat(datas[2] * 1000);
-				var z = parseFloat(datas[3] * 1000);
+				var x = parseFloat(datas[1] );
+				var y = parseFloat(datas[2] );
+				var z = parseFloat(datas[3] );
 
 				if( x < bounds.min.x ){
 
 					bounds.min.x = x;
 
-				}
-				else if( x > bounds.max.x ){
+				};
+
+				if( x > bounds.max.x ){
 
 					bounds.max.x = x;
 
@@ -185,8 +188,9 @@
 
 					bounds.min.y = y;
 
-				}
-				else if( y > bounds.max.y ){
+				};
+
+				if( y > bounds.max.y ){
 
 					bounds.max.y = y;
 
@@ -196,8 +200,9 @@
 
 					bounds.min.z = z;
 
-				}
-				else if( z > bounds.max.z ){
+				};
+
+				if( z > bounds.max.z ){
 
 					bounds.max.z = z;
 
@@ -255,6 +260,9 @@
 
 		};
 
+		bounds.min.w = Math.min(bounds.min.x, bounds.min.y, bounds.min.z);
+		bounds.max.w = Math.max(bounds.max.x, bounds.max.y, bounds.max.z);
+
 		var center = {
 			x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
 			y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
@@ -269,8 +277,9 @@
 		//
 
 		var pixelIndex = 0;
-		var pixelCount = 4 + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + (faces.length * 9);
-		var square = Math.ceil(Math.sqrt(pixelCount));
+		var pixelCount = 5 + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + (faces.length * 9);
+		
+		var square = Math.ceil(Math.sqrt(pixelCount)); 
 
 		canvas.width = canvas.height = square;
 
