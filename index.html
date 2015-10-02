@@ -70,12 +70,16 @@
 			var ambient = new THREE.AmbientLight(0x000000);
 			scene.add(ambient);
 
+			var light = new THREE.PointLight(0xFFFFFF);
+			light.position.set(5, 5, 5);
+			scene.add(light);
+
 			var image = new Image();
 
 			var generatedObject = new Object();
 
-			var imageFile = "cube";
-			var objFile = "cube";
+			var imageFile = "tree";
+			var objFile = "tree";
 
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "models/" + objFile + ".obj", false);
@@ -97,41 +101,41 @@
 				
 				};
 
+				// for( var normal = 0, length = generatedObject.datas.normals.length; normal < length; normal++ ){
+
+				// 	generatedObject.geometry.normals.push(new THREE.Vector3(generatedObject.datas.normals[normal]))
+
+				// };
+
 				for( var face = 0, length = generatedObject.datas.faces.length; face < length; face++ ){
 
-					var vertexA = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.a/*]*/;
-					var vertexB = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.b/*]*/;
-					var vertexC = /*generatedObject.geometry.vertices[*/generatedObject.datas.faces[face].vertices.c/*]*/;
+					var vertexA = generatedObject.datas.faces[face].vertices.a;
+					var vertexB = generatedObject.datas.faces[face].vertices.b;
+					var vertexC = generatedObject.datas.faces[face].vertices.c;
 
-					console.log(vertexA, vertexB, vertexC)
+					var normalA = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.a];
+					var normalB = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.b];
+					var normalC = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.c];
 
-					generatedObject.geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC));
+					generatedObject.geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, [normalA, normalB, normalC]));
 
 				};
 
-				console.log( generatedObject )
-
+				// generatedObject.geometry.computeFaceNormals();
 				generatedObject.geometry.computeBoundingBox();
+
+				console.log( generatedObject );
 
 				var size = Math.abs(generatedObject.geometry.boundingBox.min.x - generatedObject.geometry.boundingBox.max.x);
 
-				console.log(size);
-
 				camera.position.set(0, 0, size * 2);
 
-				generatedObject.material = new THREE.PointCloudMaterial({
-					color: 0xFF0000,
-					size: 2,
-					sizeAttenuation: false
-				});
-
-				generatedObject.mesh = new THREE.PointCloud(generatedObject.geometry, generatedObject.material);
+				generatedObject.mesh = new THREE.Mesh(generatedObject.geometry, new THREE.MeshPhongMaterial({
+					side: THREE.DoubleSide,
+					lights: true
+				}));
 
 				scene.add(generatedObject.mesh);
-
-				generatedObject.meshBis = new THREE.Mesh(generatedObject.geometry.clone(), new THREE.MeshBasicMaterial({
-					color: 0xFF0000
-				}));
 
 				// Source
 
@@ -140,9 +144,9 @@
 				loader.load("models/" + imageFile + ".obj", function( object ){
 
 					generatedObject.source = object;
-					generatedObject.source.children[0].material.wireframe = true;
+					// generatedObject.source.children[0].material.wireframe = true;
 
-					scene.add(generatedObject.source);
+					// scene.add(generatedObject.source);
 
 				});
 
@@ -156,8 +160,8 @@
 
 				if( generatedObject.mesh ){
 
-					// generatedObject.mesh.rotateOnAxis(new THREE.Vector3(0, 0.2, 0), Math.PI / 180);
-					// generatedObject.source.rotateOnAxis(new THREE.Vector3(0, 0.2, 0), Math.PI / 180);
+					generatedObject.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+					generatedObject.source.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 				};
 

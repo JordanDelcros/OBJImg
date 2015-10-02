@@ -29,6 +29,7 @@
 			var normals = new Array(this.getPixelValue(pixelIndex++));
 			var faces = new Array(this.getPixelValue(pixelIndex++));
 			var multiplicator = this.getPixelValue(pixelIndex++);
+
 			var pivot = {
 				x: this.getPixelValue(pixelIndex++) / multiplicator,
 				y: this.getPixelValue(pixelIndex++) / multiplicator,
@@ -100,12 +101,6 @@
 
 			};
 
-			// var center = {
-			// 	x: bounds.min.x + ((bounds.max.x - bounds.min.x) / 2),
-			// 	y: bounds.min.y + ((bounds.max.y - bounds.min.y) / 2),
-			// 	z: bounds.min.z + ((bounds.max.z - bounds.min.z) / 2)
-			// };
-
 			for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
 
 				vertices[vertex].x -= pivot.x;
@@ -114,11 +109,21 @@
 
 			};
 
-			for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex++ ){
+			for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += 2 ){
 
 			};
 
-			for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex++ ){
+			for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += 3 ){
+
+				var x = (this.getPixelValue(pixelIndex) / multiplicator) - 1;
+				var y = (this.getPixelValue(pixelIndex + 1) / multiplicator) - 1;
+				var z = (this.getPixelValue(pixelIndex + 2) / multiplicator) - 1;
+
+				normals[normal] = {
+					x: x,
+					y: y,
+					z: z
+				};
 
 			};
 
@@ -128,11 +133,24 @@
 				var vb = this.getPixelValue(pixelIndex + 1);
 				var vc = this.getPixelValue(pixelIndex + 2);
 
+				var ta = this.getPixelValue(pixelIndex + 3);
+				var tb = this.getPixelValue(pixelIndex + 4);
+				var tc = this.getPixelValue(pixelIndex + 5);
+
+				var na = this.getPixelValue(pixelIndex + 6);
+				var nb = this.getPixelValue(pixelIndex + 7);
+				var nc = this.getPixelValue(pixelIndex + 8);
+
 				faces[face] = {
 					vertices: {
 						a: va,
 						b: vb,
 						c: vc
+					},
+					normals: {
+						a: na,
+						b: nb,
+						c: nc
 					}
 				};
 
@@ -140,6 +158,7 @@
 
 			return {
 				vertices: vertices,
+				normals: normals,
 				faces: faces
 			};
 
@@ -295,19 +314,19 @@
 
 				faces.push({
 					vertices: {
-						a: parseInt(a[0]),
-						b: parseInt(b[0]),
-						c: parseInt(c[0])
+						a: parseInt(a[0]) - 1,
+						b: parseInt(b[0]) - 1,
+						c: parseInt(c[0]) - 1
 					},
 					textures: {
-						a: parseInt(a[1]),
-						b: parseInt(b[1]),
-						c: parseInt(c[1])
+						a: parseInt(a[1]) - 1,
+						b: parseInt(b[1]) - 1,
+						c: parseInt(c[1]) - 1
 					},
 					normals: {
-						a: parseInt(a[2]),
-						b: parseInt(b[2]),
-						c: parseInt(c[2])
+						a: parseInt(a[2]) - 1,
+						b: parseInt(b[2]) - 1,
+						c: parseInt(c[2]) - 1
 					}
 				});
 
@@ -423,15 +442,21 @@
 
 		for( var normal = 0, length = normals.length; normal < length; normal++ ){
 
-			context.fillStyle = "rgba(255, " + ((normals[normal].x - (normals[normal].x % 255)) / 255) + ", " + (normals[normal].x % 255) + ", 1)";
+			var xColor = OBJImg.fn.getColorFromValue((normals[normal].x + 1) * multiplicator);
+
+			context.fillStyle = "rgba(" + xColor.r + ", " + xColor.g + ", " + xColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
-			context.fillStyle = "rgba(255, " + ((normals[normal].y - (normals[normal].y % 255)) / 255) + ", " + (normals[normal].y % 255) + ", 1)";
+			var yColor = OBJImg.fn.getColorFromValue((normals[normal].y + 1) * multiplicator);
+
+			context.fillStyle = "rgba(" + yColor.r + ", " + yColor.g + ", " + yColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
-			context.fillStyle = "rgba(255, " + ((normals[normal].z - (normals[normal].z % 255)) / 255) + ", " + (normals[normal].z % 255) + ", 1)";
+			var zColor = OBJImg.fn.getColorFromValue((normals[normal].z + 1) * multiplicator);
+
+			context.fillStyle = "rgba(" + zColor.r + ", " + zColor.g + ", " + zColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
@@ -495,7 +520,7 @@
 
 		};
 
-		var datas = context.getImageData(0, 1, square, square);
+		// var datas = context.getImageData(0, 1, square, square);
 		// var datas = canvas.toDataURL("image/png");
 
 	};
