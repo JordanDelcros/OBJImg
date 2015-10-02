@@ -51,7 +51,6 @@
 			document.body.appendChild(renderer.domElement);
 
 			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 10000);
-			camera.position.set(0, 0, 200);
 
 			window.addEventListener("resize", function( event ){
 
@@ -78,8 +77,8 @@
 
 			var generatedObject = new Object();
 
-			var imageFile = "tree";
-			var objFile = "tree";
+			var objFile = "sphere";
+			var imageFile = "sphere";
 
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "models/" + objFile + ".obj", false);
@@ -101,23 +100,35 @@
 				
 				};
 
-				// for( var normal = 0, length = generatedObject.datas.normals.length; normal < length; normal++ ){
-
-				// 	generatedObject.geometry.normals.push(new THREE.Vector3(generatedObject.datas.normals[normal]))
-
-				// };
-
 				for( var face = 0, length = generatedObject.datas.faces.length; face < length; face++ ){
 
 					var vertexA = generatedObject.datas.faces[face].vertices.a;
 					var vertexB = generatedObject.datas.faces[face].vertices.b;
 					var vertexC = generatedObject.datas.faces[face].vertices.c;
 
-					var normalA = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.a];
-					var normalB = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.b];
-					var normalC = generatedObject.datas.normals[generatedObject.datas.faces[face].normals.c];
+					var normals = null;
 
-					generatedObject.geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, [normalA, normalB, normalC]));
+					if( generatedObject.datas.normals.length > 0 ){
+
+						normals = [
+							generatedObject.datas.normals[generatedObject.datas.faces[face].normals.a],
+							generatedObject.datas.normals[generatedObject.datas.faces[face].normals.b],
+							generatedObject.datas.normals[generatedObject.datas.faces[face].normals.c]
+						];
+
+					};
+
+					generatedObject.geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
+
+					// var uvA = generatedObject.datas.textures[generatedObject.datas.faces[face].textures.a];
+					// var uvB = generatedObject.datas.textures[generatedObject.datas.faces[face].textures.b];
+					// var uvC = generatedObject.datas.textures[generatedObject.datas.faces[face].textures.c];
+
+					// generatedObject.geometry.faceVertexUvs[0].push(
+					// 	new THREE.Vector2(uvA.u, uvA.v),
+					// 	new THREE.Vector2(uvB.u, uvB.v),
+					// 	new THREE.Vector2(uvC.u, uvC.v)
+					// );
 
 				};
 
@@ -128,25 +139,38 @@
 
 				var size = Math.abs(generatedObject.geometry.boundingBox.min.x - generatedObject.geometry.boundingBox.max.x);
 
-				camera.position.set(0, 0, size * 2);
+				camera.position.set(0, 0, size * 1);
 
-				generatedObject.mesh = new THREE.Mesh(generatedObject.geometry, new THREE.MeshPhongMaterial({
-					side: THREE.DoubleSide,
+				var texture =  THREE.ImageUtils.loadTexture("textures/util.png");
+
+				var material = new THREE.MeshPhongMaterial({
+					// map: texture,
 					lights: true
-				}));
+				});
+
+				generatedObject.mesh = new THREE.Mesh(generatedObject.geometry, material);
 
 				scene.add(generatedObject.mesh);
-
-				// Source
 
 				var loader = new THREE.OBJLoader();
 
 				loader.load("models/" + imageFile + ".obj", function( object ){
 
-					generatedObject.source = object;
-					// generatedObject.source.children[0].material.wireframe = true;
+					//object.children[0].material.wireframe = true;
 
-					// scene.add(generatedObject.source);
+					object.traverse(function( child ){
+
+						if( child instanceof THREE.Mesh ){
+
+							child.material.map = texture;
+
+						};
+
+					});
+
+					// scene.add(object);
+
+					generatedObject.source = object;
 
 				});
 
@@ -161,6 +185,11 @@
 				if( generatedObject.mesh ){
 
 					generatedObject.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+
+				};
+
+				if( generatedObject.source ){
+
 					generatedObject.source.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 				};
