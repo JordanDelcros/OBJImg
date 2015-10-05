@@ -1,0 +1,39 @@
+@charset "utf-8";
+
+html, body {
+	width: 100%;
+	height: 100%;
+	font-family: "Open Sans", sans-serif;
+	background-color: #222222;
+	color: #FFFFFF;
+}
+
+h1 {
+	font-size: 20px;
+	line-height: 40px;
+	text-align: center;
+}
+
+div#container {
+
+}
+
+section {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+section#dropZone p {
+	
+}
+
+section#dropZone img {
+	min-width: 100px;
+	min-height: 100px;
+}

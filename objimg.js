@@ -36,15 +36,11 @@
 				var textureMultiplicator = this.getPixelValue(pixelIndex++);
 				var textureOffset = this.getPixelValue(pixelIndex++) / textureMultiplicator;
 
-				console.info("MUL", textureMultiplicator);
-
 				var pivot = {
 					x: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
 					y: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
 					z: this.getPixelValue(pixelIndex++) / vertexMultiplicator
 				};
-
-				console.info("vertices:", vertices.length, "textures:", textures.length, "normals:", normals.length, "faces:", faces.length, "multi:", vertexMultiplicator, "pivot", pivot);
 
 				for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += 3 ){
 
@@ -182,7 +178,7 @@
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
 
-	OBJImg.generateImg = function( path ){
+	OBJImg.generateImg = function( path, onLoad ){
 
 		var fileInfo = path.split(/\//g);
 		var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
@@ -360,10 +356,6 @@
 				var canvas = document.createElement("canvas");
 				var context = canvas.getContext("2d");
 
-				//
-				// document.body.appendChild(canvas);
-				//
-
 				var pixelIndex = 0;
 
 				var parameters = 9;
@@ -406,8 +398,6 @@
 
 				var textureMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.texture.max + Math.abs(bounds.texture.min)), 1));
 				var textureMultiplicator = textureMultiplicatorColor.r * textureMultiplicatorColor.g + textureMultiplicatorColor.b;
-
-				console.warn("MUL", textureMultiplicator, textureMultiplicatorColor, MAX, bounds.texture.max);
 
 				context.fillStyle = "rgba(" + textureMultiplicatorColor.r + ", " + textureMultiplicatorColor.g + ", " + textureMultiplicatorColor.b + ", 1)";
 				context.fillRect(pixelIndex, 0, 1, 1);
@@ -468,8 +458,6 @@
 				for( var texture = 0, length = textures.length; texture < length; texture++ ){
 
 					var uColor = OBJImg.fn.getColorFromValue((textures[texture].u + Math.abs(bounds.texture.min)) * textureMultiplicator);
-
-					// console.warn(textures[texture].u,    (textures[texture].u + Math.abs(bounds.texture.min)) * textureMultiplicator)
 
 					context.fillStyle = "rgba(" + uColor.r + ", " + uColor.g + ", " + uColor.b + ", " + uColor.a + ")";
 					context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
@@ -563,16 +551,12 @@
 
 				};
 
+				var image = new Image();
 				var datas = canvas.toDataURL("image/png");
 				
-				var link = document.createElement("a");
-				link.download = fileName + ".png";
-				link.href = datas;
-				link.dataset.downloadurl = ["image/png", link.download, link.href].join(":");
+				image.src = datas;
 
-				// document.body.appendChild(link);
-				// link.click();
-				// document.body.removeChild(link);
+				onLoad(image);
 
 			};
 
@@ -580,6 +564,8 @@
 
 		xhr.open("GET", path, true);
 		xhr.send(null);
+
+		return this;
 
 	};
 

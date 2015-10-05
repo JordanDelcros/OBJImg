@@ -27,6 +27,13 @@
 			left: 0;
 		}
 
+		img {
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+
 	</style>
 	<script type="text/javascript" src="three-js/build/three.js"></script>
 	<script type="text/javascript" src="three-js/src/loaders/OBJLoader.js"></script>
@@ -73,6 +80,9 @@
 			light.position.set(15, 5, 5);
 			scene.add(light);
 
+			var hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
+			scene.add(hemisphereLight);
+
 			var image = new Image();
 
 			var generatedObject = new Object();
@@ -82,11 +92,13 @@
 
 			var generatedMesh = null;
 
-			OBJImg.generateImg("models/" + objFile + ".obj");
+			var image = OBJImg.generateImg("models/" + objFile + ".obj", function( image ){
+
+				document.body.appendChild(image);
+
+			});
 
 			new OBJImg("models/" + imgFile + ".png", function( datas ){
-
-				console.log(datas);
 
 				var geometry = new THREE.Geometry();
 

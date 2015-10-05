@@ -1,0 +1,10 @@
+{
+	"name": "OBJImg",
+	"main": "index.html",
+	"window": {
+		"toolbar": true,
+		"frame": true,
+		"width": 600,
+		"height": 600
+	}
+}
