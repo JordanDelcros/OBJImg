@@ -20,55 +20,67 @@ html {
   width: 100%;
   height: 100%;
   border-radius: 3px;
-  font-family: "Open Sans", sans-serif;
-  background-color: #222222;
+  font-family: "Roboto", sans-serif;
+  background-color: #333333;
   color: #FFFFFF; }
   html body {
     width: 100%;
     height: 100%; }
     html body header {
-      box-shadow: inset 0 10px 15px -10px rgba(255, 255, 255, 0.5);
+      background-color: #222222;
       -webkit-app-region: drag;
       -webkit-user-select: none; }
       html body header h1 {
-        height: 30px;
+        height: 34px;
         font-size: 15px;
-        line-height: 30px;
+        line-height: 34px;
         text-align: center;
         text-transform: capitalize; }
       html body header nav {
+        margin: 8px 0 0 10px;
         z-index: 2;
         position: absolute;
         left: 0;
         top: 0; }
+        html body header nav:hover button#quit {
+          background-image: url("../images/quit.svg"); }
+        html body header nav:hover button#minimize {
+          background-image: url("../images/minimize.svg"); }
+        html body header nav:hover button#fullscreen {
+          background-image: url("../images/fullscreen.svg"); }
         html body header nav button {
-          margin: 10px;
+          display: inline-block;
+          border: 1px solid transparent;
           width: 13px;
           height: 13px;
           border-radius: 10px;
+          color: rgba(0, 0, 0, 0.8);
+          cursor: default;
+          background-size: 65% auto;
+          background-repeat: no-repeat;
+          background-position: center center;
           -webkit-app-region: no-drag; }
           html body header nav button#quit {
             border: 1px solid #e04946;
-            background-color: #fa615b;
-            cursor: default; }
-            html body header nav button#quit:hover:before {
-              display: block;
-              content: "x";
-              font-size: 10px;
-              font-weight: bold;
-              line-height: 11px; }
-    html body div#container {
+            background-color: #fa615b; }
+          html body header nav button#minimize {
+            border: 1px solid #e19d3c;
+            background-color: #ffba47; }
+          html body header nav button#fullscreen {
+            border: 1px solid #14af3f;
+            background-color: #26ce51; }
+    html body main {
       position: absolute;
       left: 0;
       top: 0;
       box-sizing: border-box;
-      padding: 40px 20px 20px 20px;
+      padding: 44px 20px 20px 20px;
       width: 100%;
       height: 100%; }
-      html body div#container section {
+      html body main section {
         width: 100%;
         height: 100%; }
-        html body div#container section#dropZone {
+        html body main section#dropZone {
           box-sizing: border-box;
           border: 4px dashed #333333;
           border-radius: 3px;
@@ -76,7 +88,7 @@ html {
           background-repeat: no-repeat;
           background-position: center center;
           background-size: 30% auto; }
-          html body div#container section#dropZone p {
+          html body main section#dropZone p {
             font-size: 15px;
             font-weight: bold;
             color: #555555; }

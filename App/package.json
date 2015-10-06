@@ -9,6 +9,8 @@
 		"frame": false,
 		"transparent": true,
 		"width": 320,
-		"height": 320
+		"height": 320,
+		"min_width": 320,
+		"min_height": 320
 	}
 }

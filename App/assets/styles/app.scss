@@ -2,15 +2,15 @@
 
 @import "reset.scss";
 
-$topBarHeight: 30px;
+$topBarHeight: 34px;
 
 html {
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
 	border-radius: 3px;
-	font-family: "Open Sans", sans-serif;
-	background-color: #222222;
+	font-family: "Roboto", sans-serif;
+	background-color: #333333;
 	color: #FFFFFF;
 
 	body {
@@ -18,7 +18,7 @@ html {
 		height: 100%;
 
 		header {
-			box-shadow: inset 0 10px 15px -10px rgba(255,255,255,0.5);
+			background-color: #222222;
 			-webkit-app-region: drag;
 			-webkit-user-select: none;
 
@@ -31,37 +31,63 @@ html {
 			}
 
 			nav {
+				margin: 8px 0 0 10px;
 				z-index: 2;
 				position: absolute;
 				left: 0;
 				top: 0;
 
+				&:hover {
+
+					button {
+
+						&#quit {
+							background-image: url("../images/quit.svg");
+						}
+
+						&#minimize {
+							background-image: url("../images/minimize.svg");
+						}
+
+						&#fullscreen {
+							background-image: url("../images/fullscreen.svg");
+						}
+					}
+				}
+
 				button {
-					margin: 10px;
+					display: inline-block;
+					border: 1px solid transparent;
 					width: 13px;
 					height: 13px;
 					border-radius: 10px;
+					color: rgba(0,0,0,0.8);
+					cursor: default;
+					background-size: 65% auto;
+					background-repeat: no-repeat;
+					background-position: center center;
 					-webkit-app-region: no-drag;
 
 					&#quit {
 						border: 1px solid rgba(224,73,70,1);
 						background-color: rgba(250,97,91,1);
-						cursor: default;
+					}
 
-						&:hover:before {
-							display: block;
-							content: "x";
-							font-size: 10px;
-							font-weight: bold;
-							line-height: 11px;
-						}
+					&#minimize {
+						border: 1px solid rgba(225,157,60,1);
+						background-color: rgba(285,186,71,1);
+					}
+
+					&#fullscreen {
+						border: 1px solid rgba(20,175,63,1);
+						background-color: rgba(38,206,81,1);
 					}
 				}
 			}
 		}
 		
 
-		div#container {
+		main {
 			position: absolute;
 			left: 0;
 			top: 0;
@@ -90,7 +116,10 @@ html {
 					}
 				}
 			}
+		
+			nav {
+				
+			}
 		}
-
 	}
 }
