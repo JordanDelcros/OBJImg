@@ -1,10 +1,14 @@
 {
 	"name": "OBJImg",
+	"version": 0.1,
+	"description": "Convert 3D OBJ files into light images",
+	"keywords": ["3D", "OBJ", "three", "js", "converter"],
 	"main": "index.html",
 	"window": {
-		"toolbar": true,
-		"frame": true,
-		"width": 600,
-		"height": 600
+		"toolbar": false,
+		"frame": false,
+		"transparent": true,
+		"width": 320,
+		"height": 320
 	}
 }

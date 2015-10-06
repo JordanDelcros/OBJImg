@@ -1,39 +1,84 @@
-@charset "utf-8";
+* {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  -webkit-appearance: none; }
 
-html, body {
-	width: 100%;
-	height: 100%;
-	font-family: "Open Sans", sans-serif;
-	background-color: #222222;
-	color: #FFFFFF;
-}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal; }
 
-h1 {
-	font-size: 20px;
-	line-height: 40px;
-	text-align: center;
-}
+a, button, input[type="submit"] {
+  cursor: pointer; }
 
-div#container {
+html {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  font-family: "Open Sans", sans-serif;
+  background-color: #222222;
+  color: #FFFFFF; }
+  html body {
+    width: 100%;
+    height: 100%; }
+    html body header {
+      box-shadow: inset 0 10px 15px -10px rgba(255, 255, 255, 0.5);
+      -webkit-app-region: drag;
+      -webkit-user-select: none; }
+      html body header h1 {
+        height: 30px;
+        font-size: 15px;
+        line-height: 30px;
+        text-align: center;
+        text-transform: capitalize; }
+      html body header nav {
+        z-index: 2;
+        position: absolute;
+        left: 0;
+        top: 0; }
+        html body header nav button {
+          margin: 10px;
+          width: 13px;
+          height: 13px;
+          border-radius: 10px;
+          -webkit-app-region: no-drag; }
+          html body header nav button#quit {
+            border: 1px solid #e04946;
+            background-color: #fa615b;
+            cursor: default; }
+            html body header nav button#quit:hover:before {
+              display: block;
+              content: "x";
+              font-size: 10px;
+              font-weight: bold;
+              line-height: 11px; }
+    html body div#container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      box-sizing: border-box;
+      padding: 40px 20px 20px 20px;
+      width: 100%;
+      height: 100%; }
+      html body div#container section {
+        width: 100%;
+        height: 100%; }
+        html body div#container section#dropZone {
+          box-sizing: border-box;
+          border: 4px dashed #333333;
+          border-radius: 3px;
+          background-image: url("../images/drag-and-drop.svg");
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: 30% auto; }
+          html body div#container section#dropZone p {
+            font-size: 15px;
+            font-weight: bold;
+            color: #555555; }
 
-}
-
-section {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-}
-
-section#dropZone p {
-	
-}
-
-section#dropZone img {
-	min-width: 100px;
-	min-height: 100px;
-}
+/*# sourceMappingURL=app.css.map */
