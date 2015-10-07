@@ -1,6 +1,15 @@
-@charset "utf-8";
-
 @import "reset.scss";
+@import "fonts.scss";
+
+$darkColor: #222222;
+$lightColor: #333333;
+
+$thin: 100;
+$light: 200;
+$normal: 300;
+$medium: 400;
+$bold: 500;
+$black: 600;
 
 $topBarHeight: 34px;
 
@@ -10,7 +19,7 @@ html {
 	height: 100%;
 	border-radius: 3px;
 	font-family: "Roboto", sans-serif;
-	background-color: #333333;
+	background-color: $lightColor;
 	color: #FFFFFF;
 
 	body {
@@ -18,13 +27,15 @@ html {
 		height: 100%;
 
 		header {
-			background-color: #222222;
+			background-color: $darkColor;
 			-webkit-app-region: drag;
 			-webkit-user-select: none;
 
 			h1 {
 				height: $topBarHeight;
-				font-size: 15px;
+				letter-spacing: 1px;
+				font-size: 14px;
+				font-weight: $light;
 				line-height: $topBarHeight;
 				text-align: center;
 				text-transform: capitalize;
@@ -92,17 +103,22 @@ html {
 			left: 0;
 			top: 0;
 			box-sizing: border-box;
-			padding: ($topBarHeight + 10px) 20px 20px 20px;
+			padding: ($topBarHeight + 10px) 20px 70px 20px;
 			width: 100%;
 			height: 100%;
 			
 			section {
 				width: 100%;
 				height: 100%;
+				box-sizing: border-box;
 
 				&#dropZone {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
 					box-sizing: border-box;
-					border: 4px dashed #333333;
+					border: 4px dashed rgba(255,255,255,0.1);
 					border-radius: 3px;
 					background-image: url("../images/drag-and-drop.svg");
 					background-repeat: no-repeat;
@@ -110,15 +126,43 @@ html {
 					background-size: 30% auto;
 
 					p {
-						font-size: 15px;
-						font-weight: bold;
-						color: #555555;
+						margin: 5px 0;
+						text-align: center;
+						text-transform: uppercase;
+						letter-spacing: 1px;
+						color: #777777;
+
+						&.drag {
+							font-size: 17px;
+							font-weight: $medium;
+						}
+
+						&.browse {
+							font-size: 13px;
+							font-weight: $normal;
+
+							a {
+								text-decoration: underline;
+							}
+						}
 					}
 				}
 			}
 		
 			nav {
-				
+				display: flex;
+				flex-direction: row;
+				position: absolute;
+				width: 100%;
+				left: 0;
+				bottom: 0;
+				background-color: $darkColor;
+
+				button {
+					flex-grow: 1;
+					height: 50px;
+					background-color: transparent;
+				}
 			}
 		}
 	}

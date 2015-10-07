@@ -15,6 +15,66 @@ h1, h2, h3, h4, h5, h6 {
 a, button, input[type="submit"] {
   cursor: pointer; }
 
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../fonts/Roboto-Thin.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 100;
+  src: url("../fonts/Roboto-Thin-Italic.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 200;
+  src: url("../fonts/Roboto-Light.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 200;
+  src: url("../fonts/Roboto-Light-Italic.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../fonts/Roboto-Regular.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 300;
+  src: url("../fonts/Roboto-Italic.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/Roboto-Medium.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 400;
+  src: url("../fonts/Roboto-Medium-Italic.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../fonts/Roboto-Bold.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 500;
+  src: url("../fonts/Roboto-Bold-Italic.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../fonts/Roboto-Black.ttf"); }
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 600;
+  src: url("../fonts/Roboto-Black-Italic.ttf"); }
 html {
   overflow: hidden;
   width: 100%;
@@ -32,7 +92,9 @@ html {
       -webkit-user-select: none; }
       html body header h1 {
         height: 34px;
-        font-size: 15px;
+        letter-spacing: 1px;
+        font-size: 14px;
+        font-weight: 200;
         line-height: 34px;
         text-align: center;
         text-transform: capitalize; }
@@ -74,23 +136,50 @@ html {
       left: 0;
       top: 0;
       box-sizing: border-box;
-      padding: 44px 20px 20px 20px;
+      padding: 44px 20px 70px 20px;
       width: 100%;
       height: 100%; }
       html body main section {
         width: 100%;
-        height: 100%; }
+        height: 100%;
+        box-sizing: border-box; }
         html body main section#dropZone {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
           box-sizing: border-box;
-          border: 4px dashed #333333;
+          border: 4px dashed rgba(255, 255, 255, 0.1);
           border-radius: 3px;
           background-image: url("../images/drag-and-drop.svg");
           background-repeat: no-repeat;
           background-position: center center;
           background-size: 30% auto; }
           html body main section#dropZone p {
-            font-size: 15px;
-            font-weight: bold;
-            color: #555555; }
+            margin: 5px 0;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #777777; }
+            html body main section#dropZone p.drag {
+              font-size: 17px;
+              font-weight: 400; }
+            html body main section#dropZone p.browse {
+              font-size: 13px;
+              font-weight: 300; }
+              html body main section#dropZone p.browse a {
+                text-decoration: underline; }
+      html body main nav {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        background-color: #222222; }
+        html body main nav button {
+          flex-grow: 1;
+          height: 50px;
+          background-color: transparent; }
 
 /*# sourceMappingURL=app.css.map */

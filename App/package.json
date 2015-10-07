@@ -3,14 +3,19 @@
 	"version": 0.1,
 	"description": "Convert 3D OBJ files into light images",
 	"keywords": ["3D", "OBJ", "three", "js", "converter"],
+	"author": "Jordan Delcros",
+	"license": "",
 	"main": "index.html",
 	"window": {
+		"show": false,
 		"toolbar": false,
 		"frame": false,
 		"transparent": true,
+		"fullscreen": false,
 		"width": 320,
-		"height": 320,
+		"height": 371,
 		"min_width": 320,
-		"min_height": 320
-	}
+		"min_height": 371
+	},
+	"nodejs": true
 }
