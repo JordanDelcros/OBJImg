@@ -1,0 +1,97 @@
+# Blender MTL File: 'None'
+# Material Count: 8
+
+newmtl 07___Default
+Ns 27.450980
+Ka 0.000000 0.000000 0.000000
+Kd 0.470560 0.470560 0.470560
+Ks 0.954000 0.954000 0.954000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd G:\crysis\Nano_suit\Nanosuit_us_Neck.dds
+map_Bump -bm 0.3000 Map__6_Normal Bump.tga
+map_Ka G:\\crysis\\Nano_suit\\Nanosuit_us_Neck.dds
+
+newmtl Material__59
+Ns 17.647059
+Ka 0.000000 0.000000 0.000000
+Kd 0.401600 0.401600 0.401600
+Ks 1.550000 1.550000 1.550000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\Nano_suit\NanoSuit_us.dds
+map_Bump -bm 0.4000 Map__18_Normal Bump.tga
+map_Ka G:\\crysis\\Nano_suit\\NanoSuit_us.dds
+
+newmtl eye_overlayb01
+Ns 49.019608
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.260000 0.260000 0.260000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\textures\Eye_Lish.dds
+map_Ka G:\\crysis\\textures\\Eye_Lish.dds
+map_d G:\\crysis\\textures\\Eye_Lish.dds
+
+newmtl facesykes01
+Ns 54.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.423520 0.423520 0.423520
+Ks 0.254100 0.254100 0.254100
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\Laurence_barnes_headonly\Sykes.dds
+map_Bump -bm 0.3000 Map__24_Normal Bump.tga
+map_Ka G:\\crysis\\Laurence_barnes_headonly\\Sykes.dds
+
+newmtl glasses_002n01
+Ns 29.411765
+Ka 0.000000 0.000000 0.000000
+Kd 0.069040 0.069040 0.069040
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\Nano_suit\Nanosuit_us_Visorlight.dds
+map_Ka G:\\crysis\\Nano_suit\\Nanosuit_us_Visorlight.dds
+
+newmtl helmet_002na01
+Ns 19.607843
+Ka 0.000000 0.000000 0.000000
+Kd 0.401600 0.401600 0.401600
+Ks 1.450000 1.450000 1.450000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\Nano_suit\Nanosuit_us_Helmet.dds
+map_Bump -bm 0.4000 Map__12_Normal Bump.tga
+map_Ka G:\\crysis\\Nano_suit\\Nanosuit_us_Helmet.dds
+
+newmtl mouthteeth_01
+Ns 13.725490
+Ka 0.000000 0.000000 0.000000
+Kd 0.414080 0.414080 0.414080
+Ks 0.517600 0.517600 0.517600
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\textures\teeth.dds
+map_Bump -bm 0.3000 Map__30_Normal Bump.tga
+map_Ka G:\\crysis\\textures\\teeth.dds
+
+newmtl noneeye_blue01
+Ns 52.941176
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 1.270000 1.270000 1.270000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd G:\crysis\textures\eye_generic.dds
+map_Bump -bm 0.3000 Map__33_Normal Bump.tga
+map_Ka G:\\crysis\\textures\\eye_generic.dds

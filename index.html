@@ -32,13 +32,12 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 50%;
+			width: 10%;
 			height: auto;
 		}
 
 	</style>
-	<script type="text/javascript" src="three-js/build/three.js"></script>
-	<script type="text/javascript" src="three-js/src/loaders/OBJLoader.js"></script>
+	<script type="text/javascript" src="three-js-72/build/three.js"></script>
 	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
 
@@ -89,8 +88,8 @@
 
 			var generatedObject = new Object();
 
-			var objFile = "lara";
-			var imgFile = "lara";
+			var objFile = "harley";
+			var imgFile = "camaro";
 
 			var generatedMesh = null;
 
@@ -104,6 +103,8 @@
 			});
 
 			new OBJImg("models/" + imgFile + ".png", function( datas ){
+
+				console.log(datas);
 
 				var geometry = new THREE.Geometry();
 
@@ -153,7 +154,7 @@
 
 				camera.position.set(0, 0, Math.abs(geometry.boundingBox.min.x - geometry.boundingBox.max.x) * 2);
 
-				var texture =  THREE.ImageUtils.loadTexture("textures/tree.jpg");
+				// var texture =  THREE.ImageUtils.loadTexture("textures/tree.jpg");
 
 				var material = new THREE.MeshPhongMaterial({
 					// map: texture,
