@@ -27,6 +27,7 @@ html {
 		height: 100%;
 
 		header {
+			z-index: 2;
 			background-color: $darkColor;
 			-webkit-app-region: drag;
 			-webkit-user-select: none;
@@ -106,6 +107,7 @@ html {
 			padding: ($topBarHeight + 10px) 20px 70px 20px;
 			width: 100%;
 			height: 100%;
+			-webkit-user-select: none;
 			
 			section {
 				width: 100%;
@@ -120,38 +122,52 @@ html {
 					box-sizing: border-box;
 					border: 4px dashed rgba(255,255,255,0.1);
 					border-radius: 3px;
-					background-image: url("../images/drag-and-drop.svg");
-					background-repeat: no-repeat;
-					background-position: center center;
-					background-size: 30% auto;
 
 					p {
 						margin: 5px 0;
 						text-align: center;
 						text-transform: uppercase;
 						letter-spacing: 1px;
-						color: #777777;
 
 						&.drag {
 							font-size: 17px;
 							font-weight: $medium;
+							color: #CCCCCC;
 						}
 
 						&.browse {
 							font-size: 13px;
 							font-weight: $normal;
+							color: #777777;
 
 							a {
 								text-decoration: underline;
+								transition: color 0.3s ease-out 0s;
+
+								&:hover {
+									color: #CCCCCC;
+								}
 							}
 						}
 					}
 				}
 			}
+
+			img#generated {
+				display: block;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+				width: auto;
+				height: auto;
+			}
 		
 			nav {
+				z-index: 2;
 				display: flex;
 				flex-direction: row;
+				justify-content: space-around;
 				position: absolute;
 				width: 100%;
 				left: 0;
@@ -159,9 +175,30 @@ html {
 				background-color: $darkColor;
 
 				button {
-					flex-grow: 1;
+					width: 50px;
 					height: 50px;
+					opacity: 0.5;
 					background-color: transparent;
+					background-repeat: no-repeat;
+					background-position: center center;
+					background-size: auto 50%;
+					transition: opacity 0.3s ease-out 0s;
+
+					&:hover {
+						opacity: 0.8;
+					}
+
+					&.preview {
+						background-image: url("../images/preview.svg");
+					}
+
+					&.preferences {
+						background-image: url("../images/preferences.svg");
+					}
+
+					&.infos {
+						background-image: url("../images/infos.svg");
+					}
 				}
 			}
 		}

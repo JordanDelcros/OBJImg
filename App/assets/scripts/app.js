@@ -1,4 +1,4 @@
-(function( GUI, FileSystem, window, document ){
+(function( GUI, FileSystem, OBJImg, window, document ){
 
 	"use strict";
 
@@ -21,15 +21,15 @@
 
 			this.name = this.GUI.App.manifest.name;
 
-			this.super.showDevTools();
+			this.setMenu();
+
+			this.openDevelopersTools();
 
 			this.restoreSession();
 
-			this.setMenu();
-
 			this.document.addEventListener("DOMContentLoaded", function( event ){
 
-				this.setEvents();
+				this.setDOM();
 
 			}.bind(this), false);
 
@@ -40,24 +40,29 @@
 		},
 		setMenu: function(){
 
-			var menu = new this.GUI.Menu({
-				type: "menubar"
-			});
+			this.menu = {
+				main: new this.GUI.Menu({
+					type: "menubar"
+				}),
+				tools: {
+					main: new this.GUI.Menu(),
+					devTools: new this.GUI.MenuItem({
+						label: this.getText(["open", "devTools"]),
+						click: this.toggleDevelopersTools.bind(this)
+					})
+				}
+			};
 
-			menu.createMacBuiltin(this.name, {
+			this.menu.main.createMacBuiltin(this.name, {
 				hideEdit: true,
 				hideWindow: true
 			});
 
-			var tools = new this.GUI.Menu();
+			this.menu.tools.main.append(this.menu.tools.devTools);
 
-			tools.append(new this.GUI.MenuItem({
-				label: "custom 1"
-			}));
-
-			menu.append(new this.GUI.MenuItem({
+			this.menu.main.append(new this.GUI.MenuItem({
 				label: this.getText("tools"),
-				submenu: tools
+				submenu: this.menu.tools.main
 			}));
 
 			// complete existing
@@ -65,12 +70,12 @@
 			// 	label: "Préférences"
 			// }), 2);
 
-			this.super.menu = menu;
+			this.super.menu = this.menu.main;
 
 			return this;
 
 		},
-		setEvents: function(){
+		setDOM: function(){
 
 			var quitButton = this.document.querySelector("#quit");
 			var minimizeButton = this.document.querySelector("#minimize");
@@ -100,31 +105,78 @@
 
 			}.bind(this), false);
 
+			this.window.onbeforeunload = function( event ){
+
+				event.preventDefault();
+
+				this.saveSession();
+
+			}.bind(this);
+
 			this.window.addEventListener("dragover", function( event ){
 
 				event.preventDefault();
 
-				console.log("dragover", event);
+				// console.log("dragover", event);
 
-			}, false);
+			}.bind(this), false);
 
 			this.window.addEventListener("dragleave", function( event ){
 
 				event.preventDefault();
+				event.stopPropagation();
 
-				console.log("dragleave", event);
+				// console.log("dragleave", event);
 
-			}, false);
+			}.bind(this), false);
 
 			this.window.addEventListener("drop", function( event ){
 
 				event.preventDefault();
+				event.stopPropagation();
 
-				console.log("drop", event);
+				this.dropFile(event);
 
-			}, false);
+			}.bind(this), false);
+
+			this.generatedImage = this.document.querySelector("#generated");
 
 			return this;
+
+		},
+		dropFile: function( event ){
+
+			var path = event.dataTransfer.files[0].path;
+
+			// var fileInfo = path.split(/\//g);
+			// var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
+
+			FileSystem.readFile(path, "utf-8", function( error, datas ){
+
+				if( error ){
+
+					throw error;
+
+				};
+
+				OBJImg.generateImg(datas, function( datas ){
+
+					var image = new Image();
+					image.src = datas;
+
+					this.setGeneratedImage(image);
+
+				}.bind(this));
+
+			}.bind(this));
+
+		},
+		setGeneratedImage: function( image ){
+
+			this.generatedImage.src = image.src;
+
+			this.generatedImage.width = image.naturalWidth;
+			this.generatedImage.height = image.naturalHeight;
 
 		},
 		fullscreen: function(){
@@ -171,9 +223,57 @@
 			return this;
 
 		},
+		toggleDevelopersTools: function(){
+
+			if( this.super.isDevToolsOpen() == true ){
+
+				this.closeDevelopersTools();
+
+			}
+			else {
+
+				this.openDevelopersTools();
+
+			};
+
+		},
+		openDevelopersTools: function(){
+
+			this.super.showDevTools();
+
+			this.menu.tools.devTools.label = this.getText(["close", "devTools"]);
+
+		},
+		closeDevelopersTools: function(){
+
+			this.super.closeDevTools();
+
+			this.menu.tools.devTools.label = this.getText(["open", "devTools"]);
+
+		},
 		getText: function( label ){
 
-			return this.texts[label];
+			if( typeof label == "string" ){
+
+				label = [label];
+
+			};
+
+			var text = "";
+
+			for( var entry = 0, length = label.length; entry < length; entry++ ){
+
+				if( entry > 0 ){
+
+					text += " ";
+
+				};
+
+				text += this.texts[label[entry]];
+
+			};
+
+			return text.charAt(0).toUpperCase() + text.slice(1);
 
 		}
 	};
@@ -182,4 +282,4 @@
 
 	new App(GUI, window, document);
 
-})(require("nw.gui"), require("fs"), window, document);
+})(require("nw.gui"), require("fs"), OBJImg, window, document);

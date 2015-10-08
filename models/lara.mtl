@@ -1,0 +1,112 @@
+# Blender MTL File: 'None'
+# Material Count: 11
+
+newmtl LaraClothes
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Clothes_D.tga
+
+newmtl LaraEquipment
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Equipment_D.tga
+
+newmtl LaraEye
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Eye_D.tga
+
+newmtl LaraEyeRefl
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Eye_Reflection_D.tga
+
+newmtl LaraEyebrowEyelash
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Eyebrows_Eyelashes_D.tga
+
+newmtl LaraHair
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Hair_D.tga
+
+newmtl LaraHairTie
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Hair_Tie_D.tga
+
+newmtl LaraHead
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Head_D.tga
+
+newmtl LaraSkin
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Lara_Skin_D.tga
+
+newmtl PistolLegs
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.100000 0.100000 0.100000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Pistol_D.tga
+
+newmtl pistol
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.100000 0.100000 0.100000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/JordanDelcros/Downloads/Lara_Craft/Pistol_D.tga

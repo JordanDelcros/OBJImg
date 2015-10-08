@@ -1,8 +1,14 @@
 {
 	"fr": {
-		"tools": "outils"
+		"tools": "outils",
+		"devTools": "les outils de développeurs",
+		"open": "ouvrir",
+		"close": "fermer"
 	},
 	"en": {
-		"tools": "tools"
+		"tools": "tools",
+		"devTools": "developers tools",
+		"open": "open",
+		"close": "close"
 	}
 }

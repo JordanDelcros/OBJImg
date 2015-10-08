@@ -7,7 +7,8 @@
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-  -webkit-appearance: none; }
+  -webkit-appearance: none;
+  cursor: default !important; }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: normal; }
@@ -87,6 +88,7 @@ html {
     width: 100%;
     height: 100%; }
     html body header {
+      z-index: 2;
       background-color: #222222;
       -webkit-app-region: drag;
       -webkit-user-select: none; }
@@ -138,7 +140,8 @@ html {
       box-sizing: border-box;
       padding: 44px 20px 70px 20px;
       width: 100%;
-      height: 100%; }
+      height: 100%;
+      -webkit-user-select: none; }
       html body main section {
         width: 100%;
         height: 100%;
@@ -150,36 +153,59 @@ html {
           justify-content: center;
           box-sizing: border-box;
           border: 4px dashed rgba(255, 255, 255, 0.1);
-          border-radius: 3px;
-          background-image: url("../images/drag-and-drop.svg");
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: 30% auto; }
+          border-radius: 3px; }
           html body main section#dropZone p {
             margin: 5px 0;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #777777; }
+            letter-spacing: 1px; }
             html body main section#dropZone p.drag {
               font-size: 17px;
-              font-weight: 400; }
+              font-weight: 400;
+              color: #CCCCCC; }
             html body main section#dropZone p.browse {
               font-size: 13px;
-              font-weight: 300; }
+              font-weight: 300;
+              color: #777777; }
               html body main section#dropZone p.browse a {
-                text-decoration: underline; }
+                text-decoration: underline;
+                transition: color 0.3s ease-out 0s; }
+                html body main section#dropZone p.browse a:hover {
+                  color: #CCCCCC; }
+      html body main img#generated {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: auto;
+        height: auto; }
       html body main nav {
+        z-index: 2;
         display: flex;
         flex-direction: row;
+        justify-content: space-around;
         position: absolute;
         width: 100%;
         left: 0;
         bottom: 0;
         background-color: #222222; }
         html body main nav button {
-          flex-grow: 1;
+          width: 50px;
           height: 50px;
-          background-color: transparent; }
+          opacity: 0.5;
+          background-color: transparent;
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: auto 50%;
+          transition: opacity 0.3s ease-out 0s; }
+          html body main nav button:hover {
+            opacity: 0.8; }
+          html body main nav button.preview {
+            background-image: url("../images/preview.svg"); }
+          html body main nav button.preferences {
+            background-image: url("../images/preferences.svg"); }
+          html body main nav button.infos {
+            background-image: url("../images/infos.svg"); }
 
 /*# sourceMappingURL=app.css.map */
