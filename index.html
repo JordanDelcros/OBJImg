@@ -32,6 +32,8 @@
 			position: absolute;
 			top: 0;
 			left: 0;
+			width: 50%;
+			height: auto;
 		}
 
 	</style>
@@ -92,11 +94,14 @@
 
 			var generatedMesh = null;
 
-			// var image = OBJImg.generateImg("models/" + objFile + ".obj", function( datas ){
+			var image = OBJImg.generateImg("models/" + objFile + ".obj", function( datas ){
 
-			// 	document.body.appendChild(datas);
+				var image = new Image();
+				image.src = datas;
 
-			// });
+				document.body.appendChild(image);
+
+			});
 
 			new OBJImg("models/" + imgFile + ".png", function( datas ){
 
@@ -151,11 +156,19 @@
 				var texture =  THREE.ImageUtils.loadTexture("textures/tree.jpg");
 
 				var material = new THREE.MeshPhongMaterial({
-					map: texture,
+					// map: texture,
 					lights: true
 				});
 
 				var mesh = generatedMesh = new THREE.Mesh(geometry, material);
+
+				// var material = new THREE.PointCloudMaterial({
+				// 	size: 0.01
+				// });
+
+				// var mesh = generatedMesh = new THREE.PointCloud(geometry, material);
+
+				mesh.position.set(0, -2, 0);
 
 				scene.add(mesh);
 
