@@ -29,7 +29,11 @@
 
 			this.document.addEventListener("DOMContentLoaded", function( event ){
 
-				this.setDOM();
+				this.setView();
+
+				this.setEvents();
+
+				this.window.requestAnimationFrame(this.renderView.bind(this));
 
 			}.bind(this), false);
 
@@ -75,13 +79,44 @@
 			return this;
 
 		},
-		setDOM: function(){
+		setView: function(){
 
-			var quitButton = this.document.querySelector("#quit");
-			var minimizeButton = this.document.querySelector("#minimize");
-			var fullscreenButton = this.document.querySelector("#fullscreen");
+			this.quitButton = this.document.querySelector("#quit");
+			this.minimizeButton = this.document.querySelector("#minimize");
+			this.fullscreenButton = this.document.querySelector("#fullscreen");
 
-			quitButton.addEventListener("click", function( event ){
+			this.canvas = this.document.querySelector("canvas");
+
+			this.renderer = new THREE.WebGLRenderer({
+				canvas: this.canvas,
+				precision: "highp",
+				antialias: true,
+				alpha: true
+			});
+
+			this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+
+			this.canvasAspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
+
+			this.camera = new THREE.PerspectiveCamera(75, this.canvasAspect, 0.1, 10000);
+
+			this.camera.position.set(0, 0, 2);
+
+			this.scene = new THREE.Scene();
+
+			this.light = new THREE.PointLight(0xFFFFFF);
+			this.light.position.set(10, 10, 10);
+			this.scene.add(this.light);
+
+			this.hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
+			this.scene.add(this.hemisphereLight);
+
+			return this;
+
+		},
+		setEvents: function(){
+
+			this.quitButton.addEventListener("click", function( event ){
 
 				event.preventDefault();
 
@@ -89,7 +124,7 @@
 
 			}.bind(this), false);
 
-			minimizeButton.addEventListener("click", function( event ){
+			this.minimizeButton.addEventListener("click", function( event ){
 
 				event.preventDefault();
 
@@ -97,7 +132,7 @@
 
 			}.bind(this), false);
 
-			fullscreenButton.addEventListener("click", function( event ){
+			this.fullscreenButton.addEventListener("click", function( event ){
 
 				event.preventDefault();
 
@@ -117,16 +152,12 @@
 
 				event.preventDefault();
 
-				// console.log("dragover", event);
-
 			}.bind(this), false);
 
 			this.window.addEventListener("dragleave", function( event ){
 
 				event.preventDefault();
 				event.stopPropagation();
-
-				// console.log("dragleave", event);
 
 			}.bind(this), false);
 
@@ -139,17 +170,46 @@
 
 			}.bind(this), false);
 
-			this.generatedImage = this.document.querySelector("#generated");
+			this.window.addEventListener("resize", function( event ){
 
-			return this;
+				this.canvas.style.width = this.canvas.style.height = "";
+
+				var width = this.canvas.offsetWidth;
+				var height = this.canvas.offsetHeight;
+
+				if( this.geometry ){
+
+					var objectWidth = Math.abs(this.geometry.boundingBox.min.x - this.geometry.boundingBox.max.x);
+					var objectHeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
+					var objectWeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
+
+					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.8 / Math.tan(Math.PI * this.camera.fov / 360);
+
+					this.camera.position.z = distance;
+
+				};
+
+				this.renderer.setSize(width, height);
+				this.camera.aspect = width / height;
+
+				this.camera.updateProjectionMatrix();
+
+			}.bind(this), false);
+
+		},
+		renderView: function( now ){
+
+			this.window.requestAnimationFrame(this.renderView.bind(this));
+
+			this.renderer.render(this.scene, this.camera);
 
 		},
 		dropFile: function( event ){
 
 			var path = event.dataTransfer.files[0].path;
 
-			// var fileInfo = path.split(/\//g);
-			// var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
+			var filePath = path.split(/\//g);
+			var fileName = filePath[filePath.length - 1].split(/\./)[0];
 
 			FileSystem.readFile(path, "utf-8", function( error, datas ){
 
@@ -164,19 +224,47 @@
 					var image = new Image();
 					image.src = datas;
 
-					this.setGeneratedImage(image);
+					FileSystem.writeFile(filePath.splice(0, filePath.length - 1).join("/") + "/" + fileName + ".obj.png", datas.replace(/^data:image\/png;base64/, ""), "base64", function( error ){
+
+						if( error ){
+
+							console.error("Cant save PNG file.");
+
+						};
+
+					});
+
+					this.displayObject(image);
 
 				}.bind(this));
 
 			}.bind(this));
 
 		},
-		setGeneratedImage: function( image ){
+		displayObject: function( image ){
 
-			this.generatedImage.src = image.src;
+			this.scene.remove(this.mesh);
 
-			this.generatedImage.width = image.naturalWidth;
-			this.generatedImage.height = image.naturalHeight;
+			this.geometry = new OBJImg(image).getGeometry();
+
+			var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
+
+			this.material = new THREE.MeshPhongMaterial({
+				color: 0x222222,
+				side: THREE.FrontSide,
+				shading: THREE.SmoothShading
+			});
+
+			this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+			this.mesh.position.set(-center.x, -center.y, -center.z);
+
+			this.scene.add(this.mesh);
+
+			var event = new Event("Event");
+			event.initEvent("resize", false, false);
+
+			this.window.dispatchEvent(event);
 
 		},
 		fullscreen: function(){

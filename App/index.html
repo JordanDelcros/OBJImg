@@ -4,7 +4,8 @@
 	<meta charset="utf-8"/>
 	<title>OBJImg</title>
 	<link type="text/css" rel="stylesheet" media="all" href="assets/styles/app.css"/>
-	<script type="text/javascript" src="assets/scripts/vendors/objimg.js"></script>
+	<script type="text/javascript" src="assets/scripts/vendors/three-js-72/build/three.js"></script>
+	<script type="text/javascript" src="../objimg.js"></script>
 	<script type="text/javascript" src="assets/scripts/app.js"></script>
 </head>
 <body>
@@ -17,16 +18,16 @@
 		</nav>
 	</header>
 	<main>
+		<canvas></canvas>
 		<section id="dropZone">
 			<p class="drag">Drag and drop</p>
-			<p class="browse">or <a>browse</a></p>
+			<!-- <p class="browse">or <a>browse</a></p> -->
 		</section>
-		<img id="generated"/>
-		<nav>
-			<button class="preview"></button>
-			<button class="preferences"></button>
-			<button class="infos"></button>
-		</nav>
 	</main>
+	<nav id="main">
+		<button class="preview"></button>
+		<button class="preferences"></button>
+		<button class="infos"></button>
+	</nav>
 </body>
 </html>

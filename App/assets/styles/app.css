@@ -85,10 +85,16 @@ html {
   background-color: #333333;
   color: #FFFFFF; }
   html body {
+    padding: 54px 20px 70px 20px;
     width: 100%;
-    height: 100%; }
+    height: 100%;
+    box-sizing: border-box; }
     html body header {
       z-index: 2;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
       background-color: #222222;
       -webkit-app-region: drag;
       -webkit-user-select: none; }
@@ -134,14 +140,19 @@ html {
             border: 1px solid #14af3f;
             background-color: #26ce51; }
     html body main {
-      position: absolute;
-      left: 0;
-      top: 0;
       box-sizing: border-box;
-      padding: 44px 20px 70px 20px;
       width: 100%;
       height: 100%;
       -webkit-user-select: none; }
+      html body main canvas {
+        z-index: 3;
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent; }
       html body main section {
         width: 100%;
         height: 100%;
@@ -180,32 +191,32 @@ html {
         transform: translateX(-50%) translateY(-50%);
         width: auto;
         height: auto; }
-      html body main nav {
-        z-index: 2;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        position: absolute;
-        width: 100%;
-        left: 0;
-        bottom: 0;
-        background-color: #222222; }
-        html body main nav button {
-          width: 50px;
-          height: 50px;
-          opacity: 0.5;
-          background-color: transparent;
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: auto 50%;
-          transition: opacity 0.3s ease-out 0s; }
-          html body main nav button:hover {
-            opacity: 0.8; }
-          html body main nav button.preview {
-            background-image: url("../images/preview.svg"); }
-          html body main nav button.preferences {
-            background-image: url("../images/preferences.svg"); }
-          html body main nav button.infos {
-            background-image: url("../images/infos.svg"); }
+    html body nav#main {
+      z-index: 2;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      bottom: 0;
+      background-color: #222222; }
+      html body nav#main button {
+        width: 50px;
+        height: 50px;
+        opacity: 0.5;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: auto 50%;
+        transition: opacity 0.3s ease-out 0s; }
+        html body nav#main button:hover {
+          opacity: 0.8; }
+        html body nav#main button.preview {
+          background-image: url("../images/preview.svg"); }
+        html body nav#main button.preferences {
+          background-image: url("../images/preferences.svg"); }
+        html body nav#main button.infos {
+          background-image: url("../images/infos.svg"); }
 
 /*# sourceMappingURL=app.css.map */

@@ -12,189 +12,118 @@
 		constructor: OBJImg,
 		init: function( path, onLoad ){
 
-			var image = new Image();
+			this.datas = null;
 
-			image.addEventListener("load", function( event ){
+			if( path instanceof Image ){
 
-				var canvas = document.createElement("canvas");
-				var context = canvas.getContext("2d");
+				if( path.complete == true ){
 
-				canvas.width = image.naturalWidth;
-				canvas.height = image.naturalHeight;
+					this.datas = convertImgToObj.call(this, path);
 
-				context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+					if( onLoad instanceof Function ){
 
-				this.pixels = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
-
-				var pixelIndex = 0;
-
-				var vertexSplitting = this.getPixelValue(pixelIndex++);
-				var textureSplitting = this.getPixelValue(pixelIndex++);
-				var normalSplitting = this.getPixelValue(pixelIndex++);
-				var faceSplitting = this.getPixelValue(pixelIndex++);
-
-				var vertexCount = 0;
-
-				for( var pass = 0; pass < vertexSplitting; pass++ ){
-
-					vertexCount += this.getPixelValue(pixelIndex++);
-
-				};
-
-				var vertices = new Array(vertexCount);
-
-				var textureCount = 0;
-
-				for( var pass = 0; pass < textureSplitting; pass++ ){
-
-					textureCount += this.getPixelValue(pixelIndex++);
-
-				};
-
-				var textures = new Array(textureCount);
-
-				var normalCount = 0;
-
-				for( var pass = 0; pass < normalSplitting; pass++ ){
-
-					normalCount += this.getPixelValue(pixelIndex++);
-
-				};
-
-				var normals = new Array(normalCount);
-
-				var faceCount = 0;
-
-				for( var pass = 0; pass < faceSplitting; pass++ ){
-
-					faceCount += this.getPixelValue(pixelIndex++);
-
-				};
-
-				var faces = new Array(faceCount);
-
-				var vertexMultiplicator = this.getPixelValue(pixelIndex++);
-				var textureMultiplicator = this.getPixelValue(pixelIndex++);
-				var textureOffset = this.getPixelValue(pixelIndex++) / textureMultiplicator;
-
-				console.warn("split", vertexSplitting, textureSplitting, normalSplitting, faceSplitting, vertices.length, textures.length, normals.length, faces.length, "multi", vertexMultiplicator, textureMultiplicator, textureOffset);
-
-				var pivot = {
-					x: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
-					y: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
-					z: this.getPixelValue(pixelIndex++) / vertexMultiplicator
-				};
-
-				for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += 3 ){
-
-					var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - pivot.x;
-					var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - pivot.y;
-					var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - pivot.z;
-
-					vertices[vertex] = {
-						x: x,
-						y: y,
-						z: z
-					};
-
-				};
-
-				for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += 2 ){
-
-					var u = (this.getPixelValue(pixelIndex) / textureMultiplicator) - textureOffset;
-					var v = (this.getPixelValue(pixelIndex + 1) / textureMultiplicator) - textureOffset;
-
-					textures[texture] = {
-						u: u,
-						v: v
-					};
-
-				};
-
-				for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += 3 ){
-
-					var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - 1;
-					var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - 1;
-					var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - 1;
-
-					normals[normal] = {
-						x: x,
-						y: y,
-						z: z
-					};
-
-				};
-
-				for( var face = 0, length = faces.length; face < length; face++, pixelIndex += ((3 * vertexSplitting) + (3 * textureSplitting) + (3 * normalSplitting)) ){
-
-					var va = 0;
-					var vb = 0;
-					var vc = 0;
-
-					for( var pass = 0; pass < vertexSplitting; pass++ ){
-
-						va += this.getPixelValue(pixelIndex + pass);
-						vb += this.getPixelValue(pixelIndex + vertexSplitting + pass);
-						vc += this.getPixelValue(pixelIndex + (2 * vertexSplitting) + pass);
+						onLoad(this.datas);
 
 					};
 
-					var ta = 0;
-					var tb = 0;
-					var tc = 0;
+				}
+				else {
 
-					for( var pass = 0; pass < textureSplitting; pass++ ){
+					path.addEventListener("load", function( event ){
 
-						ta += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + pass);
-						tb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + textureSplitting + pass);
-						tc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (2 * textureSplitting) + pass);
+						this.datas = convertImgToObj.call(this, path);
 
-					};
+						if( onLoad instanceof Function ){
 
-					var na = 0;
-					var nb = 0;
-					var nc = 0;
+							onLoad(this.datas);
 
-					for( var pass = 0; pass < normalSplitting; pass++ ){
+						};
 
-						na += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + pass);
-						nb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + normalSplitting + pass);
-						nc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + (2 * normalSplitting) + pass);
-
-					};
-
-					faces[face] = {
-						vertices: {
-							a: va,
-							b: vb,
-							c: vc
-						},
-						textures: {
-							a: ta,
-							b: tb,
-							c: tc
-						},
-						normals: {
-							a: na,
-							b: nb,
-							c: nc
-						}
-					};
+					}.bind(this), false);
 
 				};
 
-				onLoad({
-					vertices: vertices,
-					textures: textures,
-					normals: normals,
-					faces: faces
-				});
+			}
+			else {
 
-			}.bind(this), false);
+				var image = new Image();
 
-			image.src = path;
+				image.addEventListener("load", function( event ){
+
+					this.datas = convertImgToObj.call(this, image);
+
+					if( onLoad instanceof Function ){
+
+							onLoad(this.datas);
+
+						};
+
+				}.bind(this), false);
+
+				image.src = path;
+
+			};
 
 			return this;
+
+		},
+		getGeometry: function(){
+
+			var geometry = new THREE.Geometry();
+
+			if( this.datas != null ){
+
+				for( var vertex = 0, length = this.datas.vertices.length; vertex < length; vertex++ ){
+
+					geometry.vertices.push(new THREE.Vector3(this.datas.vertices[vertex].x, this.datas.vertices[vertex].y, this.datas.vertices[vertex].z));
+
+				};
+
+				for( var face = 0, length = this.datas.faces.length; face < length; face++ ){
+
+					var vertexA = this.datas.faces[face].vertices.a;
+					var vertexB = this.datas.faces[face].vertices.b;
+					var vertexC = this.datas.faces[face].vertices.c;
+
+					var normals = null;
+
+					if( this.datas.normals.length > 0 ){
+
+						normals = [
+							this.datas.normals[this.datas.faces[face].normals.a],
+							this.datas.normals[this.datas.faces[face].normals.b],
+							this.datas.normals[this.datas.faces[face].normals.c],
+						];
+
+					};
+
+					geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
+
+					if( this.datas.textures.length > 0 ){
+
+						var uvA = this.datas.textures[this.datas.faces[face].textures.a];
+						var uvB = this.datas.textures[this.datas.faces[face].textures.b];
+						var uvC = this.datas.textures[this.datas.faces[face].textures.c];
+
+						if( uvA && uvB && uvC ){
+
+							geometry.faceVertexUvs[0].push([
+								new THREE.Vector2(uvA.u, uvA.v),
+								new THREE.Vector2(uvB.u, uvB.v),
+								new THREE.Vector2(uvC.u, uvC.v)
+							]);
+
+						};
+
+					};
+
+				};
+
+			};
+
+			geometry.computeBoundingBox();
+
+			return geometry;
 
 		},
 		getPixelColor: function( index ){
@@ -221,13 +150,6 @@
 			var b = Math.floor(value - (r * g));
 			var a = ((r * g) + b) > 0 ? 1 : 0;
 
-			// if( g > 255 ){
-
-			// 	b += Math.abs(255 - g);
-			// 	g = 255;
-
-			// };
-
 			return {
 				r: r,
 				g: g,
@@ -244,6 +166,224 @@
 	};
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
+
+	OBJImg.generateImg = function( path, onLoad ){
+
+		var isURL = !path.match(/[\n\s]/);
+
+		var fileInfo = path.split(/\//g);
+		var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
+
+		if( isURL ){
+
+			var xhr = new XMLHttpRequest();
+
+			xhr.addEventListener("readystatechange", function( event ){
+
+				if( xhr.readyState == 4 && xhr.status >= 200 && xhr.status < 400 ){
+
+					obj = xhr.responseText;
+
+					onLoad(convertObjToImg(obj));
+
+				}
+				else if( xhr.readyState == 4 ){
+
+					console.error("Cant load obj");
+
+				};
+
+			}, false);
+
+			xhr.open("GET", path, true);
+			xhr.send(null);
+
+		}
+		else {
+
+			onLoad(convertObjToImg(path));
+
+		};
+
+		return this;
+
+	};
+
+	function convertImgToObj( image ){
+
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
+
+		canvas.width = image.naturalWidth;
+		canvas.height = image.naturalHeight;
+
+		context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+
+		this.pixels = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
+
+		var pixelIndex = 0;
+
+		var vertexSplitting = this.getPixelValue(pixelIndex++);
+		var textureSplitting = this.getPixelValue(pixelIndex++);
+		var normalSplitting = this.getPixelValue(pixelIndex++);
+		var faceSplitting = this.getPixelValue(pixelIndex++);
+
+		var vertexCount = 0;
+
+		for( var pass = 0; pass < vertexSplitting; pass++ ){
+
+			vertexCount += this.getPixelValue(pixelIndex++);
+
+		};
+
+		var vertices = new Array(vertexCount);
+
+		var textureCount = 0;
+
+		for( var pass = 0; pass < textureSplitting; pass++ ){
+
+			textureCount += this.getPixelValue(pixelIndex++);
+
+		};
+
+		var textures = new Array(textureCount);
+
+		var normalCount = 0;
+
+		for( var pass = 0; pass < normalSplitting; pass++ ){
+
+			normalCount += this.getPixelValue(pixelIndex++);
+
+		};
+
+		var normals = new Array(normalCount);
+
+		var faceCount = 0;
+
+		for( var pass = 0; pass < faceSplitting; pass++ ){
+
+			faceCount += this.getPixelValue(pixelIndex++);
+
+		};
+
+		var faces = new Array(faceCount);
+
+		var vertexMultiplicator = this.getPixelValue(pixelIndex++);
+		var textureMultiplicator = this.getPixelValue(pixelIndex++);
+		var textureOffset = this.getPixelValue(pixelIndex++) / textureMultiplicator;
+
+		var pivot = {
+			x: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
+			y: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
+			z: this.getPixelValue(pixelIndex++) / vertexMultiplicator
+		};
+
+		for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += 3 ){
+
+			var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - pivot.x;
+			var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - pivot.y;
+			var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - pivot.z;
+
+			vertices[vertex] = {
+				x: x,
+				y: y,
+				z: z
+			};
+
+		};
+
+		for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += 2 ){
+
+			var u = (this.getPixelValue(pixelIndex) / textureMultiplicator) - textureOffset;
+			var v = (this.getPixelValue(pixelIndex + 1) / textureMultiplicator) - textureOffset;
+
+			textures[texture] = {
+				u: u,
+				v: v
+			};
+
+		};
+
+		for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += 3 ){
+
+			var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - 1;
+			var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - 1;
+			var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - 1;
+
+			normals[normal] = {
+				x: x,
+				y: y,
+				z: z
+			};
+
+		};
+
+		for( var face = 0, length = faces.length; face < length; face++, pixelIndex += ((3 * vertexSplitting) + (3 * textureSplitting) + (3 * normalSplitting)) ){
+
+			var va = 0;
+			var vb = 0;
+			var vc = 0;
+
+			for( var pass = 0; pass < vertexSplitting; pass++ ){
+
+				va += this.getPixelValue(pixelIndex + pass);
+				vb += this.getPixelValue(pixelIndex + vertexSplitting + pass);
+				vc += this.getPixelValue(pixelIndex + (2 * vertexSplitting) + pass);
+
+			};
+
+			var ta = 0;
+			var tb = 0;
+			var tc = 0;
+
+			for( var pass = 0; pass < textureSplitting; pass++ ){
+
+				ta += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + pass);
+				tb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + textureSplitting + pass);
+				tc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (2 * textureSplitting) + pass);
+
+			};
+
+			var na = 0;
+			var nb = 0;
+			var nc = 0;
+
+			for( var pass = 0; pass < normalSplitting; pass++ ){
+
+				na += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + pass);
+				nb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + normalSplitting + pass);
+				nc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + (2 * normalSplitting) + pass);
+
+			};
+
+			faces[face] = {
+				vertices: {
+					a: va,
+					b: vb,
+					c: vc
+				},
+				textures: {
+					a: ta,
+					b: tb,
+					c: tc
+				},
+				normals: {
+					a: na,
+					b: nb,
+					c: nc
+				}
+			};
+
+		};
+
+		return {
+			vertices: vertices,
+			textures: textures,
+			normals: normals,
+			faces: faces
+		};
+
+	};
 
 	function convertObjToImg( obj ){
 
@@ -750,51 +890,7 @@
 
 		};
 
-		console.info("split", vertexSplitting, textureSplitting, normalSplitting, vertices.length, textures.length, normals.length, faces.length, "multi", vertexMultiplicator, textureMultiplicator);
-
 		return canvas.toDataURL("image/png", 1.0);
-
-	};
-
-	OBJImg.generateImg = function( path, onLoad ){
-
-		var isURL = !path.match(/[\n\s]/);
-
-		var fileInfo = path.split(/\//g);
-		var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
-
-		if( isURL ){
-
-			var xhr = new XMLHttpRequest();
-
-			xhr.addEventListener("readystatechange", function( event ){
-
-				if( xhr.readyState == 4 && xhr.status >= 200 && xhr.status < 400 ){
-
-					obj = xhr.responseText;
-
-					onLoad(convertObjToImg(obj));
-
-				}
-				else if( xhr.readyState == 4 ){
-
-					console.error("Cant load obj");
-
-				};
-
-			}, false);
-
-			xhr.open("GET", path, true);
-			xhr.send(null);
-
-		}
-		else {
-
-			onLoad(convertObjToImg(path));
-
-		};
-
-		return this;
 
 	};
 

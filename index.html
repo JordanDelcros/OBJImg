@@ -88,21 +88,21 @@
 
 			var generatedObject = new Object();
 
-			var objFile = "harley";
-			var imgFile = "camaro";
+			var objFile = "altair";
+			var imgFile = "jet";
 
 			var generatedMesh = null;
 
-			var image = OBJImg.generateImg("models/" + objFile + ".obj", function( datas ){
+			// var image = OBJImg.generateImg("models/" + objFile + ".obj", function( datas ){
 
-				var image = new Image();
-				image.src = datas;
+			// 	var image = new Image();
+			// 	image.src = datas;
 
-				document.body.appendChild(image);
+			// 	document.body.appendChild(image);
 
-			});
+			// });
 
-			new OBJImg("models/" + imgFile + ".png", function( datas ){
+			new OBJImg("models/" + imgFile + ".obj.png", function( datas ){
 
 				console.log(datas);
 
@@ -140,11 +140,15 @@
 						var uvB = datas.textures[datas.faces[face].textures.b];
 						var uvC = datas.textures[datas.faces[face].textures.c];
 
-						geometry.faceVertexUvs[0].push([
-							new THREE.Vector2(uvA.u, uvA.v),
-							new THREE.Vector2(uvB.u, uvB.v),
-							new THREE.Vector2(uvC.u, uvC.v)
-						]);
+						if( uvA && uvB && uvC ){
+
+							geometry.faceVertexUvs[0].push([
+								new THREE.Vector2(uvA.u, uvA.v),
+								new THREE.Vector2(uvB.u, uvB.v),
+								new THREE.Vector2(uvC.u, uvC.v)
+							]);
+
+						};
 
 					};
 
@@ -157,8 +161,8 @@
 				// var texture =  THREE.ImageUtils.loadTexture("textures/tree.jpg");
 
 				var material = new THREE.MeshPhongMaterial({
-					// map: texture,
-					lights: true
+					color: 0x555555,
+					shading: THREE.SmoothShading
 				});
 
 				var mesh = generatedMesh = new THREE.Mesh(geometry, material);

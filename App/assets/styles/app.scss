@@ -11,7 +11,7 @@ $medium: 400;
 $bold: 500;
 $black: 600;
 
-$topBarHeight: 34px;
+$barHeight: 34px;
 
 html {
 	overflow: hidden;
@@ -23,21 +23,27 @@ html {
 	color: #FFFFFF;
 
 	body {
+		padding: ($barHeight + 20px) 20px 70px 20px;
 		width: 100%;
 		height: 100%;
+		box-sizing: border-box;
 
 		header {
 			z-index: 2;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
 			background-color: $darkColor;
 			-webkit-app-region: drag;
 			-webkit-user-select: none;
 
 			h1 {
-				height: $topBarHeight;
+				height: $barHeight;
 				letter-spacing: 1px;
 				font-size: 14px;
 				font-weight: $light;
-				line-height: $topBarHeight;
+				line-height: $barHeight;
 				text-align: center;
 				text-transform: capitalize;
 			}
@@ -100,14 +106,22 @@ html {
 		
 
 		main {
-			position: absolute;
-			left: 0;
-			top: 0;
 			box-sizing: border-box;
-			padding: ($topBarHeight + 10px) 20px 70px 20px;
+			// padding: 20px 20px 70px 20px;
 			width: 100%;
 			height: 100%;
 			-webkit-user-select: none;
+
+			canvas {
+				z-index: 3;
+				display: block;
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: transparent;
+			}
 			
 			section {
 				width: 100%;
@@ -162,43 +176,43 @@ html {
 				width: auto;
 				height: auto;
 			}
-		
-			nav {
-				z-index: 2;
-				display: flex;
-				flex-direction: row;
-				justify-content: space-around;
-				position: absolute;
-				width: 100%;
-				left: 0;
-				bottom: 0;
-				background-color: $darkColor;
+		}
 
-				button {
-					width: 50px;
-					height: 50px;
-					opacity: 0.5;
-					background-color: transparent;
-					background-repeat: no-repeat;
-					background-position: center center;
-					background-size: auto 50%;
-					transition: opacity 0.3s ease-out 0s;
+		nav#main {
+			z-index: 2;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+			position: absolute;
+			width: 100%;
+			left: 0;
+			bottom: 0;
+			background-color: $darkColor;
 
-					&:hover {
-						opacity: 0.8;
-					}
+			button {
+				width: 50px;
+				height: 50px;
+				opacity: 0.5;
+				background-color: transparent;
+				background-repeat: no-repeat;
+				background-position: center center;
+				background-size: auto 50%;
+				transition: opacity 0.3s ease-out 0s;
 
-					&.preview {
-						background-image: url("../images/preview.svg");
-					}
+				&:hover {
+					opacity: 0.8;
+				}
 
-					&.preferences {
-						background-image: url("../images/preferences.svg");
-					}
+				&.preview {
+					background-image: url("../images/preview.svg");
+				}
 
-					&.infos {
-						background-image: url("../images/infos.svg");
-					}
+				&.preferences {
+					background-image: url("../images/preferences.svg");
+				}
+
+				&.infos {
+					background-image: url("../images/infos.svg");
 				}
 			}
 		}
