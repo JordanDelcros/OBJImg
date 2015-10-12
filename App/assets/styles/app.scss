@@ -124,6 +124,7 @@ html {
 			}
 			
 			section {
+				position: absolute;
 				width: 100%;
 				height: 100%;
 				box-sizing: border-box;
@@ -203,15 +204,15 @@ html {
 					opacity: 0.8;
 				}
 
-				&.preview {
+				&[href="#preview"] {
 					background-image: url("../images/preview.svg");
 				}
 
-				&.preferences {
+				&[href="#preferences"] {
 					background-image: url("../images/preferences.svg");
 				}
 
-				&.infos {
+				&[href="#infos"] {
 					background-image: url("../images/infos.svg");
 				}
 			}

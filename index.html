@@ -88,13 +88,13 @@
 
 			var generatedObject = new Object();
 
-			var imgFile = "lara";
+			var imgFile = "camaro";
 
 			var generatedMesh = null;
 
-			new OBJImg("models/" + imgFile + ".obj.png", function( datas ){
+			new OBJImg("models/" + imgFile + ".obj.png", true, function( datas ){
 
-				console.log(datas);
+				// console.log(datas);
 
 				var geometry = new THREE.Geometry();
 

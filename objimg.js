@@ -2,27 +2,63 @@
 
 	var MAX = (255 * 255) + 255;
 
-	var OBJImg = function( path, onLoad ){
+	var OBJImg = function( path, useWorker, onLoad ){
 
-		return new OBJImg.fn.init(path, onLoad);
+		return new OBJImg.fn.init(path, useWorker, onLoad);
 
 	};
 
 	OBJImg.fn = OBJImg.prototype = {
 		constructor: OBJImg,
-		init: function( path, onLoad ){
+		init: function( path, useWorker, onLoad ){
 
 			this.datas = null;
+
+			this.canvas = document.createElement("canvas");
+			this.context = this.canvas.getContext("2d");
+
+			if( useWorker == true ){
+
+				var worker = new Worker("objimg-worker.js");
+
+				worker.addEventListener("message", function( event ){
+
+					this.datas = event.data;
+
+					if( onLoad instanceof Function ){
+
+						onLoad(this.datas);
+
+					};
+
+				}.bind(this), false);
+
+				worker.addEventListener("error", function( event ){
+
+					console.log("worker error");
+
+				}.bind(this), false);
+
+			};
 
 			if( path instanceof Image ){
 
 				if( path.complete == true ){
 
-					this.datas = convertImgToObj.call(this, path);
+					if( useWorker == true ){
 
-					if( onLoad instanceof Function ){
+						worker.postMessage(["convertImgToObj", this.getPixels(path)]);
 
-						onLoad(this.datas);
+					}
+					else {
+
+						this.datas = OBJImg.convertImgToObj(this.getPixels(path));
+
+						if( onLoad instanceof Function ){
+
+							onLoad(this.datas);
+
+						};
 
 					};
 
@@ -31,11 +67,20 @@
 
 					path.addEventListener("load", function( event ){
 
-						this.datas = convertImgToObj.call(this, path);
+						if( useWorker == true ){
 
-						if( onLoad instanceof Function ){
+							worker.postMessage(["convertImgToObj", this.getPixels(path)]);
 
-							onLoad(this.datas);
+						}
+						else {
+
+							this.datas = OBJImg.convertImgToObj(this.getPixels(path));
+
+							if( onLoad instanceof Function ){
+
+								onLoad(this.datas);
+
+							};
 
 						};
 
@@ -50,13 +95,22 @@
 
 				image.addEventListener("load", function( event ){
 
-					this.datas = convertImgToObj.call(this, image);
+					if( useWorker == true ){
 
-					if( onLoad instanceof Function ){
+						worker.postMessage(["convertImgToObj", this.getPixels(image)]);
+
+					}
+					else {
+
+						this.datas = OBJImg.convertImgToObj(this.getPixels(image));
+
+						if( onLoad instanceof Function ){
 
 							onLoad(this.datas);
 
 						};
+
+					};
 
 				}.bind(this), false);
 
@@ -65,6 +119,16 @@
 			};
 
 			return this;
+
+		},
+		getPixels: function( image ){
+
+			this.canvas.width = image.naturalWidth;
+			this.canvas.height = image.naturalHeight;
+
+			this.context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+
+			return this.context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
 
 		},
 		getGeometry: function(){
@@ -126,19 +190,23 @@
 			return geometry;
 
 		},
-		getPixelColor: function( index ){
+		getPixelColor: function( index, pixels ){
+
+			pixels = (pixels || this.pixels);
 
 			return {
-				r: this.pixels[index * 4],
-				g: this.pixels[index * 4 + 1],
-				b: this.pixels[index * 4 + 2],
-				a: this.pixels[index * 4 + 3]
+				r: pixels[index * 4],
+				g: pixels[index * 4 + 1],
+				b: pixels[index * 4 + 2],
+				a: pixels[index * 4 + 3]
 			};
 
 		},
-		getPixelValue: function( index ){
+		getPixelValue: function( index, pixels ){
 
-			var color = this.getPixelColor(index);
+			pixels = (pixels || this.pixels);
+
+			var color = this.getPixelColor(index, pixels);
 
 			return color.r * color.g + color.b;
 
@@ -184,7 +252,8 @@
 
 					obj = xhr.responseText;
 
-					onLoad(convertObjToImg(obj));
+					onLoad(OBJImg.convertObjToImg(obj));
+
 
 				}
 				else if( xhr.readyState == 4 ){
@@ -201,7 +270,7 @@
 		}
 		else {
 
-			onLoad(convertObjToImg(path));
+			onLoad(OBJImg.convertObjToImg(path));
 
 		};
 
@@ -209,30 +278,20 @@
 
 	};
 
-	function convertImgToObj( image ){
-
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
-
-		canvas.width = image.naturalWidth;
-		canvas.height = image.naturalHeight;
-
-		context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-
-		this.pixels = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
+	OBJImg.convertImgToObj = function( pixels ){
 
 		var pixelIndex = 0;
 
-		var vertexSplitting = this.getPixelValue(pixelIndex++);
-		var textureSplitting = this.getPixelValue(pixelIndex++);
-		var normalSplitting = this.getPixelValue(pixelIndex++);
-		var faceSplitting = this.getPixelValue(pixelIndex++);
+		var vertexSplitting = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		var textureSplitting = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		var normalSplitting = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		var faceSplitting = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 		var vertexCount = 0;
 
 		for( var pass = 0; pass < vertexSplitting; pass++ ){
 
-			vertexCount += this.getPixelValue(pixelIndex++);
+			vertexCount += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 		};
 
@@ -242,7 +301,7 @@
 
 		for( var pass = 0; pass < textureSplitting; pass++ ){
 
-			textureCount += this.getPixelValue(pixelIndex++);
+			textureCount += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 		};
 
@@ -252,7 +311,7 @@
 
 		for( var pass = 0; pass < normalSplitting; pass++ ){
 
-			normalCount += this.getPixelValue(pixelIndex++);
+			normalCount += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 		};
 
@@ -262,27 +321,27 @@
 
 		for( var pass = 0; pass < faceSplitting; pass++ ){
 
-			faceCount += this.getPixelValue(pixelIndex++);
+			faceCount += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 		};
 
 		var faces = new Array(faceCount);
 
-		var vertexMultiplicator = this.getPixelValue(pixelIndex++);
-		var textureMultiplicator = this.getPixelValue(pixelIndex++);
-		var textureOffset = this.getPixelValue(pixelIndex++) / textureMultiplicator;
+		var vertexMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		var textureMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		var textureOffset = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / textureMultiplicator;
 
 		var pivot = {
-			x: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
-			y: this.getPixelValue(pixelIndex++) / vertexMultiplicator,
-			z: this.getPixelValue(pixelIndex++) / vertexMultiplicator
+			x: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator,
+			y: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator,
+			z: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator
 		};
 
 		for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += 3 ){
 
-			var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - pivot.x;
-			var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - pivot.y;
-			var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - pivot.z;
+			var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / vertexMultiplicator) - pivot.x;
+			var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / vertexMultiplicator) - pivot.y;
+			var z = (OBJImg.fn.getPixelValue(pixelIndex + 2, pixels) / vertexMultiplicator) - pivot.z;
 
 			vertices[vertex] = {
 				x: x,
@@ -294,8 +353,8 @@
 
 		for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += 2 ){
 
-			var u = (this.getPixelValue(pixelIndex) / textureMultiplicator) - textureOffset;
-			var v = (this.getPixelValue(pixelIndex + 1) / textureMultiplicator) - textureOffset;
+			var u = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / textureMultiplicator) - textureOffset;
+			var v = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / textureMultiplicator) - textureOffset;
 
 			textures[texture] = {
 				u: u,
@@ -306,9 +365,9 @@
 
 		for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += 3 ){
 
-			var x = (this.getPixelValue(pixelIndex) / vertexMultiplicator) - 1;
-			var y = (this.getPixelValue(pixelIndex + 1) / vertexMultiplicator) - 1;
-			var z = (this.getPixelValue(pixelIndex + 2) / vertexMultiplicator) - 1;
+			var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / vertexMultiplicator) - 1;
+			var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / vertexMultiplicator) - 1;
+			var z = (OBJImg.fn.getPixelValue(pixelIndex + 2, pixels) / vertexMultiplicator) - 1;
 
 			normals[normal] = {
 				x: x,
@@ -326,9 +385,9 @@
 
 			for( var pass = 0; pass < vertexSplitting; pass++ ){
 
-				va += this.getPixelValue(pixelIndex + pass);
-				vb += this.getPixelValue(pixelIndex + vertexSplitting + pass);
-				vc += this.getPixelValue(pixelIndex + (2 * vertexSplitting) + pass);
+				va += OBJImg.fn.getPixelValue(pixelIndex + pass, pixels);
+				vb += OBJImg.fn.getPixelValue(pixelIndex + vertexSplitting + pass, pixels);
+				vc += OBJImg.fn.getPixelValue(pixelIndex + (2 * vertexSplitting) + pass, pixels);
 
 			};
 
@@ -338,9 +397,9 @@
 
 			for( var pass = 0; pass < textureSplitting; pass++ ){
 
-				ta += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + pass);
-				tb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + textureSplitting + pass);
-				tc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (2 * textureSplitting) + pass);
+				ta += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + pass, pixels);
+				tb += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + textureSplitting + pass, pixels);
+				tc += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + (2 * textureSplitting) + pass, pixels);
 
 			};
 
@@ -350,9 +409,9 @@
 
 			for( var pass = 0; pass < normalSplitting; pass++ ){
 
-				na += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + pass);
-				nb += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + normalSplitting + pass);
-				nc += this.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + (2 * normalSplitting) + pass);
+				na += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + pass, pixels);
+				nb += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + normalSplitting + pass, pixels);
+				nc += OBJImg.fn.getPixelValue(pixelIndex + (3 * vertexSplitting) + (3 * textureSplitting) + (2 * normalSplitting) + pass, pixels);
 
 			};
 
@@ -385,7 +444,7 @@
 
 	};
 
-	function convertObjToImg( obj ){
+	OBJImg.convertObjToImg = function( obj ){
 
 		var lines = obj.split(/\n/g);
 		var vertices = new Array();
@@ -560,6 +619,8 @@
 
 		var pixelCount = parameters + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting));
 		var square = Math.ceil(Math.sqrt(pixelCount)); 
+
+		var imageDatas = new Float32Array(pixelCount);
 
 		canvas.width = canvas.height = square;
 
@@ -896,4 +957,4 @@
 
 	window.OBJImg = OBJImg;
 
-})(window, document);
+})(this, this.document);

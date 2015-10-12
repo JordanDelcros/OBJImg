@@ -83,6 +83,15 @@
 			this.minimizeButton = this.document.querySelector("#minimize");
 			this.fullscreenButton = this.document.querySelector("#fullscreen");
 
+			this.preview = this.document.querySelector("#preview");
+			this.previewButton = this.document.querySelector("[href='#preview']");
+
+			this.preferences = this.document.querySelector("#preferences");
+			this.preferencesButton = this.document.querySelector("[href='#preferences']");
+
+			this.infos = this.document.querySelector("#infos");
+			this.infosButton = this.document.querySelector("[href='#infos']");
+
 			this.canvas = this.document.querySelector("canvas");
 
 			this.renderer = new THREE.WebGLRenderer({
@@ -121,7 +130,7 @@
 			this.controls.panSpeed = 0.8;
 			this.controls.noZoom = false;
 			this.controls.noPan = true;
-			this.controls.staticMoving = true;
+			this.controls.staticMoving = false;
 			this.controls.dynamicDampingFactor = 0.3;
 
 			return this;
@@ -150,6 +159,28 @@
 				event.preventDefault();
 
 				this.fullscreen();
+
+			}.bind(this), false);
+
+			this.previewButton.addEventListener("click", function( event ){
+
+				event.preventDefault();
+
+				this.preview.innerHTML = "";
+
+				for( var object in this.window.localStorage ){
+
+					var info = JSON.parse(this.window.localStorage[object]);
+
+					if( info.path && info.base64 ){
+
+						var node = this.document.createElement("div");
+
+						this.preview.appendChild(node);
+
+					};
+
+				};
 
 			}.bind(this), false);
 
@@ -221,39 +252,50 @@
 		},
 		dropFile: function( event ){
 
-			var path = event.dataTransfer.files[0].path;
+			var self = this;
 
-			var filePath = path.split(/\//g);
-			var fileName = filePath[filePath.length - 1].split(/\./)[0];
+			for( var file = 0, length = event.dataTransfer.files.length; file < length; file++ ){
 
-			FileSystem.readFile(path, "utf-8", function( error, datas ){
+				var filePath = event.dataTransfer.files[file].path;
+				var fileName = filePath.split("/").pop().split(".")[0];
 
-				if( error ){
+				FileSystem.readFile(filePath, "utf-8", function( filePath, fileName, error, datas ){
 
-					throw error;
+					if( error ){
 
-				};
+						throw error;
 
-				OBJImg.generateImg(datas, function( datas ){
+					};
 
-					var image = new Image();
-					image.src = datas;
+					OBJImg.generateImg(datas, function( datas ){
 
-					FileSystem.writeFile(filePath.splice(0, filePath.length - 1).join("/") + "/" + fileName + ".obj.png", datas.replace(/^data:image\/png;base64/, ""), "base64", function( error ){
+						var image = new Image();
+						image.src = datas;
 
-						if( error ){
+						var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
 
-							console.error("Cant save PNG file.");
+						self.window.localStorage.setItem(fileName, JSON.stringify({
+							path: path,
+							base64: datas
+						}));
 
-						};
+						FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( error ){
+
+							if( error ){
+
+								console.error(error, "Cant save PNG file.");
+
+							};
+
+						});
+
+						self.displayObject(image);
 
 					});
 
-					this.displayObject(image);
+				}.bind(this, filePath, fileName));
 
-				}.bind(this));
-
-			}.bind(this));
+			};
 
 		},
 		displayObject: function( image ){
@@ -306,7 +348,7 @@
 		},
 		saveSession: function(){
 
-			this.window.localStorage.setItem("session", JSON.stringify({
+			this.window.localStorage.setItem("_session", JSON.stringify({
 				position: {
 					x: this.super.x,
 					y: this.super.y
@@ -318,9 +360,9 @@
 		},
 		restoreSession: function(){
 
-			if( this.window.localStorage.hasOwnProperty("session") ){
+			if( this.window.localStorage.hasOwnProperty("_session") ){
 
-				var session = JSON.parse(this.window.localStorage.getItem("session"));
+				var session = JSON.parse(this.window.localStorage.getItem("_session"));
 
 				this.super.moveTo(session.position.x, session.position.y);
 
