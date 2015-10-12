@@ -23,8 +23,6 @@
 
 			this.setMenu();
 
-			this.openDevelopersTools();
-
 			this.restoreSession();
 
 			this.document.addEventListener("DOMContentLoaded", function( event ){
@@ -94,22 +92,37 @@
 				alpha: true
 			});
 
+			this.renderer.shadowEnabled = true;
+			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
 			this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
 			this.canvasAspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
 
 			this.camera = new THREE.PerspectiveCamera(75, this.canvasAspect, 0.1, 10000);
 
-			this.camera.position.set(0, 0, 2);
-
 			this.scene = new THREE.Scene();
 
-			this.light = new THREE.PointLight(0xFFFFFF);
+			this.light = new THREE.SpotLight(0xFFFFFF, 1.0, 1000, Math.PI / 3, 10, 1);
+			this.light.castShadow = true;
+			this.light.shadowMapWidth = this.light.shadowMapHeight = 1024;
+			this.light.shadowMapCameraNear = 500;
+			this.light.shadowMapCameraFar = 4000;
+			this.light.shadowMapCameraFov = 30;
 			this.light.position.set(10, 10, 10);
 			this.scene.add(this.light);
 
 			this.hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
 			this.scene.add(this.hemisphereLight);
+
+			this.controls = new THREE.TrackballControls(this.camera);
+			this.controls.rotateSpeed = 2.0;
+			this.controls.zoomSpeed = 0.8;
+			this.controls.panSpeed = 0.8;
+			this.controls.noZoom = false;
+			this.controls.noPan = true;
+			this.controls.staticMoving = true;
+			this.controls.dynamicDampingFactor = 0.3;
 
 			return this;
 
@@ -183,7 +196,7 @@
 					var objectHeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
 					var objectWeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
 
-					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.8 / Math.tan(Math.PI * this.camera.fov / 360);
+					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.5 / Math.tan(Math.PI * this.camera.fov / 360);
 
 					this.camera.position.z = distance;
 
@@ -200,6 +213,8 @@
 		renderView: function( now ){
 
 			this.window.requestAnimationFrame(this.renderView.bind(this));
+
+			this.controls.update();
 
 			this.renderer.render(this.scene, this.camera);
 
@@ -256,6 +271,9 @@
 			});
 
 			this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+			this.mesh.castShadow = true;
+			this.mesh.receiveShadow = true;
 
 			this.mesh.position.set(-center.x, -center.y, -center.z);
 
