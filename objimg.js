@@ -164,55 +164,115 @@
 
 				if( this.datas != null ){
 
-					var geometry = new THREE.Geometry();
+					console.log(this.datas);
 
-					for( var vertex = 0, length = this.datas.vertices.length; vertex < length; vertex++ ){
+					for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
-						geometry.vertices.push(new THREE.Vector3(this.datas.vertices[vertex].x, this.datas.vertices[vertex].y, this.datas.vertices[vertex].z));
+						var geometry = new THREE.Geometry();
 
-					};
+						for( var face = 0, faceLenght = this.datas.objects[object].faces.length; face < faceLenght; face++ ){
 
-					for( var face = 0, length = this.datas.faces.length; face < length; face++ ){
+							var faceID = this.datas.objects[object].faces[face];
 
-						var vertexA = this.datas.faces[face].vertices.a;
-						var vertexB = this.datas.faces[face].vertices.b;
-						var vertexC = this.datas.faces[face].vertices.c;
+							var verticesID = this.datas.faces[faceID].vertices;
+							var texturesID = this.datas.faces[faceID].textures;
+							var normalsID = this.datas.faces[faceID].normals;
 
-						var normals = null;
+							var vertexA = this.datas.vertices[verticesID.a];
+							var vertexB = this.datas.vertices[verticesID.b];
+							var vertexC = this.datas.vertices[verticesID.c];
 
-						if( this.datas.normals.length > 0 ){
+							geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z), new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z), new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
 
-							normals = [
-								this.datas.normals[this.datas.faces[face].normals.a],
-								this.datas.normals[this.datas.faces[face].normals.b],
-								this.datas.normals[this.datas.faces[face].normals.c],
-							];
+							var normals = null;
 
-						};
+							if( this.datas.normals.length > 0 ){
 
-						geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
+								normals = [
+									this.datas.normals[normalsID.a],
+									this.datas.normals[normalsID.b],
+									this.datas.normals[normalsID.c],
+								];
 
-						if( this.datas.textures.length > 0 ){
+							};
 
-							var uvA = this.datas.textures[this.datas.faces[face].textures.a];
-							var uvB = this.datas.textures[this.datas.faces[face].textures.b];
-							var uvC = this.datas.textures[this.datas.faces[face].textures.c];
+							geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
 
-							if( uvA && uvB && uvC ){
+							if( this.datas.textures.length > 0 ){
 
-								geometry.faceVertexUvs[0].push([
-									new THREE.Vector2(uvA.u, uvA.v),
-									new THREE.Vector2(uvB.u, uvB.v),
-									new THREE.Vector2(uvC.u, uvC.v)
-								]);
+								var uvA = this.datas.textures[texturesID.a];
+								var uvB = this.datas.textures[texturesID.b];
+								var uvC = this.datas.textures[texturesID.c];
+
+								if( uvA && uvB && uvC ){
+
+									geometry.faceVertexUvs[0].push([
+										new THREE.Vector2(uvA.u, uvA.v),
+										new THREE.Vector2(uvB.u, uvB.v),
+										new THREE.Vector2(uvC.u, uvC.v),
+									]);
+
+								};
 
 							};
 
 						};
 
+						var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
+
+						this.object3D.add(mesh);
+
 					};
 
-					geometry.computeBoundingBox();
+					// var geometry = new THREE.Geometry();
+
+					// for( var vertex = 0, length = this.datas.vertices.length; vertex < length; vertex++ ){
+
+					// 	geometry.vertices.push(new THREE.Vector3(this.datas.vertices[vertex].x, this.datas.vertices[vertex].y, this.datas.vertices[vertex].z));
+
+					// };
+
+					// for( var face = 0, length = this.datas.faces.length; face < length; face++ ){
+
+					// 	var vertexA = this.datas.faces[face].vertices.a;
+					// 	var vertexB = this.datas.faces[face].vertices.b;
+					// 	var vertexC = this.datas.faces[face].vertices.c;
+
+					// 	var normals = null;
+
+					// 	if( this.datas.normals.length > 0 ){
+
+					// 		normals = [
+					// 			this.datas.normals[this.datas.faces[face].normals.a],
+					// 			this.datas.normals[this.datas.faces[face].normals.b],
+					// 			this.datas.normals[this.datas.faces[face].normals.c],
+					// 		];
+
+					// 	};
+
+					// 	geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
+
+					// 	if( this.datas.textures.length > 0 ){
+
+					// 		var uvA = this.datas.textures[this.datas.faces[face].textures.a];
+					// 		var uvB = this.datas.textures[this.datas.faces[face].textures.b];
+					// 		var uvC = this.datas.textures[this.datas.faces[face].textures.c];
+
+					// 		if( uvA && uvB && uvC ){
+
+					// 			geometry.faceVertexUvs[0].push([
+					// 				new THREE.Vector2(uvA.u, uvA.v),
+					// 				new THREE.Vector2(uvB.u, uvB.v),
+					// 				new THREE.Vector2(uvC.u, uvC.v)
+					// 			]);
+
+					// 		};
+
+					// 	};
+
+					// };
+
+					// geometry.computeBoundingBox();
 
 					var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
 
@@ -386,7 +446,8 @@
 			};
 
 			objects[object] = {
-				index: objectIndex
+				index: objectIndex,
+				faces: new Array()
 			};
 
 		};
@@ -404,7 +465,8 @@
 			};
 
 			groups[group] = {
-				index: groupIndex
+				index: groupIndex,
+				faces: new Array()
 			};
 
 		};
@@ -511,13 +573,26 @@
 				}
 			};
 
+			for( var object = (objects.length - 1); object >= 0; object-- ){
+
+				if( face >= objects[object].index ){
+
+					objects[object].faces.push(face);
+
+					break;
+
+				};
+
+			};
+
 		};
 
 		return {
 			vertices: vertices,
 			textures: textures,
 			normals: normals,
-			faces: faces
+			faces: faces,
+			objects: objects
 		};
 
 	};
