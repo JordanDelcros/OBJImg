@@ -1,14 +1,26 @@
 {
 	"fr": {
+		"view": "afficher",
+		"preview": "l'aperçu",
+		"preferences": "préférences",
+		"infos": "crédits",
 		"tools": "outils",
 		"devTools": "les outils de développeurs",
 		"open": "ouvrir",
-		"close": "fermer"
+		"close": "fermer",
+		"show": "voir",
+		"hide": "masquer"
 	},
 	"en": {
+		"view": "view",
+		"preview": "preview",
+		"preferences": "preferences",
+		"infos": "infos",
 		"tools": "tools",
 		"devTools": "developers tools",
 		"open": "open",
-		"close": "close"
+		"close": "close",
+		"show": "show",
+		"hide": "hide"
 	}
 }

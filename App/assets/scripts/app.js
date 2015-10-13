@@ -17,7 +17,8 @@
 			this.window = window;
 			this.document = document;
 
-			this.texts = JSON.parse(FileSystem.readFileSync("assets/datas/texts.json", "utf-8"))[this.window.navigator.language];
+			this.infosData = JSON.parse(FileSystem.readFileSync("assets/datas/infos.json", "utf-8"));
+			this.textsData = JSON.parse(FileSystem.readFileSync("assets/datas/texts.json", "utf-8"))[this.window.navigator.language];
 
 			this.name = this.GUI.App.manifest.name;
 
@@ -46,6 +47,21 @@
 				main: new this.GUI.Menu({
 					type: "menubar"
 				}),
+				view: {
+					main: new this.GUI.Menu(),
+					preview: new this.GUI.MenuItem({
+						label: this.getText(["show", "preview"]),
+						click: this.togglePreview.bind(this)
+					}),
+					preferences: new this.GUI.MenuItem({
+						label: this.getText(["show", "preferences"]),
+						click: this.togglePreferences.bind(this)
+					}),
+					infos: new this.GUI.MenuItem({
+						label: this.getText(["show", "infos"]),
+						click: this.toggleInfos.bind(this)
+					})
+				},
 				tools: {
 					main: new this.GUI.Menu(),
 					devTools: new this.GUI.MenuItem({
@@ -59,6 +75,15 @@
 				hideEdit: true,
 				hideWindow: true
 			});
+
+			this.menu.view.main.append(this.menu.view.preview);
+			this.menu.view.main.append(this.menu.view.preferences);
+			this.menu.view.main.append(this.menu.view.infos);
+
+			this.menu.main.append(new this.GUI.MenuItem({
+				label: this.getText("view"),
+				submenu: this.menu.view.main
+			}));
 
 			this.menu.tools.main.append(this.menu.tools.devTools);
 
@@ -77,11 +102,23 @@
 			return this;
 
 		},
+		updateMenu: function(){
+
+			this.menu.tools.devTools.label = this.super.isDevToolsOpen() ? this.getText(["close", "devTools"]) : this.getText(["open", "devTools"]);
+
+			this.menu.view.preview.label = this.preview.classList.contains("active") ? this.getText(["hide", "preview"]) : this.getText(["show", "preview"]);
+			this.menu.view.preferences.label = this.preferences.classList.contains("active") ? this.getText(["hide", "preferences"]) : this.getText(["show", "preferences"]);
+			this.menu.view.infos.label = this.infos.classList.contains("active") ? this.getText(["hide", "infos"]) : this.getText(["show", "infos"]);
+
+		},
 		setView: function(){
 
 			this.quitButton = this.document.querySelector("#quit");
 			this.minimizeButton = this.document.querySelector("#minimize");
 			this.fullscreenButton = this.document.querySelector("#fullscreen");
+
+			this.dropZone = this.document.querySelector("section#dropZone");
+			this.image = this.dropZone.querySelector("section#dropZone img");
 
 			this.preview = this.document.querySelector("#preview");
 			this.previewButton = this.document.querySelector("[href='#preview']");
@@ -91,6 +128,30 @@
 
 			this.infos = this.document.querySelector("#infos");
 			this.infosButton = this.document.querySelector("[href='#infos']");
+			this.infosAuthor = this.infos.querySelector("#author");
+			this.infosVersion = this.infos.querySelector("#version");
+			this.infosContributors = this.infos.querySelector("#contributors");
+
+			this.infosAuthor.innerText = this.infosData.author;
+			this.infosVersion.innerText = this.infosData.version;
+
+			for( var contributor = 0, length = this.infosData.contributors.length; contributor < length; contributor++ ){
+
+				var li = this.document.createElement("li");
+
+				var name = this.document.createElement("span");
+				name.classList.add("name");
+				name.innerText = this.infosData.contributors[contributor].name + ": ";
+
+				var description = this.document.createElement("span");
+				description.innerText = this.infosData.contributors[contributor].do;
+
+				li.appendChild(name);
+				li.appendChild(description);
+
+				this.infosContributors.appendChild(li);
+
+			};
 
 			this.canvas = this.document.querySelector("canvas");
 
@@ -140,6 +201,24 @@
 		},
 		setEvents: function(){
 
+			this.super.on("focus", function( event ){
+
+				this.updateMenu();
+
+			}.bind(this), false);
+
+			this.super.on("devtools-opened", function( event ){
+
+				this.updateMenu();
+
+			}.bind(this), false);
+
+			this.super.on("devtools-closed", function( event ){
+
+				this.updateMenu();
+
+			}.bind(this), false);
+
 			this.quitButton.addEventListener("click", function( event ){
 
 				event.preventDefault();
@@ -168,30 +247,23 @@
 
 				event.preventDefault();
 
-				this.preview.innerHTML = "";
+				this.togglePreview();
 
-				for( var object in this.window.localStorage ){
+			}.bind(this), false);
 
-					var info = JSON.parse(this.window.localStorage[object]);
+			this.preferencesButton.addEventListener("click", function( event ){
 
-					if( info.path && info.base64 ){
+				event.preventDefault();
 
-						var node = this.document.createElement("div");
+				this.togglePreferences();
 
-						var image = new Image();
-						image.src = info.base64;
+			}.bind(this), false);
 
-						var name = this.document.createElement("p");
-						name.innerText = info.name;
+			this.infosButton.addEventListener("click", function( event ){
 
-						node.appendChild(image);
-						node.appendChild(name);
+				event.preventDefault();
 
-						this.preview.appendChild(node);
-
-					};
-
-				};
+				this.toggleInfos();
 
 			}.bind(this), false);
 
@@ -240,7 +312,7 @@
 
 					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.5 / Math.tan(Math.PI * this.camera.fov / 360);
 
-					this.camera.position.z = distance;
+					this.camera.position.z = distance * (this.camera.position.z < 0 ? -1 : 1);
 
 				};
 
@@ -259,6 +331,126 @@
 			this.controls.update();
 
 			this.renderer.render(this.scene, this.camera);
+
+		},
+		togglePreview: function(){
+
+			if( this.preview.classList.contains("active") ){
+
+				this.hidePreview();
+
+			}
+			else {
+
+				this.showPreview();
+
+			};
+
+		},
+		showPreview: function(){
+
+			this.dropZone.classList.remove("active");
+			this.preview.classList.add("active");
+			this.preferences.classList.remove("active");
+			this.infos.classList.remove("active");
+
+			this.previewButton.classList.add("active");
+			this.preferencesButton.classList.remove("active");
+			this.infosButton.classList.remove("active");
+
+			this.updateMenu();
+
+		},
+		hidePreview: function(){
+
+			this.dropZone.classList.add("active");
+			this.preview.classList.remove("active");
+			this.preferences.classList.remove("active");
+			this.infos.classList.remove("active");
+
+			this.previewButton.classList.remove("active");
+
+			this.updateMenu();
+
+		},
+		togglePreferences: function(){
+
+			if( this.preferences.classList.contains("active") ){
+
+				this.hidePreferences();
+
+			}
+			else {
+
+				this.showPreferences();
+
+			};
+
+		},
+		showPreferences: function(){
+
+			this.dropZone.classList.remove("active");
+			this.preview.classList.remove("active");
+			this.preferences.classList.add("active");
+			this.infos.classList.remove("active");
+
+			this.previewButton.classList.remove("active");
+			this.preferencesButton.classList.add("active");
+			this.infosButton.classList.remove("active");
+
+			this.updateMenu();
+
+		},
+		hidePreferences: function(){
+
+			this.dropZone.classList.add("active");
+			this.preview.classList.remove("active");
+			this.preferences.classList.remove("active");
+			this.infos.classList.remove("active");
+
+			this.preferencesButton.classList.remove("active");
+
+			this.updateMenu();
+
+		},
+		toggleInfos: function(){
+
+			if( this.infos.classList.contains("active") ){
+
+				this.hideInfos();
+
+			}
+			else {
+
+				this.showInfos();
+
+			};
+
+		},
+		showInfos: function(){
+
+			this.dropZone.classList.remove("active");
+			this.preview.classList.remove("active");
+			this.preferences.classList.remove("active");
+			this.infos.classList.add("active");
+
+			this.previewButton.classList.remove("active");
+			this.preferencesButton.classList.remove("active");
+			this.infosButton.classList.add("active");
+
+			this.updateMenu();
+
+		},
+		hideInfos: function(){
+
+			this.dropZone.classList.add("active");
+			this.preview.classList.remove("active");
+			this.preferences.classList.remove("active");
+			this.infos.classList.remove("active");
+
+			this.infosButton.classList.remove("active");
+
+			this.updateMenu();
 
 		},
 		dropFile: function( event ){
@@ -320,6 +512,10 @@
 
 		},
 		displayObject: function( image ){
+
+			this.dropZone.classList.add("filled");
+
+			this.image.src = image.src;
 
 			this.scene.remove(this.mesh);
 
@@ -410,14 +606,14 @@
 
 			this.super.showDevTools();
 
-			this.menu.tools.devTools.label = this.getText(["close", "devTools"]);
+			this.updateMenu();
 
 		},
 		closeDevelopersTools: function(){
 
 			this.super.closeDevTools();
 
-			this.menu.tools.devTools.label = this.getText(["open", "devTools"]);
+			this.updateMenu();
 
 		},
 		getText: function( label ){
@@ -438,7 +634,7 @@
 
 				};
 
-				text += this.texts[label[entry]];
+				text += this.textsData[label[entry]];
 
 			};
 

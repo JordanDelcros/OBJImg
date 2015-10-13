@@ -19,13 +19,22 @@
 		</nav>
 	</header>
 	<main>
-		<section id="dropZone">
-			<canvas></canvas>
+		<section id="dropZone" class="active">
+			<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="generated image"/>
 			<p class="drag">Drag and drop</p>
 		</section>
-		<section id="preview"></section>
+		<section id="preview">
+			<canvas></canvas>
+		</section>
 		<section id="preferences"></section>
-		<section id="infos"></section>
+		<section id="infos">
+			<p class="title">author</p>
+			<p id="author"></p>
+			<p class="title">version</p>
+			<p id="version"></p>
+			<p class="title">contributors</p>
+			<ul id="contributors"></ul>
+		</section>
 	</main>
 	<nav id="main">
 		<button href="#preview"></button>
