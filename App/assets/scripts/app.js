@@ -124,9 +124,11 @@
 			this.hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
 			this.scene.add(this.hemisphereLight);
 
-			this.controls = new THREE.TrackballControls(this.camera);
+			this.controls = new THREE.TrackballControls(this.camera, this.canvas);
 			this.controls.rotateSpeed = 2.0;
 			this.controls.zoomSpeed = 0.8;
+			this.controls.minDistance = 1;
+			this.controls.maxDistance = 1000;
 			this.controls.panSpeed = 0.8;
 			this.controls.noZoom = false;
 			this.controls.noPan = true;
@@ -175,6 +177,15 @@
 					if( info.path && info.base64 ){
 
 						var node = this.document.createElement("div");
+
+						var image = new Image();
+						image.src = info.base64;
+
+						var name = this.document.createElement("p");
+						name.innerText = info.name;
+
+						node.appendChild(image);
+						node.appendChild(name);
 
 						this.preview.appendChild(node);
 
@@ -259,11 +270,11 @@
 				var filePath = event.dataTransfer.files[file].path;
 				var fileName = filePath.split("/").pop().split(".")[0];
 
-				FileSystem.readFile(filePath, "utf-8", function( filePath, fileName, error, datas ){
+				FileSystem.readFile(filePath, "utf-8", function( filePath, fileName, errorMessage, datas ){
 
-					if( error ){
+					if( errorMessage ){
 
-						throw error;
+						throw errorMessage;
 
 					};
 
@@ -274,16 +285,26 @@
 
 						var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
 
-						self.window.localStorage.setItem(fileName, JSON.stringify({
-							path: path,
-							base64: datas
-						}));
+						try {
 
-						FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( error ){
+							self.window.localStorage.setItem(fileName, JSON.stringify({
+								name: fileName,
+								path: path,
+								base64: datas
+							}));
 
-							if( error ){
+						}
+						catch( errorMessage ){
 
-								console.error(error, "Cant save PNG file.");
+							console.error(errorMessage);
+
+						};
+
+						FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
+
+							if( errorMessage ){
+
+								console.error(errorMessage, "Cant save PNG file.");
 
 							};
 
