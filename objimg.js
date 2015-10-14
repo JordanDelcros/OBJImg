@@ -1,5 +1,7 @@
 (function( window, document ){
 
+	var basePath = ( document ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/" : "");
+
 	var MAX = (255 * 255) + 255;
 
 	var OBJImg = function( path, useWorker, onLoad ){
@@ -18,11 +20,14 @@
 			this.context = this.canvas.getContext("2d");
 
 			this.object3D = window.THREE ? new window.THREE.Object3D() : null;
+			this.simpleObject3D = window.THREE ? new window.THREE.Object3D() : null;
 			this.updateObject3D = false;
+			this.updateSimpleObject3D = false;
+			this.onComplete = null;
 
 			if( useWorker == true ){
 
-				var worker = new Worker("objimg-worker.js");
+				var worker = new Worker(basePath + "objimg-worker.js");
 
 				worker.addEventListener("message", function( event ){
 
@@ -31,6 +36,12 @@
 					if( this.updateObject3D == true ){
 
 						this.setObject3D();
+
+					};
+
+					if( this.updateSimpleObject3D == true ){
+
+						this.setSimpleObject3D();
 
 					};
 
@@ -69,6 +80,12 @@
 
 						};
 
+						if( this.updateSimpleObject3D == true ){
+
+							this.setSimpleObject3D();
+
+						};
+
 						if( onLoad instanceof Function ){
 
 							onLoad(this.datas);
@@ -94,6 +111,12 @@
 							if( this.updateObject3D == true ){
 
 								this.setObject3D();
+
+							};
+
+							if( this.updateSimpleObject3D == true ){
+
+								this.setSimpleObject3D();
 
 							};
 
@@ -131,6 +154,12 @@
 
 						};
 
+						if( this.updateSimpleObject3D == true ){
+
+							this.setSimpleObject3D();
+
+						};
+
 						if( onLoad instanceof Function ){
 
 							onLoad(this.datas);
@@ -160,156 +189,177 @@
 		},
 		setObject3D: function(){
 
-			if( THREE ){
+			if( this.datas != null ){
 
-				if( this.datas != null ){
+				window.datas = this.datas;
 
-					window.datas = this.datas;
+				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
-					console.info(this.datas);
+					var geometry = new THREE.Geometry();
 
-					for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
+					var sharedVertices = new Array();
 
-						console.info(this.datas.objects[object]);
+					for( var face = 0, faceLength = this.datas.objects[object].faces.length; face < faceLength; face++ ){
 
-						var geometry = new THREE.Geometry();
+						var faceID = this.datas.objects[object].faces[face];
+						var verticesID = faceID.vertices;
+						var normalsID = faceID.normals;
 
-						var sharedVertices = new Array();
+						var vertexAID = sharedVertices.indexOf(verticesID.a);
 
-						for( var face = 0, faceLength = this.datas.objects[object].faces.length; face < faceLength; face++ ){
+						if( vertexAID == -1 ){
 
-							var faceID = this.datas.objects[object].faces[face];
-							var verticesID = faceID.vertices;
-							var normalsID = faceID.normals;
+							vertexAID = sharedVertices.push(verticesID.a) - 1;
 
-							var vertexAID = sharedVertices.indexOf(verticesID.a);
+							var vertexA = this.datas.vertices[verticesID.a];
 
-							if( vertexAID == -1 ){
-
-								vertexAID = sharedVertices.push(verticesID.a) - 1;
-
-								var vertexA = this.datas.vertices[vertexAID];
-
-								geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z)) - 1;
-
-							};
-
-							var vertexBID = sharedVertices.indexOf(verticesID.b);
-
-							if( vertexBID == -1 ){
-
-								vertexBID = sharedVertices.push(verticesID.b) - 1;
-
-								var vertexB = this.datas.vertices[vertexBID];
-
-								geometry.vertices.push(new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z));
-
-							};
-
-							var vertexCID = sharedVertices.indexOf(verticesID.c);
-
-							if( vertexCID == -1 ){
-
-								vertexCID = sharedVertices.push(verticesID.c) - 1;
-
-								var vertexC = this.datas.vertices[vertexCID];
-
-								geometry.vertices.push(new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
-
-							};
-
-							var normals = null;
-
-							if( this.datas.normals.length > 0 ){
-
-								normals = [
-									this.datas.normals[normalsID.a],
-									this.datas.normals[normalsID.b],
-									this.datas.normals[normalsID.c]
-								];
-
-							};
-
-							geometry.faces.push(new THREE.Face3(vertexAID, vertexBID, vertexCID, normals));
+							geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z));
 
 						};
 
-						var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-							// size: 0.01,
-							color: Math.random() * 0xFFFFFF,
-							side: THREE.DoubleSide
-						}));
+						var vertexBID = sharedVertices.indexOf(verticesID.b);
 
-						this.object3D.add(mesh);
+						if( vertexBID == -1 ){
+
+							vertexBID = sharedVertices.push(verticesID.b) - 1;
+
+							var vertexB = this.datas.vertices[verticesID.b];
+
+							geometry.vertices.push(new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z));
+
+						};
+
+						var vertexCID = sharedVertices.indexOf(verticesID.c);
+
+						if( vertexCID == -1 ){
+
+							vertexCID = sharedVertices.push(verticesID.c) - 1;
+
+							var vertexC = this.datas.vertices[verticesID.c];
+
+							geometry.vertices.push(new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
+
+						};
+
+						var normals = null;
+
+						if( this.datas.normals.length > 0 ){
+
+							normals = [
+								this.datas.normals[normalsID.a],
+								this.datas.normals[normalsID.b],
+								this.datas.normals[normalsID.c]
+							];
+
+						};
+
+						geometry.faces.push(new THREE.Face3(vertexAID, vertexBID, vertexCID, normals));
 
 					};
 
-					// var geometry = new THREE.Geometry();
+					var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+						color: Math.random() * 0xFFFFFF,
+						side: THREE.DoubleSide
+					}));
 
-					// for( var vertex = 0, length = this.datas.vertices.length; vertex < length; vertex++ ){
-
-					// 	geometry.vertices.push(new THREE.Vector3(this.datas.vertices[vertex].x, this.datas.vertices[vertex].y, this.datas.vertices[vertex].z));
-
-					// };
-
-					// for( var face = 0, length = this.datas.faces.length; face < length; face++ ){
-
-					// 	var vertexA = this.datas.faces[face].vertices.a;
-					// 	var vertexB = this.datas.faces[face].vertices.b;
-					// 	var vertexC = this.datas.faces[face].vertices.c;
-
-					// 	var normals = null;
-
-					// 	if( this.datas.normals.length > 0 ){
-
-					// 		normals = [
-					// 			this.datas.normals[this.datas.faces[face].normals.a],
-					// 			this.datas.normals[this.datas.faces[face].normals.b],
-					// 			this.datas.normals[this.datas.faces[face].normals.c],
-					// 		];
-
-					// 	};
-
-					// 	geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
-
-					// 	if( this.datas.textures.length > 0 ){
-
-					// 		var uvA = this.datas.textures[this.datas.faces[face].textures.a];
-					// 		var uvB = this.datas.textures[this.datas.faces[face].textures.b];
-					// 		var uvC = this.datas.textures[this.datas.faces[face].textures.c];
-
-					// 		if( uvA && uvB && uvC ){
-
-					// 			geometry.faceVertexUvs[0].push([
-					// 				new THREE.Vector2(uvA.u, uvA.v),
-					// 				new THREE.Vector2(uvB.u, uvB.v),
-					// 				new THREE.Vector2(uvC.u, uvC.v)
-					// 			]);
-
-					// 		};
-
-					// 	};
-
-					// };
-
-					// geometry.computeBoundingBox();
-
-					// var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
-
-					// this.object3D.add(mesh);
+					this.object3D.add(mesh);
 
 				};
 
-				console.warn("END");
+				if( this.onComplete instanceof Function ){
+
+					this.onComplete(this.object3D);
+
+				};
 
 			};
 
 			return this;
 
 		},
-		getObject3D: function(){
+		getObject3D: function( onComplete ){
 
 			this.updateObject3D = true;
+
+			this.onComplete = onComplete;
+
+			return this.object3D;
+
+		},
+		setSimpleObject3D: function(){
+
+			if( this.datas != null ){
+
+				var geometry = new THREE.Geometry();
+
+				for( var vertex = 0, length = this.datas.vertices.length; vertex < length; vertex++ ){
+
+					geometry.vertices.push(new THREE.Vector3(this.datas.vertices[vertex].x, this.datas.vertices[vertex].y, this.datas.vertices[vertex].z));
+
+				};
+
+				for( var face = 0, length = this.datas.faces.length; face < length; face++ ){
+
+					var vertexA = this.datas.faces[face].vertices.a;
+					var vertexB = this.datas.faces[face].vertices.b;
+					var vertexC = this.datas.faces[face].vertices.c;
+
+					var normals = null;
+
+					if( this.datas.normals.length > 0 ){
+
+						normals = [
+							this.datas.normals[this.datas.faces[face].normals.a],
+							this.datas.normals[this.datas.faces[face].normals.b],
+							this.datas.normals[this.datas.faces[face].normals.c],
+						];
+
+					};
+
+					geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
+
+					if( this.datas.textures.length > 0 ){
+
+						var uvA = this.datas.textures[this.datas.faces[face].textures.a];
+						var uvB = this.datas.textures[this.datas.faces[face].textures.b];
+						var uvC = this.datas.textures[this.datas.faces[face].textures.c];
+
+						if( uvA && uvB && uvC ){
+
+							geometry.faceVertexUvs[0].push([
+								new THREE.Vector2(uvA.u, uvA.v),
+								new THREE.Vector2(uvB.u, uvB.v),
+								new THREE.Vector2(uvC.u, uvC.v)
+							]);
+
+						};
+
+					};
+
+				};
+
+				geometry.computeBoundingBox();
+
+				var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
+
+				this.object3D.add(mesh);
+
+				if( this.onComplete instanceof Function ){
+
+					this.onComplete(this.object3D);
+
+				};
+
+			};
+
+			return this;
+
+		},
+		getSimpleObject3D: function( onComplete ){
+
+			this.updateSimpleObject3D = true;
+
+			this.onComplete = onComplete;
 
 			return this.object3D;
 

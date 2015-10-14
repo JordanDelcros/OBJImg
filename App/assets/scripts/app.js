@@ -185,16 +185,16 @@
 			this.hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
 			this.scene.add(this.hemisphereLight);
 
-			this.controls = new THREE.TrackballControls(this.camera, this.canvas);
-			this.controls.rotateSpeed = 2.0;
-			this.controls.zoomSpeed = 0.8;
-			this.controls.minDistance = 1;
-			this.controls.maxDistance = 1000;
-			this.controls.panSpeed = 0.8;
-			this.controls.noZoom = false;
-			this.controls.noPan = true;
-			this.controls.staticMoving = false;
-			this.controls.dynamicDampingFactor = 0.3;
+			this.controls = new THREE.TrackballControls(this.camera);
+			// this.controls.rotateSpeed = 2.0;
+			// this.controls.zoomSpeed = 0.8;
+			// this.controls.minDistance = 1;
+			// this.controls.maxDistance = 1000;
+			// this.controls.panSpeed = 0.8;
+			// this.controls.noZoom = false;
+			// this.controls.noPan = true;
+			// this.controls.staticMoving = false;
+			// this.controls.dynamicDampingFactor = 0.3;
 
 			return this;
 
@@ -327,6 +327,12 @@
 		renderView: function( now ){
 
 			this.window.requestAnimationFrame(this.renderView.bind(this));
+
+			if( this.mesh ){
+
+				this.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+
+			};
 
 			this.controls.update();
 
@@ -519,22 +525,25 @@
 
 			this.scene.remove(this.mesh);
 
-			this.geometry = new OBJImg(image).getGeometry();
+			this.mesh = new OBJImg(image, true).getObject3D(function( object ){
 
-			var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
 
-			this.material = new THREE.MeshPhongMaterial({
-				color: 0x222222,
-				side: THREE.FrontSide,
-				shading: THREE.SmoothShading
 			});
 
-			this.mesh = new THREE.Mesh(this.geometry, this.material);
+			// var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
 
-			this.mesh.castShadow = true;
-			this.mesh.receiveShadow = true;
+			// this.material = new THREE.MeshPhongMaterial({
+			// 	color: 0x222222,
+			// 	side: THREE.FrontSide,
+			// 	shading: THREE.SmoothShading
+			// });
 
-			this.mesh.position.set(-center.x, -center.y, -center.z);
+			// this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+			// this.mesh.castShadow = true;
+			// this.mesh.receiveShadow = true;
+
+			// this.mesh.position.set(-center.x, -center.y, -center.z);
 
 			this.scene.add(this.mesh);
 
