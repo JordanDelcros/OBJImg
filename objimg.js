@@ -164,19 +164,85 @@
 
 				if( this.datas != null ){
 
-					console.log(this.datas);
+					window.datas = this.datas;
 
-					var object3D = new THREE.Object3D();
+					console.info(this.datas);
 
 					for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
-						console.log(this.datas.objects[object]);
+						console.info(this.datas.objects[object]);
+
+						var geometry = new THREE.Geometry();
+
+						var sharedVertices = new Array();
+
+						for( var face = 0, faceLength = this.datas.objects[object].faces.length; face < faceLength; face++ ){
+
+							var faceID = this.datas.objects[object].faces[face];
+							var verticesID = faceID.vertices;
+							var normalsID = faceID.normals;
+
+							var vertexAID = sharedVertices.indexOf(verticesID.a);
+
+							if( vertexAID == -1 ){
+
+								vertexAID = sharedVertices.push(verticesID.a) - 1;
+
+								var vertexA = this.datas.vertices[vertexAID];
+
+								geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z)) - 1;
+
+							};
+
+							var vertexBID = sharedVertices.indexOf(verticesID.b);
+
+							if( vertexBID == -1 ){
+
+								vertexBID = sharedVertices.push(verticesID.b) - 1;
+
+								var vertexB = this.datas.vertices[vertexBID];
+
+								geometry.vertices.push(new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z));
+
+							};
+
+							var vertexCID = sharedVertices.indexOf(verticesID.c);
+
+							if( vertexCID == -1 ){
+
+								vertexCID = sharedVertices.push(verticesID.c) - 1;
+
+								var vertexC = this.datas.vertices[vertexCID];
+
+								geometry.vertices.push(new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
+
+							};
+
+							var normals = null;
+
+							if( this.datas.normals.length > 0 ){
+
+								normals = [
+									this.datas.normals[normalsID.a],
+									this.datas.normals[normalsID.b],
+									this.datas.normals[normalsID.c]
+								];
+
+							};
+
+							geometry.faces.push(new THREE.Face3(vertexAID, vertexBID, vertexCID, normals));
+
+						};
+
+						var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+							// size: 0.01,
+							color: Math.random() * 0xFFFFFF,
+							side: THREE.DoubleSide
+						}));
+
+						this.object3D.add(mesh);
 
 					};
-
-					this.object3D = object3D;
-
-					return this;
 
 					// var geometry = new THREE.Geometry();
 
@@ -233,6 +299,8 @@
 					// this.object3D.add(mesh);
 
 				};
+
+				console.warn("END");
 
 			};
 
@@ -351,7 +419,7 @@
 
 		};
 
-		var vertices = new Array(vertexCount);
+		var vertices = new Array(vertexCount)
 
 		var textureCount = 0;
 
@@ -361,7 +429,7 @@
 
 		};
 
-		var textures = new Array(textureCount);
+		var textures = new Array(textureCount)
 
 		var normalCount = 0;
 
@@ -371,7 +439,7 @@
 
 		};
 
-		var normals = new Array(normalCount);
+		var normals = new Array(normalCount)
 
 		var faceCount = 0;
 
@@ -381,11 +449,17 @@
 
 		};
 
-		var faces = new Array(faceCount);
+		var faces = new Array(faceCount)
 
 		var vertexMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-		var textureMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-		var textureOffset = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / textureMultiplicator;
+
+		if( textures.length > 0 ){
+
+			var textureMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+			var textureOffset = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / textureMultiplicator;
+
+		};
 
 		var objects = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
 
@@ -408,19 +482,19 @@
 
 		var groups = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
 
-		// for( var group = 0, length = groups.length; group < length; group++ ){
+		for( var group = 0, length = groups.length; group < length; group++ ){
 
-		// 	var groupIndex = 0;
+			var groupIndex = 0;
 
-		// 	for( var pass = 0; pass < faceSplitting; pass++ ){
+			for( var pass = 0; pass < faceSplitting; pass++ ){
 
-		// 		groupIndex += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				groupIndex += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
-		// 	};
+			};
 
-		// 	groups[group] = groupIndex
+			groups[group] = groupIndex
 
-		// };
+		};
 
 		var pivot = {
 			x: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator,
@@ -742,50 +816,52 @@
 
 			};
 
-			return count - 1;
+			return count;
 
 		})({
-			vertexSplitting: 1 + vertexSplitting,
-			textureSplitting: 1 + textureSplitting,
-			normalSplitting: 1 + normalSplitting,
-			faceSplitting: 1 + faceSplitting,
+			vertexSplitting: 1,
+			textureSplitting: 1,
+			normalSplitting: 1,
+			faceSplitting: 1,
+			vertices: vertexSplitting,
+			textures: textureSplitting,
+			normals: normalSplitting,
+			faces: faceSplitting,
 			vertexMultiplicator: 1,
-			textureMultiplicator: 1,
-			textureOffset: 1,
+			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
+			textureOffset: (textureSplitting > 0 ? 1 : 0),
 			objects: 1 + (objects.length * faceSplitting),
 			groups: 1 + (groups.length * faceSplitting),
 			pivot: 3
 		});
 
 		var pixelCount = parameters + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting));
-		var square = Math.ceil(Math.sqrt(pixelCount)); 
-
-		var imageDatas = new Float32Array(pixelCount);
+		var square = Math.ceil(Math.sqrt(pixelCount));
 
 		canvas.width = canvas.height = square;
 
 		var vertexSplittingColor = OBJImg.fn.getColorFromValue(vertexSplitting);
 
 		context.fillStyle = "rgba(" + vertexSplittingColor.r + ", " + vertexSplittingColor.g + ", " + vertexSplittingColor.b + ", " + vertexSplittingColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var textureSplittingColor = OBJImg.fn.getColorFromValue(textureSplitting);
 
 		context.fillStyle = "rgba(" + textureSplittingColor.r + ", " + textureSplittingColor.g + ", " + textureSplittingColor.b + ", " + textureSplittingColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var normalSplittingColor = OBJImg.fn.getColorFromValue(normalSplitting);
 
 		context.fillStyle = "rgba(" + normalSplittingColor.r + ", " + normalSplittingColor.g + ", " + normalSplittingColor.b + ", " + normalSplittingColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var faceSplittingColor = OBJImg.fn.getColorFromValue(faceSplitting);
 
 		context.fillStyle = "rgba(" + faceSplittingColor.r + ", " + faceSplittingColor.g + ", " + faceSplittingColor.b + ", " + faceSplittingColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var vertexPass = 0;
@@ -796,7 +872,7 @@
 			var vertexColor = OBJImg.fn.getColorFromValue(vertexIndex);
 
 			context.fillStyle = "rgba(" + vertexColor.r + ", " + vertexColor.g + ", " + vertexColor.b + ", " + vertexColor.a + ")";
-			context.fillRect(pixelIndex, 0, 1, 1);
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
 			vertexPass += vertexIndex;
@@ -811,7 +887,7 @@
 			var textureColor = OBJImg.fn.getColorFromValue(textureIndex);
 
 			context.fillStyle = "rgba(" + textureColor.r + ", " + textureColor.g + ", " + textureColor.b + ", " + textureColor.a + ")";
-			context.fillRect(pixelIndex, 0, 1, 1);
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
 			texturePass += textureIndex;
@@ -826,7 +902,7 @@
 			var normalColor = OBJImg.fn.getColorFromValue(normalIndex);
 
 			context.fillStyle = "rgba(" + normalColor.r + ", " + normalColor.g + ", " + normalColor.b + ", " + normalColor.a + ")";
-			context.fillRect(pixelIndex, 0, 1, 1);
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
 			normalPass += normalIndex;
@@ -841,7 +917,7 @@
 			var faceColor = OBJImg.fn.getColorFromValue(faceIndex);
 
 			context.fillStyle = "rgba(" + faceColor.r + ", " + faceColor.g + ", " + faceColor.b + ", " + faceColor.a + ")";
-			context.fillRect(pixelIndex, 0, 1, 1);
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
 			facePass += faceIndex;
@@ -852,26 +928,31 @@
 		var vertexMultiplicator = vertexMultiplicatorColor.r * vertexMultiplicatorColor.g + vertexMultiplicatorColor.b;
 
 		context.fillStyle = "rgba(" + vertexMultiplicatorColor.r + ", " + vertexMultiplicatorColor.g + ", " + vertexMultiplicatorColor.b + ", 1)";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
-		var textureMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.texture.max + Math.abs(bounds.texture.min)), 1));
-		var textureMultiplicator = textureMultiplicatorColor.r * textureMultiplicatorColor.g + textureMultiplicatorColor.b;
+		if( textureSplitting > 0 ){
 
-		context.fillStyle = "rgba(" + textureMultiplicatorColor.r + ", " + textureMultiplicatorColor.g + ", " + textureMultiplicatorColor.b + ", 1)";
-		context.fillRect(pixelIndex, 0, 1, 1);
-		pixelIndex++;
 
-		var textureOffsetColor = OBJImg.fn.getColorFromValue(Math.abs(bounds.texture.min) * textureMultiplicator);
+			var textureMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.texture.max + Math.abs(bounds.texture.min)), 1));
+			var textureMultiplicator = textureMultiplicatorColor.r * textureMultiplicatorColor.g + textureMultiplicatorColor.b;
 
-		context.fillStyle = "rgba(" + textureOffsetColor.r + ", " + textureOffsetColor.g + ", " + textureOffsetColor.b + ", " + textureOffsetColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
-		pixelIndex++;
+			context.fillStyle = "rgba(" + textureMultiplicatorColor.r + ", " + textureMultiplicatorColor.g + ", " + textureMultiplicatorColor.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			var textureOffsetColor = OBJImg.fn.getColorFromValue(Math.abs(bounds.texture.min) * textureMultiplicator);
+
+			context.fillStyle = "rgba(" + textureOffsetColor.r + ", " + textureOffsetColor.g + ", " + textureOffsetColor.b + ", " + textureOffsetColor.a + ")";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+		};
 
 		var objectsColor = OBJImg.fn.getColorFromValue(objects.length);
 
 		context.fillStyle = "rgba(" + objectsColor.r + ", " + objectsColor.g + ", " + objectsColor.b + ", " + objectsColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		for( var object = 0, length = objects.length; object < length; object++ ){
@@ -884,7 +965,7 @@
 				var objectColor = OBJImg.fn.getColorFromValue(objectIndex);
 
 				context.fillStyle = "rgba(" + objectColor.r + ", " + objectColor.g + ", " + objectColor.b + ", " + objectColor.a + ")";
-				context.fillRect(pixelIndex, 0, 1, 1);
+				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
 				objectPass += objectIndex;
@@ -896,7 +977,7 @@
 		var groupsColor = OBJImg.fn.getColorFromValue(groups.length);
 
 		context.fillStyle = "rgba(" + groupsColor.r + ", " + groupsColor.g + ", " + groupsColor.b + ", " + groupsColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		for( var group = 0, length = groups.length; group < length; group++ ){
@@ -909,22 +990,12 @@
 				var groupColor = OBJImg.fn.getColorFromValue(groupIndex);
 
 				context.fillStyle = "rgba(" + groupColor.r + ", " + groupColor.g + ", " + groupColor.b + ", " + groupColor.a + ")";
-				context.fillRect(pixelIndex, 0, 1, 1);
+				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
 				groupPass += groupIndex;
 
 			};
-
-		};
-
-		for( var pass = 0, length = groups.length; pass < length; pass++ ){
-
-			var groupIndex = OBJImg.fn.getColorFromValue(groups[pass].index);
-
-			context.fillStyle = "rgba(" + groupIndex.r + ", " + groupIndex.g + ", " + groupIndex.b + ", " + groupIndex.a + ")";
-			context.fillRect(pixelIndex, 0, 1, 1);
-			pixelIndex++;
 
 		};
 
@@ -937,19 +1008,19 @@
 		var pivotXColor = OBJImg.fn.getColorFromValue(pivot.x);
 
 		context.fillStyle = "rgba(" + pivotXColor.r + ", " + pivotXColor.g + ", " + pivotXColor.b + ", " + pivotXColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var pivotYColor = OBJImg.fn.getColorFromValue(pivot.y);
 
 		context.fillStyle = "rgba(" + pivotYColor.r + ", " + pivotYColor.g + ", " + pivotYColor.b + ", " + pivotYColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		var pivotZColor = OBJImg.fn.getColorFromValue(pivot.z);
 
 		context.fillStyle = "rgba(" + pivotZColor.r + ", " + pivotZColor.g + ", " + pivotZColor.b + ", " + pivotZColor.a + ")";
-		context.fillRect(pixelIndex, 0, 1, 1);
+		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
 		for( var vertex = 0, length = vertices.length; vertex < length; vertex++ ){
