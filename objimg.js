@@ -166,63 +166,17 @@
 
 					console.log(this.datas);
 
+					var object3D = new THREE.Object3D();
+
 					for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
-						var geometry = new THREE.Geometry();
-
-						for( var face = 0, faceLenght = this.datas.objects[object].faces.length; face < faceLenght; face++ ){
-
-							var faceID = this.datas.objects[object].faces[face];
-
-							var verticesID = this.datas.faces[faceID].vertices;
-							var texturesID = this.datas.faces[faceID].textures;
-							var normalsID = this.datas.faces[faceID].normals;
-
-							var vertexA = this.datas.vertices[verticesID.a];
-							var vertexB = this.datas.vertices[verticesID.b];
-							var vertexC = this.datas.vertices[verticesID.c];
-
-							geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z), new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z), new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
-
-							var normals = null;
-
-							if( this.datas.normals.length > 0 ){
-
-								normals = [
-									this.datas.normals[normalsID.a],
-									this.datas.normals[normalsID.b],
-									this.datas.normals[normalsID.c],
-								];
-
-							};
-
-							geometry.faces.push(new THREE.Face3(vertexA, vertexB, vertexC, normals));
-
-							if( this.datas.textures.length > 0 ){
-
-								var uvA = this.datas.textures[texturesID.a];
-								var uvB = this.datas.textures[texturesID.b];
-								var uvC = this.datas.textures[texturesID.c];
-
-								if( uvA && uvB && uvC ){
-
-									geometry.faceVertexUvs[0].push([
-										new THREE.Vector2(uvA.u, uvA.v),
-										new THREE.Vector2(uvB.u, uvB.v),
-										new THREE.Vector2(uvC.u, uvC.v),
-									]);
-
-								};
-
-							};
-
-						};
-
-						var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
-
-						this.object3D.add(mesh);
+						console.log(this.datas.objects[object]);
 
 					};
+
+					this.object3D = object3D;
+
+					return this;
 
 					// var geometry = new THREE.Geometry();
 
@@ -274,9 +228,9 @@
 
 					// geometry.computeBoundingBox();
 
-					var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
+					// var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
 
-					this.object3D.add(mesh);
+					// this.object3D.add(mesh);
 
 				};
 
@@ -454,22 +408,19 @@
 
 		var groups = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
 
-		for( var group = 0, length = groups.length; group < length; group++ ){
+		// for( var group = 0, length = groups.length; group < length; group++ ){
 
-			var groupIndex = 0;
+		// 	var groupIndex = 0;
 
-			for( var pass = 0; pass < faceSplitting; pass++ ){
+		// 	for( var pass = 0; pass < faceSplitting; pass++ ){
 
-				groupIndex += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+		// 		groupIndex += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
-			};
+		// 	};
 
-			groups[group] = {
-				index: groupIndex,
-				faces: new Array()
-			};
+		// 	groups[group] = groupIndex
 
-		};
+		// };
 
 		var pivot = {
 			x: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator,
@@ -577,7 +528,7 @@
 
 				if( face >= objects[object].index ){
 
-					objects[object].faces.push(face);
+					objects[object].faces.push(faces[face]);
 
 					break;
 
