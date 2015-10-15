@@ -4,8 +4,6 @@
 
 	var MAX = (255 * 255) + 255;
 
-	var charactersDictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
-
 	var OBJImg = function( path, useWorker, onLoad ){
 
 		return new OBJImg.fn.init(path, useWorker, onLoad);
@@ -411,6 +409,49 @@
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
 
+	OBJImg.generateImg = function( path, onLoad ){
+
+		var isURL = !path.match(/[\n\s]/);
+
+		var fileInfo = path.split(/\//g);
+		var fileName = fileInfo[fileInfo.length - 1].split(/\./)[0];
+
+		if( isURL ){
+
+			var xhr = new XMLHttpRequest();
+
+			xhr.addEventListener("readystatechange", function( event ){
+
+				if( xhr.readyState == 4 && xhr.status >= 200 && xhr.status < 400 ){
+
+					obj = xhr.responseText;
+
+					onLoad(OBJImg.convertObjToImg(obj));
+
+
+				}
+				else if( xhr.readyState == 4 ){
+
+					console.error("Cant load obj");
+
+				};
+
+			}, false);
+
+			xhr.open("GET", path, true);
+			xhr.send(null);
+
+		}
+		else {
+
+			onLoad(OBJImg.convertObjToImg(path));
+
+		};
+
+		return this;
+
+	};
+
 	OBJImg.convertImgToObj = function( pixels ){
 
 		var pixelIndex = 0;
@@ -459,86 +500,6 @@
 		};
 
 		var faces = new Array(faceCount)
-
-		var materials = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
-
-		for( var material = 0, length = materials.length; material < length; material++ ){
-
-			var ambientColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
-			var ambientMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
-			var ambientMap = "";
-
-			for( var character = 0; character < ambientMapCharacters; character++ ){
-
-				ambientMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
-
-			};
-
-			console.log(ambientMap);
-
-			var diffuseColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
-			var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
-			var diffuseMap = "";
-
-			for( var character = 0; character < diffuseMapCharacters; character++ ){
-
-				diffuseMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
-
-			};
-
-			var specularColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
-			var specularMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
-			var specularMap = "";
-
-			for( var character = 0; character < specularMapCharacters; character++ ){
-
-				specularMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
-
-			};
-
-			materials[material] = {
-				ambient: {
-					map: null,
-					encodedMap: null,
-					r: ambientColor.r / 255,
-					g: ambientColor.g / 255,
-					b: ambientColor.b / 255
-				},
-				diffuse: {
-					map: null,
-					encodedMap: null,
-					r: diffuseColor.r / 255,
-					g: diffuseColor.g / 255,
-					b: diffuseColor.b / 255
-				},
-				specular: {
-					map: null,
-					encodedMap: null,
-					forceMap: null,
-					encodedForceMap: null,
-					force: 1.0,
-					r: specularColor.r / 255,
-					g: specularColor.g / 255,
-					b: specularColor.b / 255,
-				},
-				reflection: {
-					map: null,
-					type: null,
-				},
-				opacity: {
-					map: null,
-					encodedMap: null,
-					value: 1.0
-				},
-				illumination: 2
-			};
-
-		};
-
-		console.info(materials);
 
 		var vertexMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
@@ -711,239 +672,15 @@
 
 	};
 
-	OBJImg.generateImg = function( options ){
+	OBJImg.convertObjToImg = function( obj ){
 
-		var isURL = !/[\n\s]/.test(options.obj);
-
-		var isOBJLoaded = false;
-		var isMTLLoaded = options.mtl == undefined;
-
-		var obj = "";
-		var mtl = "";
-
-		if( isURL == true ){
-
-			var OBJRequest = new XMLHttpRequest();
-
-			OBJRequest.addEventListener("readystatechange", function( event ){
-
-				if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
-
-					obj = this.responseText;
-					isOBJLoaded = true;
-
-					if( isOBJLoaded == true && isMTLLoaded == true ){
-
-						options.done(OBJImg.convertObjToImg(obj, mtl));
-
-					};
-
-				}
-				else if( this.readyState == 4 ){
-
-					options.fail("Cant load obj");
-
-				};
-
-			}, false);
-
-			OBJRequest.open("GET", options.obj, true);
-			OBJRequest.send(null);
-
-			var MTLRequest = new XMLHttpRequest();
-
-			MTLRequest.addEventListener("readystatechange", function( event ){
-
-				if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
-
-					mtl = this.responseText;
-					isMTLLoaded = true;
-
-					if( isOBJLoaded == true && isMTLLoaded == true ){
-
-						options.done(OBJImg.convertObjToImg(obj, mtl));
-
-					};
-
-				}
-				else if( this.readyState == 4 ){
-
-					options.fail("Cant load obj");
-
-				};
-
-			}, false);
-
-			MTLRequest.open("GET", options.mtl, true);
-			MTLRequest.send(null);
-
-		}
-		else {
-
-			options.done(OBJImg.convertObjToImg(options.obj, options.mtl));
-
-		};
-
-		return this;
-
-	};
-
-	OBJImg.convertObjToImg = function( obj, mtl ){
-
-		// console.log(mtl.split(/\n/g));
-
-		var OBJLines = obj.split(/\n/g);
+		var lines = obj.split(/\n/g);
 		var objects = new Array();
 		var groups = new Array();
 		var vertices = new Array();
 		var textures = new Array();
 		var normals = new Array();
 		var faces = new Array();
-
-		var MTLLines = mtl.split(/\n/g);
-		var materials = new Array();
-
-		for( var line = 0, length = MTLLines.length, index = -1; line < length; line++ ){
-
-			var datas = MTLLines[line].split(/\s+(?!$)/g);
-			var type = datas[0].replace(/\s+/, "").toLowerCase();
-
-			if( type == "newmtl" ){
-
-				index++;
-
-				materials[index] = {
-					name: datas[1],
-					ambient: {
-						map: null,
-						encodedMap: null,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					diffuse: {
-						map: null,
-						encodedMap: null,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					specular: {
-						map: null,
-						encodedMap: null,
-						forceMap: null,
-						encodedForceMap: null,
-						force: 1.0,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					reflection: {
-						map: null,
-						type: null,
-					},
-					opacity: {
-						map: null,
-						encodedMap: null,
-						value: 1.0
-					},
-					illumination: 2
-				};
-
-			}
-			else if( type == "ka" ){
-
-				materials[index].ambient.r = parseFloat(datas[1]);
-				materials[index].ambient.g = parseFloat(datas[2]);
-				materials[index].ambient.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "kd" ){
-
-				materials[index].diffuse.r = parseFloat(datas[1]);
-				materials[index].diffuse.g = parseFloat(datas[2]);
-				materials[index].diffuse.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "ks" ){
-
-				materials[index].specular.r = parseFloat(datas[1]);
-				materials[index].specular.g = parseFloat(datas[2]);
-				materials[index].specular.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "ns" ){
-
-				materials[index].specular.force = parseFloat(datas[1]);
-
-			}
-			else if( type == "d" ){
-
-				materials[index].opacity.value = parseFloat(datas[1]);
-
-			}
-			else if( type == "illum" ){
-
-				materials[index].illumination = parseInt(datas[1]);
-
-			}
-			else if( type.substr(0, 3) == "map" ){
-
-				var map = datas[1] || null;
-				var encodedMap = new Array();
-
-				if( map != null ){
-
-					for( var character = 0, characterLength = map.length; character < characterLength; character++ ){
-
-						encodedMap[character] = charactersDictionnary.indexOf(map[character]);
-
-					};
-
-				};
-
-				if( type == "map_ka" ){
-
-					materials[index].ambient.map = map;
-					materials[index].ambient.encodedMap = encodedMap;
-
-				}
-				else if( type == "map_kd" ){
-
-					materials[index].diffuse.map = map;
-					materials[index].diffuse.encodedMap = encodedMap;
-
-				}
-				else if( type == "map_ks" ){
-
-					materials[index].specular.map = map;
-					materials[index].specular.encodedMap = encodedMap;
-
-				}
-				else if( type == "map_ns" ){
-
-					materials[index].specular.forceMap = map;
-					materials[index].specular.encodedMorceMap = encodedMap;
-
-				}
-				else if( type == "map_d" ){
-
-					materials[index].opacity.map = map;
-					materials[index].opacity.encodedMap = encodedMap;
-
-				}
-				else if( type == "refl" ){
-
-					materials[index].reflection.map = map;
-					materials[index].reflection.encodedMap = encodedMap;
-
-				};
-
-			};
-
-		};
-
-		console.warn(materials);
 
 		var bounds = {
 			vertex: {
@@ -966,10 +703,10 @@
 			}
 		};
 
-		for( var line = 0, length = OBJLines.length; line < length; line++ ){
+		for( var line = 0, length = lines.length; line < length; line++ ){
 
-			var datas = OBJLines[line].split(/\s+/g);
-			var type = datas[0].toLowerCase();
+			var datas = lines[line].split(/\s+/g);
+			var type = datas[0];
 
 			if( type == "v" ){
 
@@ -1140,7 +877,6 @@
 			textures: textureSplitting,
 			normals: normalSplitting,
 			faces: faceSplitting,
-			materials: 1 + materials.length,
 			vertexMultiplicator: 1,
 			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 			textureOffset: (textureSplitting > 0 ? 1 : 0),
@@ -1149,21 +885,7 @@
 			pivot: 3
 		});
 
-		var pixelCount = parameters 
-			+ (vertices.length * 3)
-			+ (textures.length * 2)
-			+ (normals.length * 3)
-			+ ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting))
-			+ ((materials.length * 3 * 4));
-
-		for( var material = 0, length = materials.length; material < length; material++ ){
-
-			pixelCount += materials[material].ambient.encodedMap.length;
-			pixelCount += materials[material].diffuse.encodedMap.length;
-			pixelCount += materials[material].specular.encodedMap.length;
-
-		};
-
+		var pixelCount = parameters + (vertices.length * 3) + (textures.length * 2) + (normals.length * 3) + ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting));
 		var square = Math.ceil(Math.sqrt(pixelCount));
 
 		canvas.width = canvas.height = square;
@@ -1249,104 +971,6 @@
 			pixelIndex++;
 
 			facePass += faceIndex;
-
-		};
-
-		var materialColor = OBJImg.fn.getColorFromValue(materials.length);
-
-		context.fillStyle = "rgba(" + materialColor.r + ", " + materialColor.g + ", " + materialColor.b + ", 1)";
-		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-		pixelIndex++;
-
-		if( materials.length > 0 ){
-
-			for( var material = 0, length = materials.length; material < length; material++ ){
-
-				var ambientRedColor = materials[material].ambient.r * 255;
-				var ambientGreenColor = materials[material].ambient.g * 255;
-				var ambientBlueColor = materials[material].ambient.b * 255;
-
-				context.fillStyle = "rgba(" + ambientRedColor + ", " + ambientGreenColor + ", " + ambientBlueColor + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				var ambientMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
-
-				context.fillStyle = "rgba(" + ambientMapCharacters.r + ", " + ambientMapCharacters.g + ", " + ambientMapCharacters.b + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				if( materials[material].ambient.encodedMap.length > 0 ){
-
-					for( var character = 0, characterLength = materials[material].ambient.encodedMap.length; character < characterLength; character++ ){
-
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap[character]);
-
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
-
-					};
-
-				};
-
-				var diffuseRedColor = materials[material].diffuse.r * 255;
-				var diffuseGreenColor = materials[material].diffuse.g * 255;
-				var diffuseBlueColor = materials[material].diffuse.b * 255;
-
-				context.fillStyle = "rgba(" + diffuseRedColor + ", " + diffuseGreenColor + ", " + diffuseBlueColor + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				var diffuseMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
-
-				context.fillStyle = "rgba(" + diffuseMapCharacters.r + ", " + diffuseMapCharacters.g + ", " + diffuseMapCharacters.b + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				if( materials[material].diffuse.encodedMap.length == true ){
-
-					for( var character = 0, characterLength = materials[material].diffuse.encodedMap.length; character < characterLength; character++ ){
-
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].diffuse.encodedMap[character]);
-
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
-
-					};
-
-				};
-
-				var specularRedColor = materials[material].specular.r * 255;
-				var specularGreenColor = materials[material].specular.g * 255;
-				var specularBlueColor = materials[material].specular.b * 255;
-
-				context.fillStyle = "rgba(" + specularRedColor + ", " + specularGreenColor + ", " + specularBlueColor + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				var specularMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
-
-				context.fillStyle = "rgba(" + specularMapCharacters.r + ", " + specularMapCharacters.g + ", " + specularMapCharacters.b + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				if( materials[material].specular.encodedMap.length == true ){
-
-					for( var character = 0, characterLength = materials[material].diffuse.encodedMap.length; character < characterLength; character++ ){
-
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].diffuse.encodedMap[character]);
-
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
-
-					};
-
-				};
-
-			};
 
 		};
 
