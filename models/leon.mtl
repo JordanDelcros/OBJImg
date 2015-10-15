@@ -1,0 +1,134 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  Deep Exploration 5.5 5.5.3.2642 Release
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl leonmesh_08
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 55.7152
+map_Kd pl0013.tga
+map_bump 
+bump 
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_07
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 64
+map_Kd leon_kami_n.tga
+map_bump 
+bump 
+map_opacity leon_kami_n.tga
+map_d leon_kami_n.tga
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_06
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 121.887
+map_Kd pl0011.tga
+map_bump pl0011_n.tga
+bump pl0011_n.tga
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_05
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 42.2243
+map_Kd pl0004.tga
+map_bump pl0004_n.tga
+bump pl0004_n.tga
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_04
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 21.1121
+map_Kd leon_tex.tga
+map_bump 
+bump 
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_03
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 121.887
+map_Kd pl0005.tga
+map_bump pl0005_n.tga
+bump pl0005_n.tga
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_02
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 34.2967
+map_Kd pl0012.tga
+map_bump pl0012_n.tga
+bump pl0012_n.tga
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
+
+newmtl leonmesh_01
+Ka 0.4 0.4 0.4
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 121.887
+map_Kd pl0014.tga
+map_bump pl0014_n.tga
+bump pl0014_n.tga
+map_opacity 
+map_d 
+refl 
+map_kS 
+map_kA 
+map_Ns 
