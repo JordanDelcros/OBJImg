@@ -170,7 +170,6 @@
 			this.canvasAspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
 
 			this.camera = new THREE.PerspectiveCamera(75, this.canvasAspect, 0.1, 10000);
-			this.camera.position.set(0, 0, 1);
 
 			this.scene = new THREE.Scene();
 
@@ -187,15 +186,15 @@
 			this.scene.add(this.hemisphereLight);
 
 			this.controls = new THREE.TrackballControls(this.camera);
-			this.controls.rotateSpeed = 2.0;
-			this.controls.zoomSpeed = 0.8;
-			this.controls.minDistance = 1;
-			this.controls.maxDistance = 1000;
-			this.controls.panSpeed = 0.8;
-			this.controls.noZoom = false;
-			this.controls.noPan = true;
-			this.controls.staticMoving = false;
-			this.controls.dynamicDampingFactor = 0.3;
+			// this.controls.rotateSpeed = 2.0;
+			// this.controls.zoomSpeed = 0.8;
+			// this.controls.minDistance = 1;
+			// this.controls.maxDistance = 1000;
+			// this.controls.panSpeed = 0.8;
+			// this.controls.noZoom = false;
+			// this.controls.noPan = true;
+			// this.controls.staticMoving = false;
+			// this.controls.dynamicDampingFactor = 0.3;
 
 			return this;
 
@@ -331,7 +330,7 @@
 
 			if( this.mesh ){
 
-				this.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), (Math.PI / 180) * 0.1);
+				this.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 			};
 
@@ -528,38 +527,23 @@
 
 			this.mesh = new OBJImg(image, true).getObject3D(function( object ){
 
-				console.log(object);
-
-				var bounds = {
-					min: new THREE.Vector3(Infinity, Infinity, Infinity),
-					max: new THREE.Vector3(-Infinity, -Infinity, -Infinity)
-				}
-
-				object.traverse(function( mesh ){
-
-					if( mesh instanceof THREE.Mesh ){
-
-						mesh.geometry.computeBoundingBox();
-
-						var boundingBox = mesh.geometry.boundingBox;
-
-						bounds.min.x = Math.min(boundingBox.min.x, bounds.min.x);
-						bounds.min.y = Math.min(boundingBox.min.y, bounds.min.y);
-						bounds.min.z = Math.min(boundingBox.min.z, bounds.min.z);
-
-						bounds.max.x = Math.max(boundingBox.max.x, bounds.max.x);
-						bounds.max.y = Math.max(boundingBox.max.y, bounds.max.y);
-						bounds.max.z = Math.max(boundingBox.max.z, bounds.max.z);
-
-					};
-
-				});
-
-				var center = new THREE.Vector3().addVectors(bounds.min, bounds.max).divideScalar(2);
-
-				object.position.set(-center.x, -center.y, -center.z);
 
 			});
+
+			// var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
+
+			// this.material = new THREE.MeshPhongMaterial({
+			// 	color: 0x222222,
+			// 	side: THREE.FrontSide,
+			// 	shading: THREE.SmoothShading
+			// });
+
+			// this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+			// this.mesh.castShadow = true;
+			// this.mesh.receiveShadow = true;
+
+			// this.mesh.position.set(-center.x, -center.y, -center.z);
 
 			this.scene.add(this.mesh);
 
