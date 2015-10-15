@@ -90,20 +90,33 @@
 
 			var generatedMesh = null;
 
-			var imgFile = "vanquish";
+			var imgFile = "leon";
 
-			// OBJImg.generateImg("models/" + imgFile + ".obj", function( datas ){
+			OBJImg.generateImg({
+				obj: "models/" + imgFile + ".obj",
+				mtl: "models/" + imgFile + ".mtl",
+				options: {
+					wrap: true,
+					side: THREE.DoubleSide
+				},
+				done: function( datas ){
 
-			// 	var image = new Image();
-			// 	image.src = datas;
+					var image = new Image();
+					image.src = datas;
 
-			// 	document.body.appendChild(image);
+					document.body.appendChild(image);
 
-			// });
+				},
+				fail: function( error ){
 
-			var simpleObject = new OBJImg("models/" + imgFile + ".obj.png", false).getSimpleObject3D();
-			simpleObject.position.set(-2, 0, 0);
-			scene.add(simpleObject);
+					console.error(error);
+
+				}
+			});
+
+			// var simpleObject = new OBJImg("models/" + imgFile + ".obj.png", false).getSimpleObject3D();
+			// simpleObject.position.set(-2, 0, 0);
+			// scene.add(simpleObject);
 
 			var object = new OBJImg("models/" + imgFile + ".obj.png", false).getObject3D();
 			object.position.set(2, 0, 0);
@@ -113,8 +126,8 @@
 
 				window.requestAnimationFrame(render);
 
-				simpleObject.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
-				object.rotation.set(simpleObject.rotation.x, simpleObject.rotation.y, simpleObject.rotation.z);
+				// simpleObject.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+				object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 				renderer.render(scene, camera);
 
