@@ -90,36 +90,46 @@
 
 			var generatedMesh = null;
 
-			var imgFile = "leon";
+			var fileName = "leon";
 
-			OBJImg.generateImg({
-				obj: "models/" + imgFile + ".obj",
-				mtl: "models/" + imgFile + ".mtl",
-				options: {
-					wrap: true,
-					side: THREE.DoubleSide
-				},
-				done: function( datas ){
+			// OBJImg.generateImg({
+			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
+			// 	mtl: "models/" + fileName + "/" + fileName + ".mtl",
+			// 	options: {
+			// 		wrap: true,
+			// 		side: THREE.DoubleSide
+			// 	},
+			// 	done: function( datas ){
 
-					var image = new Image();
-					image.src = datas;
+			// 		var image = new Image();
+			// 		image.src = datas;
 
-					document.body.appendChild(image);
+			// 		document.body.appendChild(image);
 
-				},
-				fail: function( error ){
+			// 	},
+			// 	fail: function( error ){
 
-					console.error(error);
+			// 		console.error(error);
+
+			// 	}
+			// });
+
+			var obj = new OBJImg({
+				image: "models/" + fileName + "/" + fileName + ".obj.png",
+				useWorker: false,
+				onLoad: function(obj){
+
+					console.log("DONE");
 
 				}
 			});
 
-			// var simpleObject = new OBJImg("models/" + imgFile + ".obj.png", false).getSimpleObject3D();
+			// var simpleObject = obj.getSimpleObject3D();
 			// simpleObject.position.set(-2, 0, 0);
 			// scene.add(simpleObject);
 
-			var object = new OBJImg("models/" + imgFile + ".obj.png", false).getObject3D();
-			object.position.set(2, 0, 0);
+			var object = obj.getObject3D();
+			// object.position.set(2, 0, 0);
 			scene.add(object);
 
 			function render( now ){
