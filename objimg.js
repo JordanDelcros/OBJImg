@@ -1,20 +1,22 @@
 (function( window, document ){
 
-	var basePath = ( document ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/" : "");
+	var workerPath = ( document ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/" : "");
 
 	var MAX = (255 * 255) + 255;
 
 	var charactersDictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
 
-	var OBJImg = function( path, useWorker, onLoad ){
+	var OBJImg = function( options ){
 
-		return new OBJImg.fn.init(path, useWorker, onLoad);
+		return new OBJImg.fn.init(options);
 
 	};
 
 	OBJImg.fn = OBJImg.prototype = {
 		constructor: OBJImg,
-		init: function( path, useWorker, onLoad ){
+		init: function( options ){
+
+			this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
 
 			this.datas = null;
 
@@ -27,9 +29,9 @@
 			this.updateSimpleObject3D = false;
 			this.onComplete = null;
 
-			if( useWorker == true ){
+			if( options.useWorker == true ){
 
-				var worker = new Worker(basePath + "objimg-worker.js");
+				var worker = new Worker(workerPath + "objimg-worker.js");
 
 				worker.addEventListener("message", function( event ){
 
@@ -47,9 +49,9 @@
 
 					};
 
-					if( onLoad instanceof Function ){
+					if( options.onLoad instanceof Function ){
 
-						onLoad(this.datas);
+						options.onLoad(this.datas);
 
 					};
 
@@ -63,18 +65,18 @@
 
 			};
 
-			if( path instanceof Image ){
+			if( options.image instanceof Image ){
 
-				if( path.complete == true ){
+				if( options.image.complete == true ){
 
 					if( useWorker == true ){
 
-						worker.postMessage(["convertImgToObj", this.getPixels(path)]);
+						worker.postMessage(["convertImgToObj", this.getPixels(options.image)]);
 
 					}
 					else {
 
-						this.datas = OBJImg.convertImgToObj(this.getPixels(path));
+						this.datas = OBJImg.convertImgToObj(this.getPixels(options.image));
 
 						if( this.updateObject3D == true ){
 
@@ -88,9 +90,9 @@
 
 						};
 
-						if( onLoad instanceof Function ){
+						if( options.onLoad instanceof Function ){
 
-							onLoad(this.datas);
+							options.onLoad(this.datas);
 
 						};
 
@@ -99,16 +101,16 @@
 				}
 				else {
 
-					path.addEventListener("load", function( event ){
+					options.image.addEventListener("load", function( event ){
 
 						if( useWorker == true ){
 
-							worker.postMessage(["convertImgToObj", this.getPixels(path)]);
+							worker.postMessage(["convertImgToObj", this.getPixels(options.image)]);
 
 						}
 						else {
 
-							this.datas = OBJImg.convertImgToObj(this.getPixels(path));
+							this.datas = OBJImg.convertImgToObj(this.getPixels(options.image));
 
 							if( this.updateObject3D == true ){
 
@@ -122,9 +124,9 @@
 
 							};
 
-							if( onLoad instanceof Function ){
+							if( options.onLoad instanceof Function ){
 
-								onLoad(this.datas);
+								options.onLoad(this.datas);
 
 							};
 
@@ -141,7 +143,7 @@
 
 				image.addEventListener("load", function( event ){
 
-					if( useWorker == true ){
+					if( options.useWorker == true ){
 
 						worker.postMessage(["convertImgToObj", this.getPixels(image)]);
 
@@ -162,9 +164,9 @@
 
 						};
 
-						if( onLoad instanceof Function ){
+						if( options.onLoad instanceof Function ){
 
-							onLoad(this.datas);
+							options.onLoad(this.datas);
 
 						};
 
@@ -172,7 +174,7 @@
 
 				}.bind(this), false);
 
-				image.src = path;
+				image.src = options.image;
 
 			};
 
@@ -197,15 +199,21 @@
 
 				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
+					var objectDatas = this.datas.objects[object];
+					var verticesDatas = this.datas.vertices;
+					var normalsDatas = this.datas.normals;
+					var texturesDatas = this.datas.textures;
+
 					var geometry = new THREE.Geometry();
 
 					var sharedVertices = new Array();
 
-					for( var face = 0, faceLength = this.datas.objects[object].faces.length; face < faceLength; face++ ){
+					for( var face = 0, faceLength = objectDatas.faces.length; face < faceLength; face++ ){
 
-						var faceID = this.datas.objects[object].faces[face];
+						var faceID = objectDatas.faces[face];
 						var verticesID = faceID.vertices;
 						var normalsID = faceID.normals;
+						var texturesID = faceID.textures;
 
 						var vertexAID = sharedVertices.indexOf(verticesID.a);
 
@@ -213,7 +221,7 @@
 
 							vertexAID = sharedVertices.push(verticesID.a) - 1;
 
-							var vertexA = this.datas.vertices[verticesID.a];
+							var vertexA = verticesDatas[verticesID.a];
 
 							geometry.vertices.push(new THREE.Vector3(vertexA.x, vertexA.y, vertexA.z));
 
@@ -225,7 +233,7 @@
 
 							vertexBID = sharedVertices.push(verticesID.b) - 1;
 
-							var vertexB = this.datas.vertices[verticesID.b];
+							var vertexB = verticesDatas[verticesID.b];
 
 							geometry.vertices.push(new THREE.Vector3(vertexB.x, vertexB.y, vertexB.z));
 
@@ -237,7 +245,7 @@
 
 							vertexCID = sharedVertices.push(verticesID.c) - 1;
 
-							var vertexC = this.datas.vertices[verticesID.c];
+							var vertexC = verticesDatas[verticesID.c];
 
 							geometry.vertices.push(new THREE.Vector3(vertexC.x, vertexC.y, vertexC.z));
 
@@ -245,24 +253,59 @@
 
 						var normals = null;
 
-						if( this.datas.normals.length > 0 ){
+						if( normalsDatas.length > 0 ){
 
 							normals = [
-								this.datas.normals[normalsID.a],
-								this.datas.normals[normalsID.b],
-								this.datas.normals[normalsID.c]
+								normalsDatas[normalsID.a],
+								normalsDatas[normalsID.b],
+								normalsDatas[normalsID.c]
 							];
 
 						};
 
 						geometry.faces.push(new THREE.Face3(vertexAID, vertexBID, vertexCID, normals));
 
+						if( texturesDatas.length > 0 ){
+
+							var uvA = texturesDatas[texturesID.a];
+							var uvB = texturesDatas[texturesID.b];
+							var uvC = texturesDatas[texturesID.c];
+
+							geometry.faceVertexUvs[0].push([
+								new THREE.Vector2(uvA.u, uvA.v),
+								new THREE.Vector2(uvB.u, uvB.v),
+								new THREE.Vector2(uvC.u, uvC.v)
+							]);
+
+						};
+
 					};
 
-					var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-						color: Math.random() * 0xFFFFFF,
+					var materialDatas = this.datas.materials[objectDatas.material];
+
+					var map = null;
+
+					if( materialDatas.diffuse.map != null ){
+
+						map = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping, function(){
+
+							console.info("loaded");
+
+						}, function(){
+
+							console.info("NOT loaded");
+
+						});
+
+					};
+
+					var material = new THREE.MeshPhongMaterial({
+						color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
+						map: map,
 						side: THREE.DoubleSide
-					}));
+					});
+
+					var mesh = new THREE.Mesh(geometry, material);
 
 					this.object3D.add(mesh);
 
@@ -475,8 +518,6 @@
 
 			};
 
-			console.log(ambientMap);
-
 			var diffuseColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
@@ -499,46 +540,58 @@
 
 			};
 
+			var specularForceMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+			var specularForceMap = "";
+
+			for( var character = 0; character < specularMapCharacters; character++ ){
+
+				specularForceMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
+			var specularForce = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / (MAX / 1000);
+
+			var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
+			var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+			var opacityMap = "";
+
+			for( var character = 0; character < opacityMapCharacters; character++ ){
+
+				opacityMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
 			materials[material] = {
+				illumination: 2,
 				ambient: {
-					map: null,
-					encodedMap: null,
+					map: ambientMap || null,
 					r: ambientColor.r / 255,
 					g: ambientColor.g / 255,
 					b: ambientColor.b / 255
 				},
 				diffuse: {
-					map: null,
-					encodedMap: null,
+					map: diffuseMap || null,
 					r: diffuseColor.r / 255,
 					g: diffuseColor.g / 255,
 					b: diffuseColor.b / 255
 				},
 				specular: {
-					map: null,
-					encodedMap: null,
-					forceMap: null,
-					encodedForceMap: null,
-					force: 1.0,
+					map: specularMap || null,
+					forceMap: specularForceMap || null,
+					force: specularForce,
 					r: specularColor.r / 255,
 					g: specularColor.g / 255,
 					b: specularColor.b / 255,
 				},
-				reflection: {
-					map: null,
-					type: null,
-				},
 				opacity: {
-					map: null,
-					encodedMap: null,
-					value: 1.0
-				},
-				illumination: 2
+					map: opacityMap || null,
+					value: opacity
+				}
 			};
 
 		};
-
-		console.info(materials);
 
 		var vertexMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
@@ -562,26 +615,14 @@
 
 			};
 
+			var useMaterial = OBJImg.fn.getPixelColor(pixelIndex, pixels).a == 0 ? false : true;
+			var materialID = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
 			objects[object] = {
 				index: objectIndex,
-				faces: new Array()
+				faces: new Array(),
+				material: (useMaterial == true ? materialID : null)
 			};
-
-		};
-
-		var groups = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
-
-		for( var group = 0, length = groups.length; group < length; group++ ){
-
-			var groupIndex = 0;
-
-			for( var pass = 0; pass < faceSplitting; pass++ ){
-
-				groupIndex += OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
-			};
-
-			groups[group] = groupIndex
 
 		};
 
@@ -706,6 +747,7 @@
 			textures: textures,
 			normals: normals,
 			faces: faces,
+			materials: materials,
 			objects: objects
 		};
 
@@ -790,18 +832,9 @@
 
 	OBJImg.convertObjToImg = function( obj, mtl ){
 
-		// console.log(mtl.split(/\n/g));
-
-		var OBJLines = obj.split(/\n/g);
-		var objects = new Array();
-		var groups = new Array();
-		var vertices = new Array();
-		var textures = new Array();
-		var normals = new Array();
-		var faces = new Array();
-
 		var MTLLines = mtl.split(/\n/g);
 		var materials = new Array();
+		var materialsID = new Array();
 
 		for( var line = 0, length = MTLLines.length, index = -1; line < length; line++ ){
 
@@ -812,42 +845,34 @@
 
 				index++;
 
+				materialsID[index] = datas[1];
+
 				materials[index] = {
-					name: datas[1],
+					illumination: 2,
 					ambient: {
-						map: null,
-						encodedMap: null,
+						map: [],
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
 					diffuse: {
-						map: null,
-						encodedMap: null,
+						map: [],
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
 					specular: {
-						map: null,
-						encodedMap: null,
-						forceMap: null,
-						encodedForceMap: null,
+						map: [],
+						forceMap: [],
 						force: 1.0,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
-					reflection: {
-						map: null,
-						type: null,
-					},
 					opacity: {
-						map: null,
-						encodedMap: null,
+						map: [],
 						value: 1.0
-					},
-					illumination: 2
+					}
 				};
 
 			}
@@ -904,38 +929,27 @@
 
 				if( type == "map_ka" ){
 
-					materials[index].ambient.map = map;
-					materials[index].ambient.encodedMap = encodedMap;
+					materials[index].ambient.map = encodedMap;
 
 				}
 				else if( type == "map_kd" ){
 
-					materials[index].diffuse.map = map;
-					materials[index].diffuse.encodedMap = encodedMap;
+					materials[index].diffuse.map = encodedMap;
 
 				}
 				else if( type == "map_ks" ){
 
-					materials[index].specular.map = map;
-					materials[index].specular.encodedMap = encodedMap;
+					materials[index].specular.map = encodedMap;
 
 				}
 				else if( type == "map_ns" ){
 
-					materials[index].specular.forceMap = map;
-					materials[index].specular.encodedMorceMap = encodedMap;
+					materials[index].specular.forceMap = encodedMap;
 
 				}
 				else if( type == "map_d" ){
 
-					materials[index].opacity.map = map;
-					materials[index].opacity.encodedMap = encodedMap;
-
-				}
-				else if( type == "refl" ){
-
-					materials[index].reflection.map = map;
-					materials[index].reflection.encodedMap = encodedMap;
+					materials[index].opacity.map = encodedMap;
 
 				};
 
@@ -943,7 +957,12 @@
 
 		};
 
-		console.warn(materials);
+		var OBJLines = obj.split(/\n/g);
+		var objects = new Array();
+		var vertices = new Array();
+		var textures = new Array();
+		var normals = new Array();
+		var faces = new Array();
 
 		var bounds = {
 			vertex: {
@@ -1092,15 +1111,18 @@
 				});
 
 			}
-			else if( type == "o" ){
+			else if( type == "o" || type == "g" ){
 
 				objects.push({
 					name: datas[1],
+					material: null,
 					index: faces.length
 				});
 
 			}
-			else if( type == "g" ){
+			else if( type == "usemtl" ){
+
+				objects[objects.length - 1].material = materialsID.indexOf(datas[1]);
 
 			};
 
@@ -1145,7 +1167,6 @@
 			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 			textureOffset: (textureSplitting > 0 ? 1 : 0),
 			objects: 1 + (objects.length * faceSplitting),
-			groups: 1 + (groups.length * faceSplitting),
 			pivot: 3
 		});
 
@@ -1154,13 +1175,15 @@
 			+ (textures.length * 2)
 			+ (normals.length * 3)
 			+ ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting))
-			+ ((materials.length * 3 * 4));
+			+ ((materials.length * 9));
 
 		for( var material = 0, length = materials.length; material < length; material++ ){
 
-			pixelCount += materials[material].ambient.encodedMap.length;
-			pixelCount += materials[material].diffuse.encodedMap.length;
-			pixelCount += materials[material].specular.encodedMap.length;
+			pixelCount += materials[material].ambient.map.length;
+			pixelCount += materials[material].diffuse.map.length;
+			pixelCount += materials[material].specular.map.length;
+			pixelCount += materials[material].specular.forceMap.length;
+			pixelCount += materials[material].opacity.map.length;
 
 		};
 
@@ -1258,93 +1281,121 @@
 		context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 		pixelIndex++;
 
-		if( materials.length > 0 ){
+		for( var material = 0, length = materials.length; material < length; material++ ){
 
-			for( var material = 0, length = materials.length; material < length; material++ ){
+			var ambientRedColor = materials[material].ambient.r * 255;
+			var ambientGreenColor = materials[material].ambient.g * 255;
+			var ambientBlueColor = materials[material].ambient.b * 255;
 
-				var ambientRedColor = materials[material].ambient.r * 255;
-				var ambientGreenColor = materials[material].ambient.g * 255;
-				var ambientBlueColor = materials[material].ambient.b * 255;
+			context.fillStyle = "rgba(" + ambientRedColor + ", " + ambientGreenColor + ", " + ambientBlueColor + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-				context.fillStyle = "rgba(" + ambientRedColor + ", " + ambientGreenColor + ", " + ambientBlueColor + ", 1)";
+			var ambientMapCharacters = OBJImg.fn.getColorFromValue(materials[material].ambient.map.length);
+
+			context.fillStyle = "rgba(" + ambientMapCharacters.r + ", " + ambientMapCharacters.g + ", " + ambientMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			for( var character = 0, characterLength = materials[material].ambient.map.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].ambient.map[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
-				var ambientMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
+			};
 
-				context.fillStyle = "rgba(" + ambientMapCharacters.r + ", " + ambientMapCharacters.g + ", " + ambientMapCharacters.b + ", 1)";
+			var diffuseRedColor = materials[material].diffuse.r * 255;
+			var diffuseGreenColor = materials[material].diffuse.g * 255;
+			var diffuseBlueColor = materials[material].diffuse.b * 255;
+
+			context.fillStyle = "rgba(" + diffuseRedColor + ", " + diffuseGreenColor + ", " + diffuseBlueColor + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			var diffuseMapCharacters = OBJImg.fn.getColorFromValue(materials[material].diffuse.map.length);
+
+			context.fillStyle = "rgba(" + diffuseMapCharacters.r + ", " + diffuseMapCharacters.g + ", " + diffuseMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			for( var character = 0, characterLength = materials[material].diffuse.map.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].diffuse.map[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
-				if( materials[material].ambient.encodedMap.length > 0 ){
+			};
 
-					for( var character = 0, characterLength = materials[material].ambient.encodedMap.length; character < characterLength; character++ ){
+			var specularRedColor = materials[material].specular.r * 255;
+			var specularGreenColor = materials[material].specular.g * 255;
+			var specularBlueColor = materials[material].specular.b * 255;
 
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap[character]);
+			context.fillStyle = "rgba(" + specularRedColor + ", " + specularGreenColor + ", " + specularBlueColor + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
+			var specularMapCharacters = OBJImg.fn.getColorFromValue(materials[material].specular.map.length);
 
-					};
+			context.fillStyle = "rgba(" + specularMapCharacters.r + ", " + specularMapCharacters.g + ", " + specularMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-				};
+			for( var character = 0, characterLength = materials[material].specular.map.length; character < characterLength; character++ ){
 
-				var diffuseRedColor = materials[material].diffuse.r * 255;
-				var diffuseGreenColor = materials[material].diffuse.g * 255;
-				var diffuseBlueColor = materials[material].diffuse.b * 255;
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].specular.map[character]);
 
-				context.fillStyle = "rgba(" + diffuseRedColor + ", " + diffuseGreenColor + ", " + diffuseBlueColor + ", 1)";
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
-				var diffuseMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
+			};
 
-				context.fillStyle = "rgba(" + diffuseMapCharacters.r + ", " + diffuseMapCharacters.g + ", " + diffuseMapCharacters.b + ", 1)";
+			var specularForceMapCharacters =  OBJImg.fn.getColorFromValue(materials[material].specular.forceMap.length);
+
+			context.fillStyle = "rgba(" + specularForceMapCharacters.r + ", " + specularForceMapCharacters.g + ", " + specularForceMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			for( var character = 0, characterLength = materials[material].specular.forceMap.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].specular.forceMap[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
-				if( materials[material].diffuse.encodedMap.length == true ){
+			};
 
-					for( var character = 0, characterLength = materials[material].diffuse.encodedMap.length; character < characterLength; character++ ){
+			var specularForceColor = OBJImg.fn.getColorFromValue(materials[material].specular.force * (MAX / 1000));
 
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].diffuse.encodedMap[character]);
+			context.fillStyle = "rgba(" + specularForceColor.r + ", " + specularForceColor.g + ", " + specularForceColor.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
+			var opacityColor = OBJImg.fn.getColorFromValue(materials[material].opacity.value * 255);
 
-					};
+			context.fillStyle = "rgba(" + opacityColor.r + ", " + opacityColor.g + ", " + opacityColor.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-				};
+			var opacityMapCharacters =  OBJImg.fn.getColorFromValue(materials[material].opacity.map.length);
 
-				var specularRedColor = materials[material].specular.r * 255;
-				var specularGreenColor = materials[material].specular.g * 255;
-				var specularBlueColor = materials[material].specular.b * 255;
+			context.fillStyle = "rgba(" + opacityMapCharacters.r + ", " + opacityMapCharacters.g + ", " + opacityMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
 
-				context.fillStyle = "rgba(" + specularRedColor + ", " + specularGreenColor + ", " + specularBlueColor + ", 1)";
+			for( var character = 0, characterLength = materials[material].opacity.map.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].opacity.map[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
-
-				var specularMapCharacters = OBJImg.fn.getValueFromColor(materials[material].ambient.encodedMap.length);
-
-				context.fillStyle = "rgba(" + specularMapCharacters.r + ", " + specularMapCharacters.g + ", " + specularMapCharacters.b + ", 1)";
-				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-				pixelIndex++;
-
-				if( materials[material].specular.encodedMap.length == true ){
-
-					for( var character = 0, characterLength = materials[material].diffuse.encodedMap.length; character < characterLength; character++ ){
-
-						var characterColor = OBJImg.fn.getValueFromColor(materials[material].diffuse.encodedMap[character]);
-
-						context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
-						context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
-						pixelIndex++;
-
-					};
-
-				};
 
 			};
 
@@ -1398,28 +1449,20 @@
 
 			};
 
-		};
+			if( objects[object].material != null ){
 
-		var groupsColor = OBJImg.fn.getColorFromValue(groups.length);
+				var materialColor = OBJImg.fn.getColorFromValue(objects[object].material);
 
-		context.fillStyle = "rgba(" + groupsColor.r + ", " + groupsColor.g + ", " + groupsColor.b + ", " + groupsColor.a + ")";
-		context.fillRect(pixelIndex, Math.floor(pixelIndex / square), 1, 1);
-		pixelIndex++;
-
-		for( var group = 0, length = groups.length; group < length; group++ ){
-
-			var groupPass = 0;
-
-			for( var pass = 0; pass < faceSplitting; pass++ ){
-
-				var groupIndex = Math.min(groups[group].index - groupPass, MAX);
-				var groupColor = OBJImg.fn.getColorFromValue(groupIndex);
-
-				context.fillStyle = "rgba(" + groupColor.r + ", " + groupColor.g + ", " + groupColor.b + ", " + groupColor.a + ")";
+				context.fillStyle = "rgba(" + materialColor.r + ", " + materialColor.g + ", " + materialColor.b + ", 1)";
 				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 				pixelIndex++;
 
-				groupPass += groupIndex;
+			}
+			else {
+
+				context.fillStyle = "rgba(0, 0, 0, 0)";
+				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+				pixelIndex++;
 
 			};
 
