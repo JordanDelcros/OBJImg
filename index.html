@@ -38,6 +38,7 @@
 
 	</style>
 	<script type="text/javascript" src="three-js-72/build/three.js"></script>
+	<script type="text/javascript" src="three-js-71/src/controls/trackballcontrols.js"></script>
 	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
 
@@ -59,8 +60,18 @@
 			document.body.appendChild(renderer.domElement);
 
 			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 10000);
-
 			camera.position.set(0, 2, 3);
+
+			var controls = new THREE.TrackballControls(camera, renderer.domElement);
+			controls.rotateSpeed = 2.0;
+			controls.zoomSpeed = 0.8;
+			controls.minDistance = 1;
+			controls.maxDistance = 1000;
+			controls.panSpeed = 0.8;
+			controls.noZoom = false;
+			controls.noPan = false;
+			controls.staticMoving = false;
+			controls.dynamicDampingFactor = 0.3;
 
 			window.addEventListener("resize", function( event ){
 
@@ -90,7 +101,7 @@
 
 			var generatedMesh = null;
 
-			var fileName = "leon";
+			var fileName = "lara";
 
 			// OBJImg.generateImg({
 			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
@@ -117,27 +128,22 @@
 			var obj = new OBJImg({
 				image: "models/" + fileName + "/" + fileName + ".obj.png",
 				useWorker: false,
-				onLoad: function(obj){
-
-					console.log("DONE");
-
-				}
+				onLoad: function( obj ){}
 			});
 
 			// var simpleObject = obj.getSimpleObject3D();
 			// simpleObject.position.set(-2, 0, 0);
 			// scene.add(simpleObject);
 
-			var object = obj.getObject3D();
-			// object.position.set(2, 0, 0);
+			var object = obj.getObject3D(function( obj ){});
+			object.position.set(0, -2, 0);
 			scene.add(object);
 
 			function render( now ){
 
 				window.requestAnimationFrame(render);
 
-				// simpleObject.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
-				object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+				controls.update();
 
 				renderer.render(scene, camera);
 

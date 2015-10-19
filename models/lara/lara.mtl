@@ -10,7 +10,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Lara_Clothes_D.png
+map_Kd lara_clothes_diffuse.png
+map_Ks lara_clothes_specular.png
+map_Kn lara_clothes_normal.png
 
 newmtl LaraEquipment
 Ns 94.117647
@@ -21,7 +23,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Lara_Equipment_D.png
+map_Kd lara_equipment_diffuse.png
+map_Ks lara_equipment_specular.png
 
 newmtl LaraEye
 Ns 94.117647
@@ -32,7 +35,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Lara_Eye_D.png
+map_Kd lara_eye_diffuse.png
+map_Ks lara_eye_specular.png
+map_Kn lara_eye_specular.png
 
 newmtl LaraEyeRefl
 Ns 94.117647
@@ -43,7 +48,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 2
-map_Kd Lara_Eye_Reflection_D.png
+map_Kd lara_eye_reflection.png
 
 newmtl LaraEyebrowEyelash
 Ns 94.117647
@@ -54,7 +59,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 2
-map_Kd Lara_Eyebrows_Eyelashes_D.png
+map_Kd lara_eyelashes_diffuse.png
 
 newmtl LaraHair
 Ns 94.117647
@@ -65,7 +70,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 2
-map_Kd Lara_Hair_D.png
+map_Kd lara_hair_diffuse.png
+map_d lara_hair_alpha.png
 
 newmtl LaraHairTie
 Ns 94.117647
@@ -76,7 +82,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 0.000000
 illum 2
-map_Kd Lara_Hair_D.png
+map_Kd lara_hair_diffuse.png
+map_d lara_hair_alpha.png
 
 newmtl LaraHead
 Ns 94.117647
@@ -87,7 +94,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Lara_Head_D.png
+map_Kd lara_head_diffuse.png
+map_Ks lara_head_specular.png
 
 newmtl LaraSkin
 Ns 94.117647
@@ -98,7 +106,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Lara_Skin_D.png
+map_Kd lara_skin_diffuse.png
 
 newmtl PistolLegs
 Ns 94.117647
@@ -109,7 +117,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Pistol_D.png
+map_Kd pistol_diffuse.png
 
 newmtl pistol
 Ns 94.117647
@@ -120,4 +128,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd Pistol_D.png
+map_Kd pistol_diffuse.png

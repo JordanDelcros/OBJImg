@@ -3,6 +3,9 @@
 	var workerPath = ( document ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/" : "");
 
 	var MAX = (255 * 255) + 255;
+	var RGBA = 4;
+	var XYZ = ABC = RGB = 3;
+	var UV = 2;
 
 	var charactersDictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
 
@@ -24,8 +27,8 @@
 			this.context = this.canvas.getContext("2d");
 
 			this.object3D = window.THREE ? new window.THREE.Object3D() : null;
-			this.simpleObject3D = window.THREE ? new window.THREE.Object3D() : null;
 			this.updateObject3D = false;
+			this.simpleObject3D = window.THREE ? new window.THREE.Object3D() : null;
 			this.updateSimpleObject3D = false;
 			this.onComplete = null;
 
@@ -287,22 +290,62 @@
 
 					if( materialDatas.diffuse.map != null ){
 
-						map = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping, function(){
-
-							console.info("loaded");
-
-						}, function(){
-
-							console.info("NOT loaded");
-
-						});
+						map = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
 
 					};
+
+					var specularMap = null;
+
+					if( materialDatas.specular.map != null ){
+
+						specularMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.specular.map, THREE.UVMapping);
+
+					};
+
+					var normalMap = null;
+
+					if( materialDatas.bump.map != null ){
+
+						normalMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+
+					};
+
+					var bumpMap = null;
+
+					if( materialDatas.bump.map != null ){
+
+						bumpMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+
+					};
+
+					var alphaMap = null;
+
+					if( materialDatas.opacity.map != null ){
+
+						alphaMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.opacity.map, THREE.UVMapping);
+
+					};
+
+					console.info(materialDatas);
 
 					var material = new THREE.MeshPhongMaterial({
 						color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
 						map: map,
-						side: THREE.DoubleSide
+						specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
+						specularMap: specularMap,
+						shininess: materialDatas.specular.force,
+						normalMap: normalMap,
+						normalScale: new THREE.Vector2(1.0, 1.0),
+						bumpMap: bumpMap,
+						bumpScale: 1.0,
+						opacity: 1.0,//materialDatas.opacity.value,
+						alphaTest: 0.5,
+						alphaMap: alphaMap,
+						transparent: (materialDatas.opacity.value < 1.0 ? true : false),
+						combine: THREE.AddOperation,
+						shading: THREE.SmoothShading,
+						side: THREE.DoubleSide,
+						fog: true
 					});
 
 					var mesh = new THREE.Mesh(geometry, material);
@@ -414,10 +457,10 @@
 			pixels = (pixels || this.pixels);
 
 			return {
-				r: pixels[index * 4],
-				g: pixels[index * 4 + 1],
-				b: pixels[index * 4 + 2],
-				a: pixels[index * 4 + 3]
+				r: pixels[index * RGBA],
+				g: pixels[index * RGBA + 1],
+				b: pixels[index * RGBA + 2],
+				a: pixels[index * RGBA + 3]
 			};
 
 		},
@@ -520,7 +563,6 @@
 
 			var diffuseColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
 			var diffuseMap = "";
 
 			for( var character = 0; character < diffuseMapCharacters; character++ ){
@@ -531,7 +573,6 @@
 
 			var specularColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var specularMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
 			var specularMap = "";
 
 			for( var character = 0; character < specularMapCharacters; character++ ){
@@ -541,10 +582,9 @@
 			};
 
 			var specularForceMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
 			var specularForceMap = "";
 
-			for( var character = 0; character < specularMapCharacters; character++ ){
+			for( var character = 0; character < specularForceMapCharacters; character++ ){
 
 				specularForceMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
@@ -552,9 +592,26 @@
 
 			var specularForce = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / (MAX / 1000);
 
+			var normalMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var normalMap = "";
+
+			for( var character = 0; character < normalMapCharacters; character++ ){
+
+				normalMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
+			var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var bumpMap = "";
+
+			for( var character = 0; character < bumpMapCharacters; character++ ){
+
+				bumpMap += charactersDictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
 			var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 			var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-
 			var opacityMap = "";
 
 			for( var character = 0; character < opacityMapCharacters; character++ ){
@@ -584,6 +641,12 @@
 					r: specularColor.r / 255,
 					g: specularColor.g / 255,
 					b: specularColor.b / 255,
+				},
+				normal: {
+					map: normalMap || null
+				},
+				bump: {
+					map: bumpMap || null
 				},
 				opacity: {
 					map: opacityMap || null,
@@ -632,7 +695,7 @@
 			z: OBJImg.fn.getPixelValue(pixelIndex++, pixels) / vertexMultiplicator
 		};
 
-		for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += 3 ){
+		for( var vertex = 0, length = vertices.length; vertex < length; vertex++, pixelIndex += XYZ ){
 
 			var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / vertexMultiplicator) - pivot.x;
 			var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / vertexMultiplicator) - pivot.y;
@@ -646,7 +709,7 @@
 
 		};
 
-		for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += 2 ){
+		for( var texture = 0, length = textures.length; texture < length; texture++, pixelIndex += UV ){
 
 			var u = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / textureMultiplicator) - textureOffset;
 			var v = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / textureMultiplicator) - textureOffset;
@@ -658,7 +721,7 @@
 
 		};
 
-		for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += 3 ){
+		for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += XYZ ){
 
 			var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / vertexMultiplicator) - 1;
 			var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / vertexMultiplicator) - 1;
@@ -869,6 +932,12 @@
 						g: 1.0,
 						b: 1.0
 					},
+					normal: {
+						map: []
+					},
+					bump: {
+						map: []
+					},
 					opacity: {
 						map: [],
 						value: 1.0
@@ -912,6 +981,11 @@
 				materials[index].illumination = parseInt(datas[1]);
 
 			}
+			else if( type == "ni" ){
+
+				// Optical density (refraction)
+
+			}
 			else if( type.substr(0, 3) == "map" ){
 
 				var map = datas[1] || null;
@@ -947,6 +1021,16 @@
 					materials[index].specular.forceMap = encodedMap;
 
 				}
+				else if( type == "map_kn" ){
+
+					materials[index].normal.map = encodedMap;
+
+				}
+				else if( type == "map_bump" ){
+
+					materials[index].bump.map = encodedMap;
+
+				}
 				else if( type == "map_d" ){
 
 					materials[index].opacity.map = encodedMap;
@@ -956,6 +1040,8 @@
 			};
 
 		};
+
+		console.warn(materials)
 
 		var OBJLines = obj.split(/\n/g);
 		var objects = new Array();
@@ -1162,7 +1248,7 @@
 			textures: textureSplitting,
 			normals: normalSplitting,
 			faces: faceSplitting,
-			materials: 1 + materials.length,
+			materials: 1 + (materials.length * 7),
 			vertexMultiplicator: 1,
 			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 			textureOffset: (textureSplitting > 0 ? 1 : 0),
@@ -1171,18 +1257,20 @@
 		});
 
 		var pixelCount = parameters 
-			+ (vertices.length * 3)
-			+ (textures.length * 2)
-			+ (normals.length * 3)
-			+ ((faces.length * 3 * vertexSplitting) + (faces.length * 3 * textureSplitting) + (faces.length * 3 * normalSplitting))
-			+ ((materials.length * 9));
+			+ (vertices.length * XYZ)
+			+ (textures.length * UV)
+			+ (normals.length * XYZ)
+			+ ((faces.length * ABC * vertexSplitting) + (faces.length * ABC * textureSplitting) + (faces.length * ABC * normalSplitting));
 
 		for( var material = 0, length = materials.length; material < length; material++ ){
 
+			pixelCount += 3 * RGB;
 			pixelCount += materials[material].ambient.map.length;
 			pixelCount += materials[material].diffuse.map.length;
 			pixelCount += materials[material].specular.map.length;
 			pixelCount += materials[material].specular.forceMap.length;
+			pixelCount += materials[material].normal.map.length;
+			pixelCount += materials[material].bump.map.length;
 			pixelCount += materials[material].opacity.map.length;
 
 		};
@@ -1283,9 +1371,9 @@
 
 		for( var material = 0, length = materials.length; material < length; material++ ){
 
-			var ambientRedColor = materials[material].ambient.r * 255;
-			var ambientGreenColor = materials[material].ambient.g * 255;
-			var ambientBlueColor = materials[material].ambient.b * 255;
+			var ambientRedColor = Math.round(materials[material].ambient.r * 255);
+			var ambientGreenColor = Math.round(materials[material].ambient.g * 255);
+			var ambientBlueColor = Math.round(materials[material].ambient.b * 255);
 
 			context.fillStyle = "rgba(" + ambientRedColor + ", " + ambientGreenColor + ", " + ambientBlueColor + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
@@ -1307,13 +1395,14 @@
 
 			};
 
-			var diffuseRedColor = materials[material].diffuse.r * 255;
-			var diffuseGreenColor = materials[material].diffuse.g * 255;
-			var diffuseBlueColor = materials[material].diffuse.b * 255;
+			var diffuseRedColor = Math.round(materials[material].diffuse.r * 255);
+			var diffuseGreenColor = Math.round(materials[material].diffuse.g * 255);
+			var diffuseBlueColor = Math.round(materials[material].diffuse.b * 255);
 
 			context.fillStyle = "rgba(" + diffuseRedColor + ", " + diffuseGreenColor + ", " + diffuseBlueColor + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
+
 
 			var diffuseMapCharacters = OBJImg.fn.getColorFromValue(materials[material].diffuse.map.length);
 
@@ -1331,9 +1420,9 @@
 
 			};
 
-			var specularRedColor = materials[material].specular.r * 255;
-			var specularGreenColor = materials[material].specular.g * 255;
-			var specularBlueColor = materials[material].specular.b * 255;
+			var specularRedColor = Math.round(materials[material].specular.r * 255);
+			var specularGreenColor = Math.round(materials[material].specular.g * 255);
+			var specularBlueColor = Math.round(materials[material].specular.b * 255);
 
 			context.fillStyle = "rgba(" + specularRedColor + ", " + specularGreenColor + ", " + specularBlueColor + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
@@ -1376,6 +1465,38 @@
 			context.fillStyle = "rgba(" + specularForceColor.r + ", " + specularForceColor.g + ", " + specularForceColor.b + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
+
+			var normalMapCharacters = OBJImg.fn.getColorFromValue(materials[material].normal.map.length);
+
+			context.fillStyle = "rgba(" + normalMapCharacters.r + ", " + normalMapCharacters.g + ", " + normalMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			for( var character = 0, characterLength = materials[material].normal.map.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].normal.map[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
+				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+				pixelIndex++;
+
+			};
+
+			var bumpMapCharacters = OBJImg.fn.getColorFromValue(materials[material].bump.map.length);
+
+			context.fillStyle = "rgba(" + bumpMapCharacters.r + ", " + bumpMapCharacters.g + ", " + bumpMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			for( var character = 0, characterLength = materials[material].bump.map.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].bump.map[character]);
+
+				context.fillStyle = "rgba(" + characterColor.r + ", " + characterColor.g + ", " + characterColor.b + ", 1)";
+				context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+				pixelIndex++;
+
+			};
 
 			var opacityColor = OBJImg.fn.getColorFromValue(materials[material].opacity.value * 255);
 
