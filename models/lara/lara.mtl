@@ -10,6 +10,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
+map_Ka lara_clothes_ambient.png
 map_Kd lara_clothes_diffuse.png
 map_Ks lara_clothes_specular.png
 map_Kn lara_clothes_normal.png
@@ -23,6 +25,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
 map_Kd lara_equipment_diffuse.png
 map_Ks lara_equipment_specular.png
 
@@ -35,9 +38,10 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
 map_Kd lara_eye_diffuse.png
 map_Ks lara_eye_specular.png
-map_Kn lara_eye_specular.png
+map_Kn lara_eye_normal.png
 
 newmtl LaraEyeRefl
 Ns 94.117647
@@ -46,8 +50,9 @@ Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
-d 0.000000
+d 0.999999
 illum 2
+s on
 map_Kd lara_eye_reflection.png
 
 newmtl LaraEyebrowEyelash
@@ -57,33 +62,40 @@ Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
-d 0.000000
+d 0.999999
 illum 2
+s on
 map_Kd lara_eyelashes_diffuse.png
+map_Ks lara_eyelashes_specular.png
+map_Kn lara_eyelashes_normal.png
 
 newmtl LaraHair
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
-d 0.000000
+d 1.000000
 illum 2
-map_Kd lara_hair_diffuse.png
-map_d lara_hair_alpha.png
+s on
+map_Kd -clamp off lara_hair_diffuse.png
+map_Ks -clamp off lara_hair_specular.png
+map_Kn lara_hair_normal.png
 
 newmtl LaraHairTie
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
-d 0.000000
+d 1.000000
 illum 2
-map_Kd lara_hair_diffuse.png
-map_d lara_hair_alpha.png
+s on
+map_Kd -clamp off lara_hair_diffuse.png
+map_Ks -clamp off lara_hair_specular.png
+map_Kn lara_hair_normal.png
 
 newmtl LaraHead
 Ns 94.117647
@@ -94,8 +106,11 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
+map_Ka lara_head_ambient.png
 map_Kd lara_head_diffuse.png
 map_Ks lara_head_specular.png
+map_Kn lara_head_normal.png
 
 newmtl LaraSkin
 Ns 94.117647
@@ -106,10 +121,14 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
+map_Ka lara_skin_ambient.png
 map_Kd lara_skin_diffuse.png
+map_Ks lara_skin_specular.png
+map_Kn lara_skin_normal.png
 
 newmtl PistolLegs
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.100000 0.100000 0.100000
@@ -117,10 +136,12 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
 map_Kd pistol_diffuse.png
+map_Kn pistol_normal.png
 
 newmtl pistol
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.100000 0.100000 0.100000
@@ -128,4 +149,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
+s on
 map_Kd pistol_diffuse.png
+map_Kn pistol_normal.png

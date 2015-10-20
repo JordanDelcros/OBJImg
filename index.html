@@ -64,10 +64,10 @@
 
 			var controls = new THREE.TrackballControls(camera, renderer.domElement);
 			controls.rotateSpeed = 2.0;
-			controls.zoomSpeed = 0.8;
-			controls.minDistance = 1;
+			controls.zoomSpeed = 0.2;
+			controls.minDistance = 0;
 			controls.maxDistance = 1000;
-			controls.panSpeed = 0.8;
+			controls.panSpeed = 0.4;
 			controls.noZoom = false;
 			controls.noPan = false;
 			controls.staticMoving = false;
@@ -128,7 +128,17 @@
 			var obj = new OBJImg({
 				image: "models/" + fileName + "/" + fileName + ".obj.png",
 				useWorker: false,
-				onLoad: function( obj ){}
+				onProgress: function( progression ){
+
+					console.log(progression);
+
+				},
+				onLoad: function( obj ){},
+				onError: function( error ){
+
+					console.error(error);
+
+				}
 			});
 
 			// var simpleObject = obj.getSimpleObject3D();

@@ -1,7 +1,18 @@
+self.lastProgression = 0;
+
 importScripts("objimg.js");
 
-onmessage = function( event ){
+self.addEventListener("message", function( event ){
 
-	postMessage(OBJImg[event.data[0]](event.data[1]));
+	if( event.data.action == "convertImgToObj" ){
 
-};
+		var datas = OBJImg.convertImgToObj(event.data.content);
+
+		postMessage({
+			action: event.data.action,
+			content: datas
+		})
+
+	};
+
+}, false);

@@ -1,6 +1,7 @@
 (function( window, document ){
 
-	var workerPath = ( document ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/" : "");
+	var insideWorker = self.document === undefined;
+	var workerPath = (!insideWorker ? (Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/").replace(/^\//, "./") : "");
 
 	var MAX = (255 * 255) + 255;
 	var RGBA = 4;
@@ -38,23 +39,36 @@
 
 				worker.addEventListener("message", function( event ){
 
-					this.datas = event.data;
+					if( event.data.action == "progress" ){
 
-					if( this.updateObject3D == true ){
+						if( options.onProgress instanceof Function ){
 
-						this.setObject3D();
+							options.onProgress(event.data.content);
 
-					};
+						};
 
-					if( this.updateSimpleObject3D == true ){
+					}
+					else if( event.data.action == "convertImgToObj" ){
 
-						this.setSimpleObject3D();
+						this.datas = event.data.content;
 
-					};
+						if( this.updateObject3D == true ){
 
-					if( options.onLoad instanceof Function ){
+							this.setObject3D();
 
-						options.onLoad(this.datas);
+						};
+
+						if( this.updateSimpleObject3D == true ){
+
+							this.setSimpleObject3D();
+
+						};
+
+						if( options.onLoad instanceof Function ){
+
+							options.onLoad(this.datas);
+
+						};
 
 					};
 
@@ -62,7 +76,11 @@
 
 				worker.addEventListener("error", function( event ){
 
-					console.log("worker error");
+					if( options.onError instanceof Function ){
+
+						options.onError("worker error");
+
+					};
 
 				}.bind(this), false);
 
@@ -74,7 +92,12 @@
 
 					if( useWorker == true ){
 
-						worker.postMessage(["convertImgToObj", this.getPixels(options.image)]);
+						var pixelsBuffer = new Int16Array(this.getPixels(image));
+
+						worker.postMessage({
+							action: "convertImgToObj",
+							content: pixelsBuffer
+						}, [pixelsBuffer.buffer]);
 
 					}
 					else {
@@ -108,7 +131,12 @@
 
 						if( useWorker == true ){
 
-							worker.postMessage(["convertImgToObj", this.getPixels(options.image)]);
+							var pixelsBuffer = new Int16Array(this.getPixels(image));
+
+						worker.postMessage({
+							action: "convertImgToObj",
+							content: pixelsBuffer
+						}, [pixelsBuffer.buffer]);
 
 						}
 						else {
@@ -148,7 +176,12 @@
 
 					if( options.useWorker == true ){
 
-						worker.postMessage(["convertImgToObj", this.getPixels(image)]);
+						var pixelsBuffer = new Int16Array(this.getPixels(image));
+
+						worker.postMessage({
+							action: "convertImgToObj",
+							content: pixelsBuffer
+						}, [pixelsBuffer.buffer]);
 
 					}
 					else {
@@ -286,11 +319,21 @@
 
 					var materialDatas = this.datas.materials[objectDatas.material];
 
-					var map = null;
+					var diffuseMap = null;
 
 					if( materialDatas.diffuse.map != null ){
 
-						map = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
+						diffuseMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
+						diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+					};
+
+					var ambientMap = null;
+
+					if( materialDatas.ambient.map != null ){
+
+						ambientMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.ambient.map, THREE.UVMapping);
+						ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 					};
 
@@ -299,6 +342,7 @@
 					if( materialDatas.specular.map != null ){
 
 						specularMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.specular.map, THREE.UVMapping);
+						specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 					};
 
@@ -307,6 +351,7 @@
 					if( materialDatas.bump.map != null ){
 
 						normalMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+						normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 					};
 
@@ -315,6 +360,7 @@
 					if( materialDatas.bump.map != null ){
 
 						bumpMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+						bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 					};
 
@@ -323,27 +369,27 @@
 					if( materialDatas.opacity.map != null ){
 
 						alphaMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.opacity.map, THREE.UVMapping);
+						alphaMap.wrapS = alphaMap.wrapT = (materialDatas.alpha.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 					};
 
-					console.info(materialDatas);
-
 					var material = new THREE.MeshPhongMaterial({
 						color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
-						map: map,
+						aoMap: ambientMap,
+						map: diffuseMap,
 						specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
 						specularMap: specularMap,
 						shininess: materialDatas.specular.force,
 						normalMap: normalMap,
-						normalScale: new THREE.Vector2(1.0, 1.0),
+						normalScale: new THREE.Vector2(5.0, 5.0),
 						bumpMap: bumpMap,
 						bumpScale: 1.0,
-						opacity: 1.0,//materialDatas.opacity.value,
-						alphaTest: 0.5,
+						opacity: materialDatas.opacity.value,
+						alphaTest: 0,
 						alphaMap: alphaMap,
-						transparent: (materialDatas.opacity.value < 1.0 ? true : false),
-						combine: THREE.AddOperation,
-						shading: THREE.SmoothShading,
+						transparent: ((materialDatas.opacity.value < 1.0 || alphaMap != null) ? true : false),
+						combine: THREE.MultiplyOperation,
+						shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
 						side: THREE.DoubleSide,
 						fog: true
 					});
@@ -550,8 +596,12 @@
 
 		for( var material = 0, length = materials.length; material < length; material++ ){
 
+			var illumination = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var smooth = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+
 			var ambientColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var ambientMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var ambientClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			var ambientMap = "";
 
@@ -564,6 +614,7 @@
 			var diffuseColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var diffuseMap = "";
+			var diffuseClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < diffuseMapCharacters; character++ ){
 
@@ -574,6 +625,7 @@
 			var specularColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var specularMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var specularMap = "";
+			var specularClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < specularMapCharacters; character++ ){
 
@@ -583,6 +635,7 @@
 
 			var specularForceMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var specularForceMap = "";
+			var specularForceClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < specularForceMapCharacters; character++ ){
 
@@ -594,6 +647,7 @@
 
 			var normalMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var normalMap = "";
+			var normalClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < normalMapCharacters; character++ ){
 
@@ -603,6 +657,7 @@
 
 			var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var bumpMap = "";
+			var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < bumpMapCharacters; character++ ){
 
@@ -613,6 +668,7 @@
 			var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 			var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var opacityMap = "";
+			var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 
 			for( var character = 0; character < opacityMapCharacters; character++ ){
 
@@ -621,35 +677,43 @@
 			};
 
 			materials[material] = {
-				illumination: 2,
+				illumination: illumination,
+				smooth: smooth,
 				ambient: {
 					map: ambientMap || null,
+					clamp: ambientClamp || false,
 					r: ambientColor.r / 255,
 					g: ambientColor.g / 255,
 					b: ambientColor.b / 255
 				},
 				diffuse: {
 					map: diffuseMap || null,
+					clamp: diffuseClamp || false,
 					r: diffuseColor.r / 255,
 					g: diffuseColor.g / 255,
 					b: diffuseColor.b / 255
 				},
 				specular: {
 					map: specularMap || null,
+					clamp: specularClamp || false,
 					forceMap: specularForceMap || null,
+					forceClamp: specularForceClamp || null,
 					force: specularForce,
 					r: specularColor.r / 255,
 					g: specularColor.g / 255,
-					b: specularColor.b / 255,
+					b: specularColor.b / 255
 				},
 				normal: {
-					map: normalMap || null
+					map: normalMap || null,
+					clamp: normalClamp || false
 				},
 				bump: {
-					map: bumpMap || null
+					map: bumpMap || null,
+					clamp: bumpClamp || false
 				},
 				opacity: {
 					map: opacityMap || null,
+					clamp: opacityClamp || false,
 					value: opacity
 				}
 			};
@@ -912,34 +976,42 @@
 
 				materials[index] = {
 					illumination: 2,
+					smooth: true,
 					ambient: {
 						map: [],
+						clamp: false,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
 					diffuse: {
 						map: [],
+						clamp: false,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
 					specular: {
 						map: [],
+						clamp: false,
 						forceMap: [],
+						forceClamp: false,
 						force: 1.0,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
 					},
 					normal: {
-						map: []
+						map: [],
+						clamp: false
 					},
 					bump: {
-						map: []
+						map: [],
+						clamp: false
 					},
 					opacity: {
 						map: [],
+						clamp: false,
 						value: 1.0
 					}
 				};
@@ -981,6 +1053,11 @@
 				materials[index].illumination = parseInt(datas[1]);
 
 			}
+			else if( type == "s" ){
+
+				materials[index].smooth = (datas[1] == "off" || parseInt(datas[1]) == 0) ? false : true;
+
+			}
 			else if( type == "ni" ){
 
 				// Optical density (refraction)
@@ -988,7 +1065,7 @@
 			}
 			else if( type.substr(0, 3) == "map" ){
 
-				var map = datas[1] || null;
+				var map = datas[datas.length - 1] || null;
 				var encodedMap = new Array();
 
 				if( map != null ){
@@ -1001,47 +1078,74 @@
 
 				};
 
+				var options = {
+					clamp: true
+				};
+
+				for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
+
+					var optionType = datas[option];
+
+					if( optionType == "-clamp" ){
+
+						var value = datas[++option];
+
+						if( value == "off" || parseInt(value) == 0 ){
+
+							options.clamp = false;
+
+						};
+
+					};
+
+				};
+
 				if( type == "map_ka" ){
 
 					materials[index].ambient.map = encodedMap;
+					materials[index].ambient.clamp = options.clamp;
 
 				}
 				else if( type == "map_kd" ){
 
 					materials[index].diffuse.map = encodedMap;
+					materials[index].diffuse.clamp = options.clamp;
 
 				}
 				else if( type == "map_ks" ){
 
 					materials[index].specular.map = encodedMap;
+					materials[index].specular.clamp = options.clamp;
 
 				}
 				else if( type == "map_ns" ){
 
 					materials[index].specular.forceMap = encodedMap;
+					materials[index].specular.forceClamp = options.clamp;
 
 				}
 				else if( type == "map_kn" ){
 
 					materials[index].normal.map = encodedMap;
+					materials[index].normal.clamp = options.clamp;
 
 				}
 				else if( type == "map_bump" ){
 
 					materials[index].bump.map = encodedMap;
+					materials[index].bump.clamp = options.clamp;
 
 				}
 				else if( type == "map_d" ){
 
 					materials[index].opacity.map = encodedMap;
+					materials[index].opacity.clamp = options.clamp;
 
 				};
 
 			};
 
 		};
-
-		console.warn(materials)
 
 		var OBJLines = obj.split(/\n/g);
 		var objects = new Array();
@@ -1248,7 +1352,7 @@
 			textures: textureSplitting,
 			normals: normalSplitting,
 			faces: faceSplitting,
-			materials: 1 + (materials.length * 7),
+			materials: 1 + (materials.length * 9 * 2),
 			vertexMultiplicator: 1,
 			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 			textureOffset: (textureSplitting > 0 ? 1 : 0),
@@ -1371,6 +1475,14 @@
 
 		for( var material = 0, length = materials.length; material < length; material++ ){
 
+			context.fillStyle = "rgba(0, 0, " + materials[material].illumination + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].smooth == true ? 1 : 0) + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
 			var ambientRedColor = Math.round(materials[material].ambient.r * 255);
 			var ambientGreenColor = Math.round(materials[material].ambient.g * 255);
 			var ambientBlueColor = Math.round(materials[material].ambient.b * 255);
@@ -1382,6 +1494,10 @@
 			var ambientMapCharacters = OBJImg.fn.getColorFromValue(materials[material].ambient.map.length);
 
 			context.fillStyle = "rgba(" + ambientMapCharacters.r + ", " + ambientMapCharacters.g + ", " + ambientMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].ambient.clamp == true ? 1 : 0) + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
@@ -1403,10 +1519,13 @@
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
-
 			var diffuseMapCharacters = OBJImg.fn.getColorFromValue(materials[material].diffuse.map.length);
 
 			context.fillStyle = "rgba(" + diffuseMapCharacters.r + ", " + diffuseMapCharacters.g + ", " + diffuseMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].diffuse.clamp == true ? 1 : 0) + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
@@ -1434,6 +1553,10 @@
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
+			context.fillStyle = "rgba(0, 0, " + (materials[material].specular.clamp == true ? 1 : 0) + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
 			for( var character = 0, characterLength = materials[material].specular.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].specular.map[character]);
@@ -1447,6 +1570,10 @@
 			var specularForceMapCharacters =  OBJImg.fn.getColorFromValue(materials[material].specular.forceMap.length);
 
 			context.fillStyle = "rgba(" + specularForceMapCharacters.r + ", " + specularForceMapCharacters.g + ", " + specularForceMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].specular.forceClamp == true ? 1 : 0) + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
@@ -1472,6 +1599,10 @@
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
+			context.fillStyle = "rgba(0, 0, " + (materials[material].normal.clamp == true ? 1 : 0) + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
 			for( var character = 0, characterLength = materials[material].normal.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].normal.map[character]);
@@ -1485,6 +1616,10 @@
 			var bumpMapCharacters = OBJImg.fn.getColorFromValue(materials[material].bump.map.length);
 
 			context.fillStyle = "rgba(" + bumpMapCharacters.r + ", " + bumpMapCharacters.g + ", " + bumpMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].bump.clamp == true ? 1 : 0) + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
@@ -1507,6 +1642,10 @@
 			var opacityMapCharacters =  OBJImg.fn.getColorFromValue(materials[material].opacity.map.length);
 
 			context.fillStyle = "rgba(" + opacityMapCharacters.r + ", " + opacityMapCharacters.g + ", " + opacityMapCharacters.b + ", 1)";
+			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
+			pixelIndex++;
+
+			context.fillStyle = "rgba(0, 0, " + (materials[material].opacity.clamp == true ? 1 : 0) + ", 1)";
 			context.fillRect(pixelIndex % square, Math.floor(pixelIndex / square), 1, 1);
 			pixelIndex++;
 
