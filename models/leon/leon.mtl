@@ -8,7 +8,7 @@
 newmtl leonmesh_08
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 55.7152
 map_Kd pl0013.png
@@ -24,14 +24,14 @@ map_Ns
 newmtl leonmesh_07
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 64
 map_Kd leon_kami_n.png
 map_bump 
 bump 
 map_opacity leon_kami_n.png
-map_d leon_kami_n.png
+#map_d leon_kami_n.png
 refl 
 map_kS 
 map_kA 
@@ -40,7 +40,7 @@ map_Ns
 newmtl leonmesh_06
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 121.887
 map_Kd pl0011.png
@@ -56,7 +56,7 @@ map_Ns
 newmtl leonmesh_05
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 42.2243
 map_Kd pl0004.png
@@ -72,7 +72,7 @@ map_Ns
 newmtl leonmesh_04
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 21.1121
 map_Kd leon_tex.png
@@ -88,7 +88,7 @@ map_Ns
 newmtl leonmesh_03
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 121.887
 map_Kd pl0005.png
@@ -104,7 +104,7 @@ map_Ns
 newmtl leonmesh_02
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 34.2967
 map_Kd pl0012.png
@@ -120,7 +120,7 @@ map_Ns
 newmtl leonmesh_01
 Ka 0.4 0.4 0.4
 Kd 1 1 1
-Ks 1 1 1
+Ks 0 0 0
 illum 2
 Ns 121.887
 map_Kd pl0014.png

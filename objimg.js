@@ -319,80 +319,96 @@
 
 					var materialDatas = this.datas.materials[objectDatas.material];
 
-					var diffuseMap = null;
+					var material = null;
 
-					if( materialDatas.diffuse.map != null ){
+					if( materialDatas != undefined ){
 
-						diffuseMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
-						diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+						var diffuseMap = null;
+
+						if( materialDatas.diffuse.map != null ){
+
+							diffuseMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
+							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var ambientMap = null;
+
+						if( materialDatas.ambient.map != null ){
+
+							ambientMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.ambient.map, THREE.UVMapping);
+							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var specularMap = null;
+
+						if( materialDatas.specular.map != null ){
+
+							specularMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.specular.map, THREE.UVMapping);
+							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var normalMap = null;
+
+						if( materialDatas.bump.map != null ){
+
+							normalMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var bumpMap = null;
+
+						if( materialDatas.bump.map != null ){
+
+							bumpMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var alphaMap = null;
+
+						if( materialDatas.opacity.map != null ){
+
+							alphaMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.opacity.map, THREE.UVMapping);
+							alphaMap.wrapS = alphaMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						material = new THREE.MeshPhongMaterial({
+							color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
+							aoMap: ambientMap,
+							map: diffuseMap,
+							specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
+							specularMap: specularMap,
+							shininess: materialDatas.specular.force,
+							normalMap: normalMap,
+							normalScale: new THREE.Vector2(1.0, 1.0),
+							bumpMap: bumpMap,
+							bumpScale: 1.0,
+							opacity: materialDatas.opacity.value,
+							alphaTest: 0,
+							alphaMap: alphaMap,
+							transparent: ((materialDatas.opacity.value < 1.0 || alphaMap != null) ? true : false),
+							combine: THREE.MultiplyOperation,
+							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
+							side: THREE.DoubleSide,
+							fog: true
+						});
+
+					}
+					else {
+
+						material = new THREE.MeshPhongMaterial({
+							color: new THREE.Color(0.4, 0.4, 0.4),
+							specular: new THREE.Color(1, 1, 1),
+							shininess: 10,
+							fog: true
+						});
 
 					};
-
-					var ambientMap = null;
-
-					if( materialDatas.ambient.map != null ){
-
-						ambientMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.ambient.map, THREE.UVMapping);
-						ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-					};
-
-					var specularMap = null;
-
-					if( materialDatas.specular.map != null ){
-
-						specularMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.specular.map, THREE.UVMapping);
-						specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-					};
-
-					var normalMap = null;
-
-					if( materialDatas.bump.map != null ){
-
-						normalMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
-						normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-					};
-
-					var bumpMap = null;
-
-					if( materialDatas.bump.map != null ){
-
-						bumpMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
-						bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-					};
-
-					var alphaMap = null;
-
-					if( materialDatas.opacity.map != null ){
-
-						alphaMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.opacity.map, THREE.UVMapping);
-						alphaMap.wrapS = alphaMap.wrapT = (materialDatas.alpha.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-					};
-
-					var material = new THREE.MeshPhongMaterial({
-						color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
-						aoMap: ambientMap,
-						map: diffuseMap,
-						specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
-						specularMap: specularMap,
-						shininess: materialDatas.specular.force,
-						normalMap: normalMap,
-						normalScale: new THREE.Vector2(5.0, 5.0),
-						bumpMap: bumpMap,
-						bumpScale: 1.0,
-						opacity: materialDatas.opacity.value,
-						alphaTest: 0,
-						alphaMap: alphaMap,
-						transparent: ((materialDatas.opacity.value < 1.0 || alphaMap != null) ? true : false),
-						combine: THREE.MultiplyOperation,
-						shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
-						side: THREE.DoubleSide,
-						fog: true
-					});
 
 					var mesh = new THREE.Mesh(geometry, material);
 
@@ -883,12 +899,10 @@
 	OBJImg.generateImg = function( options ){
 
 		var isURL = !/[\n\s]/.test(options.obj);
+		var useMTL = (options.mtl == undefined) ? false : true;
 
 		var isOBJLoaded = false;
-		var isMTLLoaded = options.mtl == undefined;
-
-		var obj = "";
-		var mtl = "";
+		var isMTLLoaded = !useMTL;
 
 		if( isURL == true ){
 
@@ -898,12 +912,39 @@
 
 				if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
 
-					obj = this.responseText;
-					isOBJLoaded = true;
+					var obj = this.responseText;
 
-					if( isOBJLoaded == true && isMTLLoaded == true ){
+					var mtlFile = (options.mtl || (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
 
-						options.done(OBJImg.convertObjToImg(obj, mtl));
+					if( mtlFile != undefined ){
+
+						var MTLRequest = new XMLHttpRequest();
+
+						MTLRequest.addEventListener("readystatechange", function( event ){
+
+							if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
+
+								var mtl = this.responseText;
+
+								options.done(OBJImg.convertObjToImg(obj, mtl));
+
+							}
+							else if( this.readyState == 4 ){
+
+								options.fail("Cant load mtl");
+
+							};
+
+						}, false);
+
+						MTLRequest.open("GET", options.obj.split("/").slice(0, -1).join("/") + "/" + mtlFile, true);
+						MTLRequest.send(null);
+
+
+					}
+					else {
+
+						options.done(OBJImg.convertObjToImg(obj, ""));
 
 					};
 
@@ -918,33 +959,6 @@
 
 			OBJRequest.open("GET", options.obj, true);
 			OBJRequest.send(null);
-
-			var MTLRequest = new XMLHttpRequest();
-
-			MTLRequest.addEventListener("readystatechange", function( event ){
-
-				if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
-
-					mtl = this.responseText;
-					isMTLLoaded = true;
-
-					if( isOBJLoaded == true && isMTLLoaded == true ){
-
-						options.done(OBJImg.convertObjToImg(obj, mtl));
-
-					};
-
-				}
-				else if( this.readyState == 4 ){
-
-					options.fail("Cant load obj");
-
-				};
-
-			}, false);
-
-			MTLRequest.open("GET", options.mtl, true);
-			MTLRequest.send(null);
 
 		}
 		else {
@@ -1063,7 +1077,7 @@
 				// Optical density (refraction)
 
 			}
-			else if( type.substr(0, 3) == "map" ){
+			else if( type.substr(0, 3) == "map" && datas.length > 1 ){
 
 				var map = datas[datas.length - 1] || null;
 				var encodedMap = new Array();

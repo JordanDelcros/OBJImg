@@ -1,6 +1,6 @@
 # Blender v2.74 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib crysis.mtl
+# mtllib crysis.mtl
 o Sykes01
 v -0.022000 1.692448 -0.168599
 v -0.021600 1.694366 -0.168061

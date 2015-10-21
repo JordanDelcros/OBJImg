@@ -1,6 +1,6 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib lamp.mtl
+# mtllib lamp.mtl
 o windows
 v 0.165710 35.052021 -3.546871
 v 0.165595 37.868202 -3.547237

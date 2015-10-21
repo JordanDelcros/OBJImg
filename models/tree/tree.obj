@@ -1,6 +1,6 @@
 # This file uses centimeters as units for non-parametric coordinates.
 
-mtllib arbre01.mtl
+# mtllib arbre01.mtl
 o tree
 g default
 v 0.402925 -0.169270 0.092166
