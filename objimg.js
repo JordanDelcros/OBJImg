@@ -54,13 +54,13 @@
 
 						if( this.updateObject3D == true ){
 
-							this.setObject3D();
+							this.setObject3D(options);
 
 						};
 
 						if( this.updateSimpleObject3D == true ){
 
-							this.setSimpleObject3D();
+							this.setSimpleObject3D(options);
 
 						};
 
@@ -106,13 +106,13 @@
 
 						if( this.updateObject3D == true ){
 
-							this.setObject3D();
+							this.setObject3D(options);
 
 						};
 
 						if( this.updateSimpleObject3D == true ){
 
-							this.setSimpleObject3D();
+							this.setSimpleObject3D(options);
 
 						};
 
@@ -145,13 +145,13 @@
 
 							if( this.updateObject3D == true ){
 
-								this.setObject3D();
+								this.setObject3D(options);
 
 							};
 
 							if( this.updateSimpleObject3D == true ){
 
-								this.setSimpleObject3D();
+								this.setSimpleObject3D(options);
 
 							};
 
@@ -190,13 +190,13 @@
 
 						if( this.updateObject3D == true ){
 
-							this.setObject3D();
+							this.setObject3D(options);
 
 						};
 
 						if( this.updateSimpleObject3D == true ){
 
-							this.setSimpleObject3D();
+							this.setSimpleObject3D(options);
 
 						};
 
@@ -227,7 +227,7 @@
 			return this.context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
 
 		},
-		setObject3D: function(){
+		setObject3D: function( options ){
 
 			if( this.datas != null ){
 
@@ -325,9 +325,11 @@
 
 						var diffuseMap = null;
 
+						var textureLoader = new THREE.TextureLoader();
+
 						if( materialDatas.diffuse.map != null ){
 
-							diffuseMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.diffuse.map, THREE.UVMapping);
+							diffuseMap = new textureLoader.load(this.basePath + materialDatas.diffuse.map);
 							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -336,7 +338,7 @@
 
 						if( materialDatas.ambient.map != null ){
 
-							ambientMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.ambient.map, THREE.UVMapping);
+							ambientMap = new textureLoader.load(this.basePath + materialDatas.ambient.map);
 							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -345,7 +347,7 @@
 
 						if( materialDatas.specular.map != null ){
 
-							specularMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.specular.map, THREE.UVMapping);
+							specularMap = new textureLoader.load(this.basePath + materialDatas.specular.map);
 							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -354,7 +356,7 @@
 
 						if( materialDatas.bump.map != null ){
 
-							normalMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+							normalMap = new textureLoader.load(this.basePath + materialDatas.bump.map);
 							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -363,7 +365,7 @@
 
 						if( materialDatas.bump.map != null ){
 
-							bumpMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.bump.map, THREE.UVMapping);
+							bumpMap = new textureLoader.load(this.basePath + materialDatas.bump.map);
 							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -372,7 +374,7 @@
 
 						if( materialDatas.opacity.map != null ){
 
-							alphaMap = new THREE.ImageUtils.loadTexture(this.basePath + materialDatas.opacity.map, THREE.UVMapping);
+							alphaMap = new textureLoader.load(this.basePath + materialDatas.opacity.map);
 							alphaMap.wrapS = alphaMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -411,6 +413,9 @@
 					};
 
 					var mesh = new THREE.Mesh(geometry, material);
+
+					mesh.castShadow = options.castShadow;
+					mesh.receiveShadow = options.receiveShadow;
 
 					this.object3D.add(mesh);
 

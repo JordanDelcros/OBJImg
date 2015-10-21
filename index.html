@@ -37,7 +37,7 @@
 		}
 
 	</style>
-	<script type="text/javascript" src="three-js-72/build/three.js"></script>
+	<script type="text/javascript" src="three-js-73/build/three.js"></script>
 	<script type="text/javascript" src="three-js-71/src/controls/trackballcontrols.js"></script>
 	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
@@ -55,7 +55,11 @@
 				antialias: true
 			});
 
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
 			renderer.setSize(width, height);
+
 
 			document.body.appendChild(renderer.domElement);
 
@@ -91,6 +95,15 @@
 			scene.add(ambient);
 
 			var light = new THREE.PointLight(0xFFFFFF);
+
+			light.castShadow = true;
+			light.shadowCameraNear = 1;
+			light.shadowCameraFar = 20;
+			light.shadowDarkness = 1;
+			light.shadowMapWidth = 1024;
+			light.shadowMapHeight = 1024;
+			light.shadowBias = 0.01 ;
+
 			light.position.set(15, 5, 5);
 			scene.add(light);
 
@@ -98,10 +111,8 @@
 			scene.add(hemisphereLight);
 
 			var image = new Image();
-
 			var generatedMesh = null;
-
-			var fileName = "delorean";
+			var fileName = "humer";
 
 			// OBJImg.generateImg({
 			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
@@ -126,6 +137,8 @@
 
 			var obj = new OBJImg({
 				image: "models/" + fileName + "/" + fileName + ".obj.png",
+				receiveShadow: true,
+				castShadow: true,
 				useWorker: false,
 				onProgress: function( progression ){
 
@@ -153,6 +166,8 @@
 				window.requestAnimationFrame(render);
 
 				controls.update();
+
+				// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 				renderer.render(scene, camera);
 
