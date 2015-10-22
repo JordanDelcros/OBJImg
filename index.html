@@ -32,8 +32,8 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 10%;
-			height: auto;
+			max-width: 10%;
+			max-height: 10%;
 		}
 
 	</style>
@@ -43,6 +43,14 @@
 	<script type="text/javascript">
 
 		window.onload = function(){
+
+			// console.log(window.performance.now());
+
+			// setInterval(function(){
+
+			// 	console.log(window.performance.now());
+
+			// }, 1000)
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -54,9 +62,6 @@
 				alpha: true,
 				antialias: true
 			});
-
-			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 			renderer.setSize(width, height);
 
@@ -95,15 +100,6 @@
 			scene.add(ambient);
 
 			var light = new THREE.PointLight(0xFFFFFF);
-
-			light.castShadow = true;
-			light.shadowCameraNear = 1;
-			light.shadowCameraFar = 20;
-			light.shadowDarkness = 1;
-			light.shadowMapWidth = 1024;
-			light.shadowMapHeight = 1024;
-			light.shadowBias = 0.01 ;
-
 			light.position.set(15, 5, 5);
 			scene.add(light);
 
@@ -114,66 +110,58 @@
 			var generatedMesh = null;
 			var fileName = "humer";
 
-			// OBJImg.generateImg({
-			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
-			// 	options: {
-			// 		wrap: true,
-			// 		side: THREE.DoubleSide
-			// 	},
-			// 	done: function( datas ){
+			OBJImg.generateImg({
+				obj: "models/" + fileName + "/" + fileName + ".obj",
+				useWorker: true,
+				done: function( datas ){
 
-			// 		var image = new Image();
-			// 		image.src = datas;
+					var image = new Image();
+					image.src = datas;
 
-			// 		document.body.appendChild(image);
-
-			// 	},
-			// 	fail: function( error ){
-
-			// 		console.error(error);
-
-			// 	}
-			// });
-
-			var obj = new OBJImg({
-				image: "models/" + fileName + "/" + fileName + ".obj.png",
-				receiveShadow: true,
-				castShadow: true,
-				useWorker: false,
-				onProgress: function( progression ){
-
-					console.log(progression);
+					document.body.appendChild(image);
 
 				},
-				onLoad: function( obj ){},
-				onError: function( error ){
+				error: function( error ){
 
 					console.error(error);
 
 				}
 			});
 
-			// var simpleObject = obj.getSimpleObject3D();
-			// simpleObject.position.set(0, 0, 0);
-			// scene.add(simpleObject);
+			// var obj = new OBJImg({
+			// 	image: "models/" + fileName + "/" + fileName + ".obj.png",
+			// 	receiveShadow: false,
+			// 	castShadow: false,
+			// 	useWorker: true,
+			// 	onLoad: function( obj ){},
+			// 	onError: function( error ){
 
-			var object = obj.getObject3D(function( obj ){});
-			object.position.set(0, 0, 0);
-			scene.add(object);
+			// 		console.error(error);
 
-			function render( now ){
+			// 	}
+			// });
 
-				window.requestAnimationFrame(render);
+			// // var simpleObject = obj.getSimpleObject3D();
+			// // simpleObject.position.set(0, 0, 0);
+			// // scene.add(simpleObject);
 
-				controls.update();
+			// var object = obj.getObject3D(function( obj ){});
+			// object.position.set(0, 0, 0);
+			// scene.add(object);
 
-				// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+			// function render( now ){
 
-				renderer.render(scene, camera);
+			// 	window.requestAnimationFrame(render);
 
-			};
+			// 	controls.update();
 
-			window.requestAnimationFrame(render);
+			// 	// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+
+			// 	renderer.render(scene, camera);
+
+			// };
+
+			// window.requestAnimationFrame(render);
 
 		};
 

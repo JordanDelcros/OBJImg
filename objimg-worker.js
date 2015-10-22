@@ -4,14 +4,33 @@ importScripts("objimg.js");
 
 self.addEventListener("message", function( event ){
 
-	if( event.data.action == "convertImgToObj" ){
+	var action = event.data.action;
 
-		var datas = OBJImg.convertImgToObj(event.data.content);
+	if( action == "convertIMG" ){
+
+		var datas = OBJImg.convertIMG(event.data.content);
 
 		postMessage({
 			action: event.data.action,
 			content: datas
 		})
+
+	}
+	else if( action == "parse" ){
+
+		var datas = OBJImg.parse(event.data.content[0], event.data.content[1]);
+
+		postMessage({
+			action: "parse",
+			content: datas
+		});
+
+	}
+	else if( action == "convertOBJ" ){
+
+		// var datas = OBJImg.convertOBJ(event.data.content[0], event.data.content[1]);
+
+		console.warn(event.data);
 
 	};
 
