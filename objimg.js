@@ -22,7 +22,7 @@
 		constructor: OBJImg,
 		init: function( options ){
 
-			this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
+			// this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
 
 			this.datas = null;
 
@@ -81,11 +81,13 @@
 
 			if( options.image instanceof Image ){
 
+				this.basePath = options.image.getAttribute("src").split("/").slice(0, -1).join("/") + "/";
+
 				if( options.image.complete == true ){
 
-					if( useWorker == true ){
+					if( options.useWorker == true ){
 
-						var pixelsBuffer = new Int16Array(this.getPixels(image));
+						var pixelsBuffer = new Int16Array(this.getPixels(options.image));
 
 						worker.postMessage({
 							action: "convertIMG",
@@ -122,7 +124,7 @@
 
 					options.image.addEventListener("load", function( event ){
 
-						if( useWorker == true ){
+						if( options.useWorker == true ){
 
 							var pixelsBuffer = new Int16Array(this.getPixels(image));
 
@@ -162,6 +164,8 @@
 
 			}
 			else {
+
+				this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
 
 				var image = new Image();
 
@@ -895,7 +899,7 @@
 
 	};
 
-	OBJImg.generateImg = function( options ){
+	OBJImg.generateIMG = function( options ){
 
 		var isURL = !/[\n\s]/.test(options.obj);
 		var useMTL = (options.mtl == undefined) ? false : true;
@@ -1072,8 +1076,6 @@
 				options.done(canvas.toDataURL("image/png", 1.0));
 
 			};
-
-			options.done(OBJImg.convertOBJ(options.obj, options.mtl));
 
 		};
 

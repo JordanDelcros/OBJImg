@@ -186,15 +186,15 @@
 			this.scene.add(this.hemisphereLight);
 
 			this.controls = new THREE.TrackballControls(this.camera);
-			// this.controls.rotateSpeed = 2.0;
-			// this.controls.zoomSpeed = 0.8;
-			// this.controls.minDistance = 1;
-			// this.controls.maxDistance = 1000;
-			// this.controls.panSpeed = 0.8;
-			// this.controls.noZoom = false;
-			// this.controls.noPan = true;
-			// this.controls.staticMoving = false;
-			// this.controls.dynamicDampingFactor = 0.3;
+			this.controls.rotateSpeed = 2.0;
+			this.controls.zoomSpeed = 0.8;
+			this.controls.minDistance = 1;
+			this.controls.maxDistance = 1000;
+			this.controls.panSpeed = 0.8;
+			this.controls.noZoom = false;
+			this.controls.noPan = true;
+			this.controls.staticMoving = false;
+			this.controls.dynamicDampingFactor = 0.3;
 
 			return this;
 
@@ -327,12 +327,6 @@
 		renderView: function( now ){
 
 			this.window.requestAnimationFrame(this.renderView.bind(this));
-
-			if( this.mesh ){
-
-				this.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
-
-			};
 
 			this.controls.update();
 
@@ -468,7 +462,7 @@
 				var filePath = event.dataTransfer.files[file].path;
 				var fileName = filePath.split("/").pop().split(".")[0];
 
-				FileSystem.readFile(filePath, "utf-8", function( filePath, fileName, errorMessage, datas ){
+				FileSystem.readFile(filePath, "utf-8", function( filePath, fileName, errorMessage, OBJDatas ){
 
 					if( errorMessage ){
 
@@ -476,40 +470,48 @@
 
 					};
 
-					OBJImg.generateImg(datas, function( datas ){
+					OBJImg.generateIMG({
+						obj: OBJDatas, 
+						done: function( datas ){
 
-						var image = new Image();
-						image.src = datas;
+							var image = new Image();
+							image.src = datas;
 
-						var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
+							var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
 
-						try {
+							try {
 
-							self.window.localStorage.setItem(fileName, JSON.stringify({
-								name: fileName,
-								path: path,
-								base64: datas
-							}));
+								self.window.localStorage.setItem(fileName, JSON.stringify({
+									name: fileName,
+									path: path,
+									base64: datas
+								}));
 
-						}
-						catch( errorMessage ){
+							}
+							catch( errorMessage ){
 
-							console.error(errorMessage);
-
-						};
-
-						FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
-
-							if( errorMessage ){
-
-								console.error(errorMessage, "Cant save PNG file.");
+								console.error(errorMessage);
 
 							};
 
-						});
+							FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
 
-						self.displayObject(image);
+								if( errorMessage ){
 
+									console.error(errorMessage, "Cant save PNG file.");
+
+								};
+
+							});
+
+							self.displayObject(image);
+
+						},
+						fail: function(){
+
+							console.error("fail");
+
+						}
 					});
 
 				}.bind(this, filePath, fileName));
@@ -525,10 +527,10 @@
 
 			this.scene.remove(this.mesh);
 
-			this.mesh = new OBJImg(image, true).getObject3D(function( object ){
-
-
-			});
+			this.mesh = new OBJImg({
+				image: image,
+				useWorker: true
+			}).getObject3D();
 
 			// var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
 

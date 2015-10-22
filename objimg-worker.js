@@ -1,5 +1,3 @@
-self.lastProgression = 0;
-
 importScripts("objimg.js");
 
 self.addEventListener("message", function( event ){
