@@ -128,40 +128,40 @@
 				}
 			});
 
-			// var obj = new OBJImg({
-			// 	image: "models/" + fileName + "/" + fileName + ".obj.png",
-			// 	receiveShadow: false,
-			// 	castShadow: false,
-			// 	useWorker: true,
-			// 	onLoad: function( obj ){},
-			// 	onError: function( error ){
+			var obj = new OBJImg({
+				image: "models/" + fileName + "/" + fileName + ".obj.png",
+				receiveShadow: false,
+				castShadow: false,
+				useWorker: true,
+				onLoad: function( obj ){},
+				onError: function( error ){
 
-			// 		console.error(error);
+					console.error(error);
 
-			// 	}
-			// });
+				}
+			});
 
-			// // var simpleObject = obj.getSimpleObject3D();
-			// // simpleObject.position.set(0, 0, 0);
-			// // scene.add(simpleObject);
+			// var simpleObject = obj.getSimpleObject3D();
+			// simpleObject.position.set(0, 0, 0);
+			// scene.add(simpleObject);
 
-			// var object = obj.getObject3D(function( obj ){});
-			// object.position.set(0, 0, 0);
-			// scene.add(object);
+			var object = obj.getObject3D(function( obj ){});
+			object.position.set(0, 0, 0);
+			scene.add(object);
 
-			// function render( now ){
+			function render( now ){
 
-			// 	window.requestAnimationFrame(render);
+				window.requestAnimationFrame(render);
 
-			// 	controls.update();
+				controls.update();
 
-			// 	// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
+				// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
-			// 	renderer.render(scene, camera);
+				renderer.render(scene, camera);
 
-			// };
+			};
 
-			// window.requestAnimationFrame(render);
+			window.requestAnimationFrame(render);
 
 		};
 

@@ -897,11 +897,11 @@
 
 	OBJImg.generateImg = function( options ){
 
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
-
 		var isURL = !/[\n\s]/.test(options.obj);
 		var useMTL = (options.mtl == undefined) ? false : true;
+
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
 
 		if( options.useWorker == true ){
 
@@ -909,25 +909,23 @@
 
 			worker.addEventListener("message", function( event ){
 
-				console.info(event.data);
+				if( event.data.action == "convertOBJ" ){
 
-				var action = event.data.action;
+					var pixels = event.data.content;
+					var square = Math.ceil(Math.sqrt(pixels.length / 4));
 
-				if( action == "parse" ){
+					var imageData = context.createImageData(square, square);
+					imageData.data.set(pixels);
 
-					console.log("parse")
+					canvas.width = canvas.height = square;
 
-					createCanvas(event.data.content);
+					context.putImageData(imageData, 0, 0);
 
-					worker.postMessage({
-						action: "convertOBJ",
-						content: [event.data.content, null]
-					});
+					if( options.done instanceof Function ){
 
-				}
-				else if( action == "convertOBJ" ){
+						options.done(canvas.toDataURL("image/png", 1.0));
 
-
+					};
 
 				};
 
@@ -970,15 +968,24 @@
 								if( options.useWorker == true ){
 
 									worker.postMessage({
-										action: "parse",
-										callback: "convertOBJ",
+										action: "convertOBJ",
 										content: [obj, mtl]
 									});
 
 								}
 								else {
 
-									options.done(OBJImg.convertOBJ(obj, mtl));
+									var pixels = OBJImg.convertOBJ(obj, mtl);
+									var square = Math.ceil(Math.sqrt(pixels.length / 4));
+
+									var imageData = context.createImageData(square, square);
+									imageData.data.set(pixels);
+
+									canvas.width = canvas.height = square;
+
+									context.putImageData(imageData, 0, 0);
+
+									options.done(canvas.toDataURL("image/png", 1.0));
 
 								};
 
@@ -998,7 +1005,29 @@
 					}
 					else {
 
-						options.done(OBJImg.convertOBJ(obj, ""));
+						if( options.useWorker == true ){
+
+							worker.postMessage({
+								action: "convertOBJ",
+								content: [obj, ""]
+							});
+
+						}
+						else {
+
+							var pixels = OBJImg.convertOBJ(obj, "");
+							var square = Math.ceil(Math.sqrt(pixels.length / 4));
+
+							var imageData = context.createImageData(square, square);
+							imageData.data.set(pixels);
+
+							canvas.width = canvas.height = square;
+
+							context.putImageData(imageData, 0, 0);
+
+							options.done(canvas.toDataURL("image/png", 1.0));
+
+						};
 
 					};
 
@@ -1017,6 +1046,33 @@
 		}
 		else {
 
+			var obj = options.obj || "";
+			var mtl = options.mtl || "";
+
+			if( options.useWorker == true ){
+
+				worker.postMessage({
+					action: "convertOBJ",
+					content: [obj, mtl]
+				});
+
+			}
+			else {
+
+				var pixels = OBJImg.convertOBJ(obj, mtl);
+				var square = Math.ceil(Math.sqrt(pixels.length / 4));
+
+				var imageData = context.createImageData(square, square);
+				imageData.data.set(pixels);
+
+				canvas.width = canvas.height = square;
+
+				context.putImageData(imageData, 0, 0);
+
+				options.done(canvas.toDataURL("image/png", 1.0));
+
+			};
+
 			options.done(OBJImg.convertOBJ(options.obj, options.mtl));
 
 		};
@@ -1025,401 +1081,8 @@
 
 	};
 
-	OBJImg.parse = function( obj, mtl ){
-
-		var MTLLines = mtl.split(/\n/g);
-		var materials = new Array();
-		var materialsID = new Array();
-
-		for( var line = 0, length = MTLLines.length, index = -1; line < length; line++ ){
-
-			var datas = MTLLines[line].split(/\s+(?!$)/g);
-			var type = datas[0].replace(/\s+/, "").toLowerCase();
-
-			if( type == "newmtl" ){
-
-				index++;
-
-				materialsID[index] = datas[1];
-
-				materials[index] = {
-					illumination: 2,
-					smooth: true,
-					ambient: {
-						map: [],
-						clamp: false,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					diffuse: {
-						map: [],
-						clamp: false,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					specular: {
-						map: [],
-						clamp: false,
-						forceMap: [],
-						forceClamp: false,
-						force: 1.0,
-						r: 1.0,
-						g: 1.0,
-						b: 1.0
-					},
-					normal: {
-						map: [],
-						clamp: false
-					},
-					bump: {
-						map: [],
-						clamp: false
-					},
-					opacity: {
-						map: [],
-						clamp: false,
-						value: 1.0
-					}
-				};
-
-			}
-			else if( type == "ka" ){
-
-				materials[index].ambient.r = parseFloat(datas[1]);
-				materials[index].ambient.g = parseFloat(datas[2]);
-				materials[index].ambient.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "kd" ){
-
-				materials[index].diffuse.r = parseFloat(datas[1]);
-				materials[index].diffuse.g = parseFloat(datas[2]);
-				materials[index].diffuse.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "ks" ){
-
-				materials[index].specular.r = parseFloat(datas[1]);
-				materials[index].specular.g = parseFloat(datas[2]);
-				materials[index].specular.b = parseFloat(datas[3]);
-
-			}
-			else if( type == "ns" ){
-
-				materials[index].specular.force = parseFloat(datas[1]);
-
-			}
-			else if( type == "d" ){
-
-				materials[index].opacity.value = parseFloat(datas[1]);
-
-			}
-			else if( type == "illum" ){
-
-				materials[index].illumination = parseInt(datas[1]);
-
-			}
-			else if( type == "s" ){
-
-				materials[index].smooth = (datas[1] == "off" || parseInt(datas[1]) == 0) ? false : true;
-
-			}
-			else if( type == "ni" ){
-
-				// Optical density (refraction)
-
-			}
-			else if( type.substr(0, 3) == "map" && datas.length > 1 ){
-
-				var map = datas[datas.length - 1] || null;
-				var encodedMap = new Array();
-
-				if( map != null ){
-
-					for( var character = 0, characterLength = map.length; character < characterLength; character++ ){
-
-						encodedMap[character] = OBJImg.dictionnary.indexOf(map[character]);
-
-					};
-
-				};
-
-				var options = {
-					clamp: true
-				};
-
-				for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
-
-					var optionType = datas[option];
-
-					if( optionType == "-clamp" ){
-
-						var value = datas[++option];
-
-						if( value == "off" || parseInt(value) == 0 ){
-
-							options.clamp = false;
-
-						};
-
-					};
-
-				};
-
-				if( type == "map_ka" ){
-
-					materials[index].ambient.map = encodedMap;
-					materials[index].ambient.clamp = options.clamp;
-
-				}
-				else if( type == "map_kd" ){
-
-					materials[index].diffuse.map = encodedMap;
-					materials[index].diffuse.clamp = options.clamp;
-
-				}
-				else if( type == "map_ks" ){
-
-					materials[index].specular.map = encodedMap;
-					materials[index].specular.clamp = options.clamp;
-
-				}
-				else if( type == "map_ns" ){
-
-					materials[index].specular.forceMap = encodedMap;
-					materials[index].specular.forceClamp = options.clamp;
-
-				}
-				else if( type == "map_kn" ){
-
-					materials[index].normal.map = encodedMap;
-					materials[index].normal.clamp = options.clamp;
-
-				}
-				else if( type == "map_bump" ){
-
-					materials[index].bump.map = encodedMap;
-					materials[index].bump.clamp = options.clamp;
-
-				}
-				else if( type == "map_d" ){
-
-					materials[index].opacity.map = encodedMap;
-					materials[index].opacity.clamp = options.clamp;
-
-				};
-
-			};
-
-		};
-
-		var OBJLines = obj.split(/\n/g);
-		var objects = new Array();
-		var vertices = new Array();
-		var textures = new Array();
-		var normals = new Array();
-		var faces = new Array();
-
-		var bounds = {
-			vertex: {
-				min: {
-					x: Infinity,
-					y: Infinity,
-					z: Infinity,
-					w: Infinity
-				},
-				max: {
-					x: -Infinity,
-					y: -Infinity,
-					z: -Infinity,
-					w: -Infinity
-				}
-			},
-			texture: {
-				min: Infinity,
-				max: -Infinity
-			}
-		};
-
-		for( var line = 0, length = OBJLines.length; line < length; line++ ){
-
-			var datas = OBJLines[line].split(/\s+/g);
-			var type = datas[0].toLowerCase();
-
-			if( type == "v" ){
-
-				var x = parseFloat(datas[1]);
-				var y = parseFloat(datas[2]);
-				var z = parseFloat(datas[3]);
-
-				if( x < bounds.vertex.min.x ){
-
-					bounds.vertex.min.x = x;
-
-				};
-
-				if( x > bounds.vertex.max.x ){
-
-					bounds.vertex.max.x = x;
-
-				};
-
-				if( y < bounds.vertex.min.y ){
-
-					bounds.vertex.min.y = y;
-
-				};
-
-				if( y > bounds.vertex.max.y ){
-
-					bounds.vertex.max.y = y;
-
-				};
-
-				if( z < bounds.vertex.min.z ){
-
-					bounds.vertex.min.z = z;
-
-				};
-
-				if( z > bounds.vertex.max.z ){
-
-					bounds.vertex.max.z = z;
-
-				};
-
-				vertices.push({
-					x: x,
-					y: y,
-					z: z
-				});
-
-			}
-			else if( type == "vt" ){
-
-				var u = parseFloat(datas[1]);
-				var v = parseFloat(datas[2]);
-
-				var min = Math.min(u, v);
-				var max = Math.max(u, v);
-
-				if( min < bounds.texture.min ){
-
-					bounds.texture.min = min;
-
-				};
-
-				if( max > bounds.texture.max ){
-
-					bounds.texture.max = max;
-
-				};
-
-				textures.push({
-					u: u,
-					v: v
-				});
-
-			}
-			else if( type == "vn" ){
-
-				normals.push({
-					x: parseFloat(datas[1]),
-					y: parseFloat(datas[2]),
-					z: parseFloat(datas[3])
-				});
-
-			}
-			else if( type == "f" ){
-
-				var a = datas[1].split(/\//g);
-				var b = datas[2].split(/\//g);
-				var c = datas[3].split(/\//g);
-
-				var va = parseInt(a[0]) - 1;
-				var vb = parseInt(b[0]) - 1;
-				var vc = parseInt(c[0]) - 1;
-
-				var ta = parseInt(a[1]) - 1;
-				var tb = parseInt(b[1]) - 1;
-				var tc = parseInt(c[1]) - 1;
-
-				var na = parseInt(a[2]) - 1;
-				var nb = parseInt(b[2]) - 1;
-				var nc = parseInt(c[2]) - 1;
-
-				faces.push({
-					vertices: {
-						a: (!isNaN(va) ? va : null),
-						b: (!isNaN(vb) ? vb : null),
-						c: (!isNaN(vc) ? vc : null)
-					},
-					textures: {
-						a: (!isNaN(ta) ? ta : null),
-						b: (!isNaN(tb) ? tb : null),
-						c: (!isNaN(tc) ? tc : null)
-					},
-					normals: {
-						a: (!isNaN(na) ? na : null),
-						b: (!isNaN(nb) ? nb : null),
-						c: (!isNaN(nc) ? nc : null)
-					}
-				});
-
-			}
-			else if( type == "o" || type == "g" ){
-
-				objects.push({
-					name: datas[1],
-					material: null,
-					index: faces.length
-				});
-
-			}
-			else if( type == "usemtl" ){
-
-				objects[objects.length - 1].material = materialsID.indexOf(datas[1]);
-
-			};
-
-		};
-
-		bounds.vertex.min.w = Math.min(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z);
-		bounds.vertex.max.w = Math.max(bounds.vertex.max.x, bounds.vertex.max.y, bounds.vertex.max.z);
-
-		var vertexSplitting = Math.ceil(vertices.length / MAX);
-		var textureSplitting = Math.ceil(textures.length / MAX);
-		var normalSplitting = Math.ceil(normals.length / MAX);
-		var faceSplitting = Math.ceil(faces.length / MAX);
-
-		return {
-			vertices: vertices,
-			textures: textures,
-			normals: normals,
-			faces: faces,
-			objects: objects,
-			bounds: bounds,
-			materials: materials,
-			vertexSplitting: vertexSplitting,
-			textureSplitting: textureSplitting,
-			normalSplitting: normalSplitting,
-			faceSplitting: faceSplitting)
-		};
-
-	};
-
-	function createCanvas( datas ){
-
-		console.log(datas);
-
-	};
-
 	OBJImg.convertOBJ = function( obj, mtl ){
 
-		console.warn("PARSED", OBJImg.parse(obj, mtl));
-
 		var MTLLines = mtl.split(/\n/g);
 		var materials = new Array();
 		var materialsID = new Array();
@@ -1782,8 +1445,8 @@
 		bounds.vertex.min.w = Math.min(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z);
 		bounds.vertex.max.w = Math.max(bounds.vertex.max.x, bounds.vertex.max.y, bounds.vertex.max.z);
 
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
+		// var canvas = document.createElement("canvas");
+		// var context = canvas.getContext("2d");
 
 		var pixelIndex = 0;
 
@@ -1840,10 +1503,13 @@
 
 		};
 
-		canvas.width = canvas.height = Math.ceil(Math.sqrt(pixelCount));
+		var square = Math.ceil(Math.sqrt(pixelCount));
 
-		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-		var data = imageData.data;
+		// canvas.width = canvas.height = square;
+
+		// var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		// var data = imageData.data;
+		var data = new Uint8ClampedArray(pixelCount * 4);
 
 		var vertexSplittingColor = OBJImg.fn.getColorFromValue(vertexSplitting);
 		data[pixelIndex++] = vertexSplittingColor.r;
@@ -2460,9 +2126,7 @@
 
 		};
 
-		context.putImageData(imageData, 0, 0);
-
-		return canvas.toDataURL("image/png", 1.0);
+		return data;
 
 	};
 
