@@ -44,13 +44,13 @@
 
 		window.onload = function(){
 
-			// console.log(window.performance.now());
+			console.log(window.performance.now());
 
-			// setInterval(function(){
+			setInterval(function(){
 
-			// 	console.log(window.performance.now());
+				console.log(window.performance.now());
 
-			// }, 1000)
+			}, 1000)
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -108,25 +108,25 @@
 
 			var image = new Image();
 			var generatedMesh = null;
-			var fileName = "humer";
+			var fileName = "lara";
 
-			OBJImg.generateIMG({
-				obj: "models/" + fileName + "/" + fileName + ".obj",
-				useWorker: true,
-				done: function( datas ){
+			// OBJImg.generateIMG({
+			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
+			// 	useWorker: true,
+			// 	done: function( datas ){
 
-					var image = new Image();
-					image.src = datas;
+			// 		var image = new Image();
+			// 		image.src = datas;
 
-					document.body.appendChild(image);
+			// 		document.body.appendChild(image);
 
-				},
-				error: function( error ){
+			// 	},
+			// 	error: function( error ){
 
-					console.error(error);
+			// 		console.error(error);
 
-				}
-			});
+			// 	}
+			// });
 
 			var obj = new OBJImg({
 				image: "models/" + fileName + "/" + fileName + ".obj.png",

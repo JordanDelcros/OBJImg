@@ -162,37 +162,29 @@
 				alpha: true
 			});
 
-			this.renderer.shadowEnabled = true;
-			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
 			this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
 			this.canvasAspect = this.canvas.offsetWidth / this.canvas.offsetHeight;
 
 			this.camera = new THREE.PerspectiveCamera(75, this.canvasAspect, 0.1, 10000);
+			this.camera.position.set(0, 0, 1);
 
 			this.scene = new THREE.Scene();
 
 			this.light = new THREE.SpotLight(0xFFFFFF, 1.0, 1000, Math.PI / 3, 10, 1);
-			this.light.castShadow = true;
-			this.light.shadowMapWidth = this.light.shadowMapHeight = 1024;
-			this.light.shadowMapCameraNear = 500;
-			this.light.shadowMapCameraFar = 4000;
-			this.light.shadowMapCameraFov = 30;
-			this.light.position.set(10, 10, 10);
 			this.scene.add(this.light);
 
 			this.hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
 			this.scene.add(this.hemisphereLight);
 
-			this.controls = new THREE.TrackballControls(this.camera);
+			this.controls = new THREE.TrackballControls(this.camera, this.canvas);
 			this.controls.rotateSpeed = 2.0;
-			this.controls.zoomSpeed = 0.8;
+			this.controls.zoomSpeed = 0.3;
 			this.controls.minDistance = 1;
 			this.controls.maxDistance = 1000;
-			this.controls.panSpeed = 0.8;
+			this.controls.panSpeed = 0.3;
 			this.controls.noZoom = false;
-			this.controls.noPan = true;
+			this.controls.noPan = false;
 			this.controls.staticMoving = false;
 			this.controls.dynamicDampingFactor = 0.3;
 
@@ -304,13 +296,13 @@
 				var width = this.canvas.offsetWidth;
 				var height = this.canvas.offsetHeight;
 
-				if( this.geometry ){
+				if( this.bounds ){
 
-					var objectWidth = Math.abs(this.geometry.boundingBox.min.x - this.geometry.boundingBox.max.x);
-					var objectHeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
-					var objectWeight = Math.abs(this.geometry.boundingBox.min.y - this.geometry.boundingBox.max.y);
+					var objectWidth = Math.abs(this.bounds.min.x - this.bounds.max.x);
+					var objectHeight = Math.abs(this.bounds.min.y - this.bounds.max.y);
+					var objectWeight = Math.abs(this.bounds.min.y - this.bounds.max.y);
 
-					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.5 / Math.tan(Math.PI * this.camera.fov / 360);
+					var distance = Math.max(objectWidth, objectHeight, objectWeight) / 1.0 / Math.tan(Math.PI * this.camera.fov / 360);
 
 					this.camera.position.z = distance * (this.camera.position.z < 0 ? -1 : 1);
 
@@ -470,49 +462,85 @@
 
 					};
 
-					OBJImg.generateIMG({
-						obj: OBJDatas, 
-						done: function( datas ){
+					var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
 
-							var image = new Image();
-							image.src = datas;
+					var mtlFile = (OBJDatas.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1] || null;
 
-							var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
+					if( mtlFile != null ){
 
-							try {
+						var mtlPath = filePath.split("/").slice(0, -1).join("/") + "/" + mtlFile;
 
-								self.window.localStorage.setItem(fileName, JSON.stringify({
-									name: fileName,
-									path: path,
-									base64: datas
-								}));
+						FileSystem.readFile(mtlPath, "utf-8", function( errorMessage, MTLDatas ){
 
-							}
-							catch( errorMessage ){
+							if( errorMessage ){
 
-								console.error(errorMessage);
+								throw errorMessage;
 
 							};
 
-							FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
+							OBJImg.generateIMG({
+								obj: OBJDatas,
+								mtl: MTLDatas,
+								done: function( datas ){
 
-								if( errorMessage ){
+									var image = new Image();
+									image.src = datas;
 
-									console.error(errorMessage, "Cant save PNG file.");
+									var path = filePath.split("/").slice(0, -1).join("/") + "/" + fileName + ".obj.png";
 
-								};
+									FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
 
+										if( errorMessage ){
+
+											console.error(errorMessage, "Cant save PNG file.");
+
+										};
+
+									});
+
+									self.displayObject(image);
+
+								},
+								fail: function(){
+
+									console.error("fail");
+
+								}
 							});
 
-							self.displayObject(image);
+						});
 
-						},
-						fail: function(){
+					}
+					else {
 
-							console.error("fail");
+						OBJImg.generateIMG({
+							obj: OBJDatas,
+							done: function( datas ){
 
-						}
-					});
+								var image = new Image();
+								image.src = datas;
+
+								FileSystem.writeFile(path, datas.replace(/^data:image\/png;base64/, ""), "base64", function( errorMessage ){
+
+									if( errorMessage ){
+
+										console.error(errorMessage, "Cant save PNG file.");
+
+									};
+
+								});
+
+								self.displayObject(image);
+
+							},
+							fail: function(){
+
+								console.error("fail");
+
+							}
+						});
+
+					};
 
 				}.bind(this, filePath, fileName));
 
@@ -527,32 +555,37 @@
 
 			this.scene.remove(this.mesh);
 
+			this.bounds = new THREE.Box3();
+
 			this.mesh = new OBJImg({
 				image: image,
 				useWorker: true
-			}).getObject3D();
+			}).getSimpleObject3D(function( obj ){
 
-			// var center = new THREE.Vector3().addVectors(this.geometry.boundingBox.min, this.geometry.boundingBox.max).divideScalar(2);
+				obj.traverse(function( child ){
 
-			// this.material = new THREE.MeshPhongMaterial({
-			// 	color: 0x222222,
-			// 	side: THREE.FrontSide,
-			// 	shading: THREE.SmoothShading
-			// });
+					if( child instanceof THREE.Mesh ){
 
-			// this.mesh = new THREE.Mesh(this.geometry, this.material);
+						child.geometry.computeBoundingBox();
 
-			// this.mesh.castShadow = true;
-			// this.mesh.receiveShadow = true;
+						this.bounds.union(child.geometry.boundingBox);
 
-			// this.mesh.position.set(-center.x, -center.y, -center.z);
+					};
+
+				}.bind(this));
+
+				var center = new THREE.Vector3().addVectors(this.bounds.min, this.bounds.max).divideScalar(-2);
+
+				obj.position.set(center.x, center.y, center.z);
+
+				var event = new Event("Event");
+				event.initEvent("resize", false, false);
+
+				this.window.dispatchEvent(event);
+
+			}.bind(this));
 
 			this.scene.add(this.mesh);
-
-			var event = new Event("Event");
-			event.initEvent("resize", false, false);
-
-			this.window.dispatchEvent(event);
 
 		},
 		fullscreen: function(){

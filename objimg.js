@@ -326,7 +326,7 @@
 
 						if( materialDatas.diffuse.map != null ){
 
-							diffuseMap = new textureLoader.load(this.basePath + materialDatas.diffuse.map);
+							diffuseMap = textureLoader.load(this.basePath + materialDatas.diffuse.map);
 							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -335,7 +335,7 @@
 
 						if( materialDatas.ambient.map != null ){
 
-							ambientMap = new textureLoader.load(this.basePath + materialDatas.ambient.map);
+							ambientMap = textureLoader.load(this.basePath + materialDatas.ambient.map);
 							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -344,7 +344,7 @@
 
 						if( materialDatas.specular.map != null ){
 
-							specularMap = new textureLoader.load(this.basePath + materialDatas.specular.map);
+							specularMap = textureLoader.load(this.basePath + materialDatas.specular.map);
 							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -353,7 +353,7 @@
 
 						if( materialDatas.bump.map != null ){
 
-							normalMap = new textureLoader.load(this.basePath + materialDatas.bump.map);
+							normalMap = textureLoader.load(this.basePath + materialDatas.bump.map);
 							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -362,7 +362,7 @@
 
 						if( materialDatas.bump.map != null ){
 
-							bumpMap = new textureLoader.load(this.basePath + materialDatas.bump.map);
+							bumpMap = textureLoader.load(this.basePath + materialDatas.bump.map);
 							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -371,7 +371,7 @@
 
 						if( materialDatas.opacity.map != null ){
 
-							alphaMap = new textureLoader.load(this.basePath + materialDatas.opacity.map);
+							alphaMap = textureLoader.load(this.basePath + materialDatas.opacity.map);
 							alphaMap.wrapS = alphaMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -902,7 +902,6 @@
 	OBJImg.generateIMG = function( options ){
 
 		var isURL = !/[\n\s]/.test(options.obj);
-		var useMTL = (options.mtl == undefined) ? false : true;
 
 		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
