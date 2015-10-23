@@ -1,50 +1,9 @@
 (function( self ){
 
-	"use strict"
-
 	var insideWorker = self.document === undefined ? true : false;
-	var scriptPath = (insideWorker == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") + "/" : "");
+	var workerPath = (insideWorker == false ? (Array.prototype.slice.call(document.querySelectorAll("script")).pop().getAttribute("src").split("/").slice(0, -1).join("/") + "/").replace(/^\//, "./") : "");
 
 	var useTHREE = (typeof THREE === "undefined") ? false : true;
-
-	if( insideWorker == false ){
-
-		var workerBolb = new Blob(["(" + function( basePath ){
-
-			importScripts(basePath + "objimg.js");
-
-			self.addEventListener("message", function( event ){
-
-				var action = event.data.action;
-
-				if( action == "convertIMG" ){
-
-					var datas = OBJImg.convertIMG(event.data.content);
-
-					postMessage({
-						action: event.data.action,
-						content: datas
-					});
-
-				}
-				else if( action == "convertOBJ" ){
-
-					var datas = OBJImg.convertOBJ(event.data.content[0], event.data.content[1]);
-
-					postMessage({
-						action: event.data.action,
-						content: datas
-					}, [datas.buffer]);
-
-				};
-
-			}, false);
-
-		}.toString() + ")('" + scriptPath + "')"]);
-
-		var workerURL = window.URL.createObjectURL(workerBolb);
-
-	};
 
 	var MAX = (255 * 255) + 255;
 	var RGBA = 4;
@@ -76,7 +35,7 @@
 
 			if( options.useWorker == true ){
 
-				var worker = new Worker(workerURL);
+				var worker = new Worker(workerPath + "objimg-worker.js");
 
 				worker.addEventListener("message", function( event ){
 
@@ -107,6 +66,15 @@
 					};
 
 				}.bind(this), false);
+
+				for( var script = 0, length = (options.importScripts || []).length; script < length; script++ ){
+
+					worker.postMessage({
+						action: "importScript",
+						content: options.importScripts[script]
+					});
+
+				};
 
 				worker.addEventListener("error", function( event ){
 
@@ -955,7 +923,7 @@
 
 		if( options.useWorker == true ){
 
-			var worker = new Worker(workerURL);
+			var worker = new Worker(workerPath + "objimg-worker.js");
 
 			worker.addEventListener("message", function( event ){
 

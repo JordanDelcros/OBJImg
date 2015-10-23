@@ -37,20 +37,12 @@
 		}
 
 	</style>
-	<script type="text/javascript" src="three-js-73/build/three.js"></script>
-	<script type="text/javascript" src="three-js-71/src/controls/trackballcontrols.js"></script>
+	<script type="text/javascript" src="ressources/three/73/build/three.js"></script>
+	<script type="text/javascript" src="ressources/three/trackballcontrols.js"></script>
 	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
 
 		window.onload = function(){
-
-			// console.log(window.performance.now());
-
-			// setInterval(function(){
-
-			// 	console.log(window.performance.now());
-
-			// }, 1000)
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -108,32 +100,31 @@
 
 			var image = new Image();
 			var generatedMesh = null;
-			var fileName = "lara";
+			var fileName = "humer";
 
-			// OBJImg.generateIMG({
-			// 	obj: "models/" + fileName + "/" + fileName + ".obj",
-			// 	useWorker: true,
-			// 	done: function( datas ){
+			OBJImg.generateIMG({
+				obj: "models/" + fileName + "/" + fileName + ".obj",
+				useWorker: true,
+				done: function( datas ){
 
-			// 		var image = new Image();
-			// 		image.src = datas;
+					var image = new Image();
+					image.src = datas;
 
-			// 		document.body.appendChild(image);
+					document.body.appendChild(image);
 
-			// 	},
-			// 	error: function( error ){
+				},
+				error: function( error ){
 
-			// 		console.error(error);
+					console.error(error);
 
-			// 	}
-			// });
+				}
+			});
 
 			var obj = new OBJImg({
 				image: "models/" + fileName + "/" + fileName + ".obj.png",
 				receiveShadow: false,
 				castShadow: false,
 				useWorker: true,
-				importScripts: ["three-js-73/build/three.js"],
 				onLoad: function( obj ){
 
 					console.log(obj);
@@ -146,10 +137,6 @@
 				}
 			});
 
-			// var simpleObject = obj.getSimpleObject3D();
-			// simpleObject.position.set(0, 0, 0);
-			// scene.add(simpleObject);
-
 			var object = obj.getObject3D(function( obj ){});
 			object.position.set(0, 0, 0);
 			scene.add(object);
@@ -159,8 +146,6 @@
 				window.requestAnimationFrame(render);
 
 				controls.update();
-
-				// object.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 180);
 
 				renderer.render(scene, camera);
 
