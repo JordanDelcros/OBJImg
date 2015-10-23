@@ -11,7 +11,7 @@ self.addEventListener("message", function( event ){
 		postMessage({
 			action: event.data.action,
 			content: datas
-		})
+		});
 
 	}
 	else if( action == "convertOBJ" ){
@@ -22,6 +22,11 @@ self.addEventListener("message", function( event ){
 			action: event.data.action,
 			content: datas
 		}, [datas.buffer]);
+
+	}
+	else if( action == "importScript" ){
+
+		importScripts(event.data.content);
 
 	};
 

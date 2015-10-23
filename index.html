@@ -44,13 +44,13 @@
 
 		window.onload = function(){
 
-			console.log(window.performance.now());
+			// console.log(window.performance.now());
 
-			setInterval(function(){
+			// setInterval(function(){
 
-				console.log(window.performance.now());
+			// 	console.log(window.performance.now());
 
-			}, 1000)
+			// }, 1000)
 
 			var width = window.innerWidth;
 			var height = window.innerHeight;
@@ -133,7 +133,12 @@
 				receiveShadow: false,
 				castShadow: false,
 				useWorker: true,
-				onLoad: function( obj ){},
+				importScripts: ["three-js-73/build/three.js"],
+				onLoad: function( obj ){
+
+					console.log(obj);
+
+				},
 				onError: function( error ){
 
 					console.error(error);

@@ -22,8 +22,6 @@
 		constructor: OBJImg,
 		init: function( options ){
 
-			// this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
-
 			this.datas = null;
 
 			this.canvas = document.createElement("canvas");
@@ -41,7 +39,9 @@
 
 				worker.addEventListener("message", function( event ){
 
-					if( event.data.action == "convertIMG" ){
+					var action = event.data.action;
+
+					if( action == "convertIMG" ){
 
 						this.datas = event.data.content;
 
@@ -66,6 +66,15 @@
 					};
 
 				}.bind(this), false);
+
+				for( var script = 0, length = (options.importScripts || []).length; script < length; script++ ){
+
+					worker.postMessage({
+						action: "importScript",
+						content: options.importScripts[script]
+					});
+
+				};
 
 				worker.addEventListener("error", function( event ){
 
@@ -128,10 +137,10 @@
 
 							var pixelsBuffer = new Int16Array(this.getPixels(image));
 
-						worker.postMessage({
-							action: "convertIMG",
-							content: pixelsBuffer
-						}, [pixelsBuffer.buffer]);
+							worker.postMessage({
+								action: "convertIMG",
+								content: pixelsBuffer
+							}, [pixelsBuffer.buffer]);
 
 						}
 						else {
@@ -559,6 +568,12 @@
 	};
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
+
+	OBJImg.generateOBJ = function( datas, options ){
+
+
+
+	};
 
 	OBJImg.dictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
 
