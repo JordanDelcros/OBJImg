@@ -13,7 +13,7 @@
 
 			importScripts(basePath + "objimg.js");
 
-			self.addEventListener("message", function( event ){
+			this.addEventListener("message", function( event ){
 
 				var action = event.data.action;
 

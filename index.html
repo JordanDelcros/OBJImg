@@ -39,7 +39,7 @@
 	</style>
 	<script type="text/javascript" src="ressources/three/73/build/three.js"></script>
 	<script type="text/javascript" src="ressources/three/trackballcontrols.js"></script>
-	<script type="text/javascript" src="objimg.js"></script>
+	<script type="text/javascript" src="objimg.min.js"></script>
 	<script type="text/javascript">
 
 		window.onload = function(){
@@ -100,11 +100,11 @@
 
 			var image = new Image();
 			var generatedMesh = null;
-			var fileName = "humer";
+			var fileName = "lara";
 
 			OBJImg.generateIMG({
 				obj: "models/" + fileName + "/" + fileName + ".obj",
-				useWorker: true,
+				useWorker: false,
 				done: function( datas ){
 
 					var image = new Image();
@@ -124,10 +124,10 @@
 				image: "models/" + fileName + "/" + fileName + ".obj.png",
 				receiveShadow: false,
 				castShadow: false,
-				useWorker: true,
+				useWorker: false,
 				onLoad: function( obj ){
 
-					console.log(obj);
+					console.log("RAW datas:", obj);
 
 				},
 				onError: function( error ){
