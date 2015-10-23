@@ -1,39 +1,13 @@
 # OBJIMG
-Convert an OBJ file (exported from a 3D soft) to an image ready for THREE JS.
+Convert an OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS.
 
 ## Wait! what?
-An OBJ file contains a list of vertices, faces, normals, and UVs...
-```
-# cube.obj
- 
-g cube
- 
-v  0.0  0.0  0.0
-v  0.0  0.0  1.0
-v  0.0  1.0  0.0
-v  0.0  1.0  1.0
-v  1.0  0.0  0.0
-v  1.0  0.0  1.0
-v  1.0  1.0  0.0
-v  1.0  1.0  1.0
+Ok, an OBJ file contains all informations about the 3D model: vertices, faces, normals, and UVs, groups and materials...
+All these informations are translated into colours and stored into one single image.
 
-vn  0.0  0.0  1.0
-vn  0.0  0.0 -1.0
-vn  0.0  1.0  0.0
-vn  0.0 -1.0  0.0
-vn  1.0  0.0  0.0
-vn -1.0  0.0  0.0
- 
-f  1//2  7//2  5//2
-f  1//2  3//2  7//2 
-f  1//6  4//6  3//6 
-f  1//6  2//6  4//6 
-f  3//3  8//3  7//3 
-f  3//3  4//3  8//3 
-f  5//5  7//5  8//5 
-f  5//5  8//5  6//5 
-f  1//4  5//4  6//4 
-f  1//4  6//4  2//4 
-f  2//1  6//1  8//1 
-f  2//1  8//1  4//1 
-```
+## Why?
+First of all, for the fun!
+
+Then cause it save disk space (the compression method can save up to 80% on the file size) and it reduce the files to load from 2 (OBJ and MTL) to only 1 (except textures).
+
+![sample schema](resources/schema.jpg)
