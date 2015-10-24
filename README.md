@@ -24,7 +24,7 @@ The `OBJImg` Class contains both methods to generate and parse the images.
 ### Generate compressed image
 To generate an image model, you can use the `OBJImg` Class script or the node-webkit Application (in progress, OSX only).
 
-### Using the Class script
+#### Using the Class script
 
 It is very easy to implement, just link the `objimg.js` script to your html then do this:
 ```javascript
