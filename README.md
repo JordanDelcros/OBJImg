@@ -45,4 +45,12 @@ OBJImg.generateIMG({
 	}
 });
 ```
-You can now append the image the generated image from the DOM or from the DevTools.
+When an image is created, you can access it in the developer tools over resources tab, or you can append it to the DOM to save it or drag it.
+
+##### Options
+
+ - **obj:** the path to the OBJ file or the OBJ content itself
+ - **mtl:** the MTL file content (optional, only if the obj is content and not a path)
+ - **useWorker:** boolean definning if the script is executed into a webworker to avoid main-thread freezing
+ - **done:** callback function with datas parameters (datas is is base64 encoded image)
+ - **error:** callback function when the script fail to generate image
