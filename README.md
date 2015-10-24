@@ -12,6 +12,7 @@ Then cause it save disk space (the compression method can save up to 80% on the 
 
 ## Example
 ![sample schema](resources/schema.jpg)
+
 This Lara Croft 3D model contains 74764 vertices, 48549 uvs, 74690 normals and 143290 faces dispatched in 12 differents groups.
 On the left, you can see the OBJ/MTL into Blender, at center, the compressed image containing all datas, and on the right, the THREE object builded from the image.
 
