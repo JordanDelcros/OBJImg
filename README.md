@@ -1,14 +1,14 @@
 # OBJIMG
-Convert an OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS.
+Convert OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS (or native WebGL).
 
 ## Wait! what?
-Ok, an OBJ file contains all informations about the 3D model: vertices, faces, normals, and UVs, groups and materials...
+Ok, an OBJ file contains all informations about the 3D model: vertices, faces, normals, UVs, groups and materials...
 All these informations are translated into colours and stored into one single image.
 
 ## Why?
 First of all, for the fun!
 
-Then cause it save disk space (the compression method can save up to 80% on the file size) and it reduce the files to load from 2 (OBJ and MTL) to only 1 (except textures).
+Then cause it save disk space (the compression method can save up to 80% on the file size, or maybe more) and it reduce the files to load from 2 (OBJ and MTL) to only 1 (except textures).
 
 ## Example
 ![sample schema](resources/schema.jpg)
@@ -54,3 +54,19 @@ When an image is created, you can access it in the developer tools over resource
  - **useWorker:** boolean definning if the script is executed into a webworker to avoid main-thread freezing
  - **done:** callback function with datas parameters (datas is is base64 encoded image)
  - **error:** callback function when the script fail to generate image
+
+If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
+
+#### Using the node webkit application
+
+Find and launch the App (require node js and node webkit) then simply drag and drop an OBJ file, the App will generate the image named like the OBJ but with a `*.obj.png` extension.
+
+##### Options
+
+App options are not yet developed.
+
+## Todo
+- Make a custome Shader supporting a maximum MTL properties
+- App options
+- App for windows/linux
+- App standalone
