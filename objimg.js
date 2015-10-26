@@ -1146,6 +1146,8 @@
 
 				materialsID[index] = datas[1];
 
+				console.warn("define", datas[1]);
+
 				materials[index] = {
 					illumination: 2,
 					smooth: true,
@@ -1228,6 +1230,11 @@
 			else if( type == "s" ){
 
 				materials[index].smooth = (datas[1] == "off" || parseInt(datas[1]) == 0) ? false : true;
+
+			}
+			else if( type == "tf" ){
+
+				// filter transmission
 
 			}
 			else if( type == "ni" ){
@@ -1484,7 +1491,13 @@
 			}
 			else if( type == "usemtl" ){
 
-				objects[objects.length - 1].material = materialsID.indexOf(datas[1]);
+				var materialID = materialsID.indexOf(datas[1]);
+
+				if( materialID >= 0 ){
+
+					objects[objects.length - 1].material = materialID
+
+				};
 
 			};
 

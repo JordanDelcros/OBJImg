@@ -38,8 +38,9 @@
 
 	</style>
 	<script type="text/javascript" src="resources/three/73/build/three.js"></script>
+	<script type="text/javascript" src="resources/three/73/src/loaders/objloader.js"></script>
 	<script type="text/javascript" src="resources/three/trackballcontrols.js"></script>
-	<script type="text/javascript" src="objimg.min.js"></script>
+	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
 
 		window.onload = function(){
@@ -100,7 +101,7 @@
 
 			var image = new Image();
 			var generatedMesh = null;
-			var fileName = "lara";
+			var fileName = "continents";
 
 			OBJImg.generateIMG({
 				obj: "models/" + fileName + "/" + fileName + ".obj",
@@ -140,6 +141,13 @@
 			var object = obj.getObject3D(function( obj ){});
 			object.position.set(0, 0, 0);
 			scene.add(object);
+
+			// var loader = new THREE.OBJLoader();
+			// loader.load("models/continents/continents.obj", function( obj ){
+
+			// 	scene.add(obj);
+
+			// });
 
 			function render( now ){
 
