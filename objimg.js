@@ -1146,8 +1146,6 @@
 
 				materialsID[index] = datas[1];
 
-				console.warn("define", datas[1]);
-
 				materials[index] = {
 					illumination: 2,
 					smooth: true,
