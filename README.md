@@ -68,6 +68,7 @@ Find and launch the App (require node js and node webkit) then simply drag and d
 App options are not yet developed.
 
 ## Todo
+- Compress way more by avoid repeating identic vertices/faces/uvs/normals
 - Make a custome Shader supporting a maximum MTL properties
 - App options
 - App for windows/linux
