@@ -1,7 +1,0 @@
-newmtl defaultMat
-illum 4
-Kd 1.00 1.00 1.00
-Ka 0.40 0.40 0.40
-Tf 1.00 1.00 1.00
-Ni 1.00
-map_Kd diffuse_ground.png
