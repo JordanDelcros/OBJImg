@@ -61,6 +61,8 @@ If the `obj`parameter is a path, the script will parse the content for a MTL lib
 
 Find and launch the App (require node js and node webkit) then simply drag and drop an OBJ file, the App will generate the image named like the OBJ but with a `*.obj.png` extension.
 
+![App screenshot](App/screenshot.gif)
+
 ##### Options
 
 App options are not yet developed.
