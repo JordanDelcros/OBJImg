@@ -21,7 +21,7 @@ This Lara Croft 3D model contains 74764 vertices, 48549 uvs, 74690 normals and 1
 On the left, you can see the OBJ/MTL into Blender, at center, the compressed image containing all datas, and on the right, the THREE object builded from the image.
 
 As you can see, the two rendered models looks similar but there is a huge difference, their sizes.
-The weight of the OBJ/MTL files is around 14Mo and the compressed image weight is around 4Mo only!
+The OBJ/MTL files weigh 13.4Mo and the compressed image only weigh 3.2Mo!
 
 ## How to?
 The `OBJImg` Class contains both methods to parse and generate the images.
@@ -100,3 +100,8 @@ When an image is created, you can access it in the developer tools over resource
  - **error:** callback function when the script fail to generate image
 
 If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
+
+## Do not compress images
+
+Each pixel represent a precise number between 0 and 65280 (255 * 255 + 255 | red * green + blue) so if you compress the image with less, pixels color will be alterate and datas too...
+You cant use image compression except lossless compression like OptiPNG. (The objimg CLI already compress the image with the strongest method of OptiPNG).
