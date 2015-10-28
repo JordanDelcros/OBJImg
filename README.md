@@ -104,9 +104,13 @@ When an image is created, you can access it in the developer tools over resource
 If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
 
 #### Using the Command Line Interface
-[[![npm version](https://badge.fury.io/js/objimg.svg)](https://badge.fury.io/js/objimg)](https://www.npmjs.com/package/objimg)
 
-In the terminal, just do `$ npm install -g objimg` then use the `objimg` command to generate PNG image from your model.
+Install the npm bin package by typing this command in the terminal:
+```
+$ npm install -g objimg
+```
+
+then use the `objimg` command to generate PNG image from your model:
 
 ```
 	// generate a png in the same directory with the same name finishing by *.png
