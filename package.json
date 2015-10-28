@@ -1,7 +1,7 @@
 {
 	"name": "objimg",
 	"version": "1.0.4",
-	"description": "Compress OBJ/MTL 3D models into a lightweight PNG ready to be imported into (Web)GL and THREE-JS",
+	"description": "Compress OBJ/MTL 3D models into lightweights PNGs ready to be imported into (Web)GL and THREE-JS",
 	"author": "Jordan Delcros",
 	"keywords": ["obj", "mtl", "compression", "webgl", "threejs"],
 	"license": "MIT",
