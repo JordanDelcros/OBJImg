@@ -1,4 +1,6 @@
 # OBJIMG
+
+[![Join the chat at https://gitter.im/JordanDelcros/OBJImg](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JordanDelcros/OBJImg?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Convert OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS (or native WebGL).
 
 ## Wait! what?
