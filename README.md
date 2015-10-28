@@ -1,6 +1,7 @@
+[![Join the chat at https://gitter.im/JordanDelcros/OBJImg](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JordanDelcros/OBJImg?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # OBJIMG
 
-[![Join the chat at https://gitter.im/JordanDelcros/OBJImg](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JordanDelcros/OBJImg?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Convert OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS (or native WebGL).
 
 ## Wait! what?
@@ -13,7 +14,7 @@ First of all, for the fun!
 Then cause it save disk space (the compression method can save up to 80% on the file size, or maybe more) and it reduce the files to load from 2 (OBJ and MTL) to only 1 (except textures).
 
 ## Example
-![sample schema](resources/schema.jpg)
+![sample schema](examples/resources/schema.jpg)
 
 This Lara Croft 3D model contains 74764 vertices, 48549 uvs, 74690 normals and 143290 faces dispatched in 12 differents groups.
 On the left, you can see the OBJ/MTL into Blender, at center, the compressed image containing all datas, and on the right, the THREE object builded from the image.
@@ -59,19 +60,18 @@ When an image is created, you can access it in the developer tools over resource
 
 If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
 
-#### Using the node webkit application
+#### Using the Command Line Interface
 
-Find and launch the App (require node js and node webkit) then simply drag and drop an OBJ file, the App will generate the image named like the OBJ but with a `*.obj.png` extension.
+In the terminal, just do `$ npm install -g objimg` then use the `objimg` command to generate PNG image from your model.
 
-![App screenshot](App/screenshot.gif)
+```shell
+	// generate a png in the same directory with the same name finishing by *.png
+	objimg path/to/model.obj 
+	
+	// generate a png in a special path with defined name
+	objimg -o path/to/output.png path/to/model.obj
+```
 
-##### Options
+##### options
 
-App options are not yet developed.
-
-## Todo
-- Compress way more by avoid repeating identic vertices/faces/uvs/normals
-- Make a custome Shader supporting a maximum MTL properties
-- App options
-- App for windows/linux
-- App standalone
+ - **-o**: choose the output path and file name for the PNG
