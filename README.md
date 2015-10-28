@@ -108,7 +108,7 @@ If the `obj`parameter is a path, the script will parse the content for a MTL lib
 
 In the terminal, just do `$ npm install -g objimg` then use the `objimg` command to generate PNG image from your model.
 
-```shell
+```
 	// generate a png in the same directory with the same name finishing by *.png
 	objimg path/to/model.obj 
 	
