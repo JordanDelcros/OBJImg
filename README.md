@@ -20,4 +20,5 @@ then use the `objimg` command to generate the PNG image from your model:
 
 ##### Options
 
- - **-o**: choose the output path and file name for the PNG
+ - **-o**: (--output) choose the output path and file name for the PNG
+ - **-v**: (--verbose) enable the verbose mode, it will logs informations along generating
