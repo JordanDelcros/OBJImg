@@ -16,13 +16,14 @@ then use the `objimg` command to generate the PNG image from your model:
 	
 	# generate a png in a special path with defined name
 	objimg -o path/to/output.png path/to/model.obj
+
 ```
 
 ##### Options
 
  - **-o**: (--output) choose the output path and file name for the PNG
  - **-v**: (--verbose) enable the verbose mode, it will logs informations along generating
- - **-b**: (--brut) do not optimize image with OptiPNG
+ - **-b**: (--brut) disable image optimization with OptiPNG
 
 ## How to use the generated image after that?
 
