@@ -140,6 +140,12 @@ Program
 
 				};
 
+				PNGFile._packer.on("end", function(){
+
+					new Log("PNG successfully generated! " + newSize + "Mo (" + percentLighter + "% lighter).");
+
+				});
+
 				PNGFile
 					.pack()
 					.pipe(FileSystem.createWriteStream(Program.output));
