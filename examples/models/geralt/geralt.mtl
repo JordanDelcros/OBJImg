@@ -1,0 +1,184 @@
+# Blender MTL File: 'None'
+# Material Count: 14
+
+newmtl Model001_Material001
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd pants_diffuse.png
+map_Ks pants_specular.png
+map_Kn pants_normal.png
+
+newmtl Model001_Material002
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd pants_diffuse.png
+map_Ks pants_specular.png
+map_Kn pants_normal.png
+
+newmtl Model001_Material003
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd gauntlets_diffuse.png
+map_Ks gauntlets_specular.png
+map_Kn gauntlets_normal.png
+
+newmtl Model001_Material004
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd face_diffuse.png
+map_Ks face_specular.png
+map_Kn face_normal.png
+
+newmtl Model001_Material005
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd mouth_diffuse.png
+map_Ks mouth_specular.png
+map_Kn mouth_normal.png
+
+newmtl Model001_Material006
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd armor_diffuse.png
+map_Ks armor_specular.png
+map_Kn armor_normal.png
+
+newmtl Model001_Material007
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd armor_diffuse.png
+map_Ks armor_specular.png
+map_Kn armor_normal.png
+
+newmtl Model001_Material008
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd boots_diffuse.png
+map_Ks boots_specular.png
+map_Kn boots_normal.png
+
+newmtl Model001_Material009
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd armor_diffuse.png
+map_Ks armor_specular.png
+map_Kn armor_normal.png
+
+newmtl Model001_Material010
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd eyes_diffuse.png
+map_Kd eyes_specular.png
+map_Kn eyes_normal.png
+
+newmtl Model001_Material011
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd hair_diffuse.png
+map_Ks hair_specular.png
+map_Kn hair_normal.png
+
+newmtl Model001_Material012
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd hair_diffuse.png
+map_Ks hair_specular.png
+map_Kn hair_normal.png
+
+newmtl Model001_Material013
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd hair_diffuse.png
+map_Ks hair_specular.png
+map_Kn hair_normal.png
+
+newmtl Model001_Material014
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd pants_diffuse.png
+map_Ks pants_specular.png
+map_Kn pants_normal.png

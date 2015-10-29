@@ -1504,9 +1504,6 @@
 		bounds.vertex.min.w = Math.min(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z);
 		bounds.vertex.max.w = Math.max(bounds.vertex.max.x, bounds.vertex.max.y, bounds.vertex.max.z);
 
-		// var canvas = document.createElement("canvas");
-		// var context = canvas.getContext("2d");
-
 		var pixelIndex = 0;
 
 		var vertexSplitting = Math.ceil(vertices.length / MAX);
@@ -1564,10 +1561,6 @@
 
 		var square = Math.ceil(Math.sqrt(pixelCount));
 
-		// canvas.width = canvas.height = square;
-
-		// var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-		// var data = imageData.data;
 		var data = new Uint8ClampedArray(pixelCount * 4);
 
 		var vertexSplittingColor = OBJImg.fn.getColorFromValue(vertexSplitting);
