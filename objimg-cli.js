@@ -142,6 +142,10 @@ Program
 
 				PNGFile._packer.on("end", function(){
 
+					var sourceSize = (FileSystem.statSync(OBJPath).size / 1000000).toFixed(2);
+					var newSize = (FileSystem.statSync(Program.output).size / 1000000).toFixed(2);
+					var percentLighter = ((1 - (newSize / sourceSize)) * 100).toFixed(2);
+
 					new Log("PNG successfully generated! " + newSize + "Mo (" + percentLighter + "% lighter).");
 
 				});
