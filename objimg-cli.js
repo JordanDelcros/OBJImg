@@ -50,6 +50,7 @@ Program
 	.usage("[options] <file>")
 	.option("-o, --output <file>", "Select output path and name.")
 	.option("-v, --verbose", "Display information logs.")
+	.option("-b, --brut", "Do not optimize with OptiPNG, fastest but bigger.")
 	.action(function( OBJPath ){
 
 		nothing = false;
@@ -131,28 +132,45 @@ Program
 
 			};
 
-			var optimizer = new OptiPNG(["-o7"]);
-
-			optimizer.on("end", function(){
+			if( Program.brut ){
 
 				if( Program.verbose ){
 
-					new Info("PNG file successfully generated and optimized.");
+					new Info("Skip optimization.");
 
 				};
 
-				var sourceSize = (FileSystem.statSync(OBJPath).size / 1000000).toFixed(2);
-				var newSize = (FileSystem.statSync(Program.output).size / 1000000).toFixed(2);
-				var percentLighter = ((1 - (newSize / sourceSize)) * 100).toFixed(2);
+				PNGFile
+					.pack()
+					.pipe(FileSystem.createWriteStream(Program.output));
 
-				new Log("PNG successfully generated! " + newSize + "Mo (" + percentLighter + "% lighter).");
+			}
+			else {
 
-			});
+				var optimizer = new OptiPNG(["-o7"]);
 
-			PNGFile
-				.pack()
-				.pipe(optimizer)
-				.pipe(FileSystem.createWriteStream(Program.output));
+				optimizer.on("end", function(){
+
+					if( Program.verbose ){
+
+						new Info("PNG file successfully generated and optimized.");
+
+					};
+
+					var sourceSize = (FileSystem.statSync(OBJPath).size / 1000000).toFixed(2);
+					var newSize = (FileSystem.statSync(Program.output).size / 1000000).toFixed(2);
+					var percentLighter = ((1 - (newSize / sourceSize)) * 100).toFixed(2);
+
+					new Log("PNG successfully generated! " + newSize + "Mo (" + percentLighter + "% lighter).");
+
+				});
+
+				PNGFile
+					.pack()
+					.pipe(optimizer)
+					.pipe(FileSystem.createWriteStream(Program.output));
+
+			};
 
 			OnDeath(function( signal, error ){
 
