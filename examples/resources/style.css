@@ -38,7 +38,8 @@ html {
     transition: opacity 0.5s linear; }
     html div#infos img#generated {
       width: auto;
-      height: 100px; }
+      height: 100px;
+      image-rendering: pixelated; }
     html div#infos p {
       color: #888888;
       line-height: 100px;
