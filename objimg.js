@@ -68,9 +68,9 @@
 			this.canvas = document.createElement("canvas");
 			this.context = this.canvas.getContext("2d");
 
-			this.object3D = useTHREE ? new self.THREE.Object3D() : null;
+			this.object3D = useTHREE ? new THREE.Object3D() : null;
 			this.updateObject3D = false;
-			this.simpleObject3D = useTHREE ? new self.THREE.Object3D() : null;
+			this.simpleObject3D = useTHREE ? new THREE.Object3D() : null;
 			this.updateSimpleObject3D = false;
 			this.onComplete = null;
 
