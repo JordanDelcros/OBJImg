@@ -269,8 +269,6 @@
 
 			if( this.datas != null && useTHREE == true ){
 
-				self.datas = this.datas;
-
 				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
 					var objectDatas = this.datas.objects[object];
