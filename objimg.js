@@ -549,11 +549,11 @@
 				mesh.castShadow = this.castShadow;
 				mesh.receiveShadow = this.receiveShadow;
 
-				this.object3D.add(mesh);
+				this.simpleObject3D.add(mesh);
 
 				if( onComplete instanceof Function ){
 
-					onComplete.call(this, this.object3D);
+					onComplete.call(this, this.simpleObject3D);
 
 				};
 
