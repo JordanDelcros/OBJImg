@@ -68,11 +68,16 @@
 			this.canvas = document.createElement("canvas");
 			this.context = this.canvas.getContext("2d");
 
+			this.castShadow = (options.castShadow || false);
+			this.receiveShadow = (options.receiveShadow || false);
+
 			this.object3D = useTHREE ? new THREE.Object3D() : null;
-			this.updateObject3D = false;
+			this.object3DNeedsUpdate = false;
+			this.object3DComplete = null;
+			
 			this.simpleObject3D = useTHREE ? new THREE.Object3D() : null;
-			this.updateSimpleObject3D = false;
-			this.onComplete = null;
+			this.simpleObject3DNeedsUpdate = false;
+			this.simpleObject3DComplete = null;
 
 			if( options.useWorker == true ){
 
@@ -86,15 +91,15 @@
 
 						this.datas = event.data.content;
 
-						if( this.updateObject3D == true ){
+						if( this.object3DNeedsUpdate == true ){
 
-							this.setObject3D(options);
+							this.setObject3D(this.object3DComplete);
 
 						};
 
-						if( this.updateSimpleObject3D == true ){
+						if( this.simpleObject3DNeedsUpdate == true ){
 
-							this.setSimpleObject3D(options);
+							this.setSimpleObject3D(this.simpleObject3DComplete);
 
 						};
 
@@ -140,15 +145,15 @@
 
 						this.datas = OBJImg.convertIMG(this.getPixels(options.image));
 
-						if( this.updateObject3D == true ){
+						if( this.object3DNeedsUpdate == true ){
 
-							this.setObject3D(options);
+							this.setObject3D(this.object3DComplete);
 
 						};
 
-						if( this.updateSimpleObject3D == true ){
+						if( this.simpleObject3DNeedsUpdate == true ){
 
-							this.setSimpleObject3D(options);
+							this.setSimpleObject3D(this.simpleObject3DComplete);
 
 						};
 
@@ -179,15 +184,15 @@
 
 							this.datas = OBJImg.convertIMG(this.getPixels(options.image));
 
-							if( this.updateObject3D == true ){
+							if( this.object3DNeedsUpdate == true ){
 
-								this.setObject3D(options);
+								this.setObject3D(this.object3DComplete);
 
 							};
 
-							if( this.updateSimpleObject3D == true ){
+							if( this.simpleObject3DNeedsUpdate == true ){
 
-								this.setSimpleObject3D(options);
+								this.setSimpleObject3D(this.simpleObject3DComplete);
 
 							};
 
@@ -226,15 +231,15 @@
 
 						this.datas = OBJImg.convertIMG(this.getPixels(image));
 
-						if( this.updateObject3D == true ){
+						if( this.object3DNeedsUpdate == true ){
 
-							this.setObject3D(options);
+							this.setObject3D(this.object3DComplete);
 
 						};
 
-						if( this.updateSimpleObject3D == true ){
+						if( this.simpleObject3DNeedsUpdate == true ){
 
-							this.setSimpleObject3D(options);
+							this.setSimpleObject3D(this.simpleObject3DComplete);
 
 						};
 
@@ -265,7 +270,7 @@
 			return this.context.getImageData(0, 0, image.naturalWidth, image.naturalHeight).data;
 
 		},
-		setObject3D: function( options ){
+		setObject3D: function( onComplete ){
 
 			if( this.datas != null && useTHREE == true ){
 
@@ -449,16 +454,16 @@
 
 					var mesh = new THREE.Mesh(geometry, material);
 
-					mesh.castShadow = options.castShadow;
-					mesh.receiveShadow = options.receiveShadow;
+					mesh.castShadow = this.castShadow;
+					mesh.receiveShadow = this.receiveShadow;
 
 					this.object3D.add(mesh);
 
 				};
 
-				if( this.onComplete instanceof Function ){
+				if( onComplete instanceof Function ){
 
-					this.onComplete(this.object3D);
+					onComplete.call(this, this.object3D);
 
 				};
 
@@ -469,14 +474,23 @@
 		},
 		getObject3D: function( onComplete ){
 
-			this.updateObject3D = true;
+			if( this.datas != null ){
 
-			this.onComplete = onComplete;
+				this.setObject3D(onComplete);
+
+			}
+			else {
+
+				this.object3DNeedsUpdate = true;
+
+				this.object3DComplete = onComplete;
+
+			};
 
 			return this.object3D;
 
 		},
-		setSimpleObject3D: function(){
+		setSimpleObject3D: function( onComplete ){
 
 			if( this.datas != null && useTHREE == true ){
 
@@ -532,11 +546,14 @@
 
 				var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial());
 
+				mesh.castShadow = this.castShadow;
+				mesh.receiveShadow = this.receiveShadow;
+
 				this.object3D.add(mesh);
 
-				if( this.onComplete instanceof Function ){
+				if( onComplete instanceof Function ){
 
-					this.onComplete(this.object3D);
+					onComplete.call(this, this.object3D);
 
 				};
 
@@ -547,11 +564,20 @@
 		},
 		getSimpleObject3D: function( onComplete ){
 
-			this.updateSimpleObject3D = true;
+			if( this.datas != null ){
 
-			this.onComplete = onComplete;
+				this.setSimpleObject3D(onComplete);
 
-			return this.object3D;
+			}
+			else {
+
+				this.simpleObject3DNeedsUpdate = true;
+
+				this.simpleObject3DComplete = onComplete;
+
+			};
+
+			return this.simpleObject3D;
 
 		},
 		getPixelColor: function( index, pixels ){
@@ -598,12 +624,6 @@
 	};
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
-
-	OBJImg.generateOBJ = function( datas, options ){
-
-
-
-	};
 
 	OBJImg.dictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
 
