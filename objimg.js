@@ -1,6 +1,6 @@
 (function( self ){
 
-	"use strict"
+	"use strict";
 
 	var insideWorker = self.document === undefined ? true : false;
 	var scriptPath = (insideWorker == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") + "/" : "");
@@ -2202,4 +2202,4 @@
 
 	};
 
-})(self);
+})(this);
