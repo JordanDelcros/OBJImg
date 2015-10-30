@@ -100,7 +100,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -112,7 +112,7 @@
 
 					if( options.onError instanceof Function ){
 
-						options.onError("worker error");
+						options.onError.call(this, "worker error");
 
 					};
 
@@ -154,7 +154,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -193,7 +193,7 @@
 
 							if( options.onLoad instanceof Function ){
 
-								options.onLoad(this.datas);
+								options.onLoad.call(this, this.datas);
 
 							};
 
@@ -240,7 +240,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -985,7 +985,7 @@
 
 				if( options.onError instanceof Function ){
 
-					options.onError("worker error");
+					options.onError.call(this, "worker error");
 
 				};
 
