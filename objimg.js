@@ -68,9 +68,9 @@
 			this.canvas = document.createElement("canvas");
 			this.context = this.canvas.getContext("2d");
 
-			this.object3D = useTHREE ? new self.THREE.Object3D() : null;
+			this.object3D = useTHREE ? new THREE.Object3D() : null;
 			this.updateObject3D = false;
-			this.simpleObject3D = useTHREE ? new self.THREE.Object3D() : null;
+			this.simpleObject3D = useTHREE ? new THREE.Object3D() : null;
 			this.updateSimpleObject3D = false;
 			this.onComplete = null;
 
@@ -100,7 +100,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -112,7 +112,7 @@
 
 					if( options.onError instanceof Function ){
 
-						options.onError("worker error");
+						options.onError.call(this, "worker error");
 
 					};
 
@@ -154,7 +154,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -193,7 +193,7 @@
 
 							if( options.onLoad instanceof Function ){
 
-								options.onLoad(this.datas);
+								options.onLoad.call(this, this.datas);
 
 							};
 
@@ -240,7 +240,7 @@
 
 						if( options.onLoad instanceof Function ){
 
-							options.onLoad(this.datas);
+							options.onLoad.call(this, this.datas);
 
 						};
 
@@ -983,7 +983,7 @@
 
 				if( options.onError instanceof Function ){
 
-					options.onError("worker error");
+					options.onError.call(this, "worker error");
 
 				};
 
