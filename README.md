@@ -47,7 +47,7 @@ var model = new OBJImg({
  - **reveiveShadow:** [boolean] define if the THREE-JS object will receive shadows (default false)
  - **castShadow:** [boolean] define if the THREE-JS object will cast shadows (default false)
  - **onLoad:** [function(datas)] called when the datas are successfuly parsed from the image
- - **onErro:** [function(error)] called when an error occurs
+ - **onError:** [function(error)] called when an error occurs
 
 ##### Methods
  - **getObject3D:** [callback] return a complete THREE-JS `Object3D` (require THREE-JS)
@@ -95,9 +95,9 @@ When an image is created, you can access it in the developer tools over resource
 ##### Options
  - **obj:** the path to the OBJ file or the OBJ content itself
  - **mtl:** the MTL file content (optional, only if the obj is content and not a path)
- - **useWorker:** boolean definning if the script is executed into a webworker to avoid main-thread freezing
- - **done:** callback function with datas parameters (datas is is base64 encoded image)
- - **error:** callback function when the script fail to generate image
+ - **useWorker:** [boolean] definning if the script is executed into a webworker to avoid main-thread freezing
+ - **onComplete:** [function(datas)] callback function with datas parameters (datas is is base64 encoded image)
+ - **onError:** [function(error)] callback function when the script fail to generate image
 
 If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
 
@@ -105,3 +105,7 @@ If the `obj`parameter is a path, the script will parse the content for a MTL lib
 
 Each pixel represent a precise number between 0 and 65280 (255 * 255 + 255 | red * green + blue) so if you compress the image with less, pixels color will be alterate and datas too...
 You cant use image compression except lossless compression like OptiPNG. (The objimg CLI already compress the image with the strongest method of OptiPNG).
+
+## Todo
+ - support quadratic face parsing
+ - support custome shaders

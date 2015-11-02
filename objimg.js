@@ -983,9 +983,9 @@
 
 					context.putImageData(imageData, 0, 0);
 
-					if( options.done instanceof Function ){
+					if( options.onComplete instanceof Function ){
 
-						options.done(canvas.toDataURL("image/png", 1.0));
+						options.onComplete(canvas.toDataURL("image/png", 1.0));
 
 					};
 
@@ -1047,7 +1047,11 @@
 
 									context.putImageData(imageData, 0, 0);
 
-									options.done(canvas.toDataURL("image/png", 1.0));
+									if( options.onComplete instanceof Function ){
+
+										options.onComplete(canvas.toDataURL("image/png", 1.0));
+
+									};
 
 								};
 
@@ -1087,7 +1091,11 @@
 
 							context.putImageData(imageData, 0, 0);
 
-							options.done(canvas.toDataURL("image/png", 1.0));
+							if( options.onComplete instanceof Function ){
+
+								options.onComplete(canvas.toDataURL("image/png", 1.0));
+
+							};
 
 						};
 
@@ -1131,7 +1139,11 @@
 
 				context.putImageData(imageData, 0, 0);
 
-				options.done(canvas.toDataURL("image/png", 1.0));
+				if( options.onComplete instanceof Function ){
+
+					options.onComplete(canvas.toDataURL("image/png", 1.0));
+
+				};
 
 			};
 
