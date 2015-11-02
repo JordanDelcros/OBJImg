@@ -53,7 +53,7 @@ var model = new OBJImg({
  - **getObject3D:** [callback] return a complete THREE-JS `Object3D` (require THREE-JS)
  - **getSimpleObject3D:** [callback] return a THREE-JS `Object3D` ignoring groups (require THREE-JS)
 
-#### Use with THREE-JS
+#### Use with THREE-JS (>= r73)
 ```javascript
 var model = new OBJImg({
 	image: "path/to/model.png",

@@ -1,6 +1,3 @@
-# 
-# 
-
 newmtl Predatorarmour
 Ns 96.078431
 Ka 0.000000 0.000000 0.000000
@@ -46,7 +43,6 @@ Ni 1.000000
 d 0.000000
 illum 1
 map_Kd console_diffuse.png
-map_Kn console_normal.png
 
 newmtl Predatorhead
 Ns 96.078431

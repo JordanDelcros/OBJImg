@@ -364,91 +364,75 @@
 
 					if( materialDatas != undefined ){
 
+						var textureLoader = new THREE.TextureLoader();
+
+						var diffuseMap = null;
+						if( materialDatas.diffuse.map != null ){
+
+							diffuseMap = textureLoader.load(this.basePath + materialDatas.diffuse.map);
+							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var ambientMap = null;
+						if( materialDatas.ambient.map != null ){
+
+							ambientMap = textureLoader.load(this.basePath + materialDatas.ambient.map);
+							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var specularMap = null;
+						if( materialDatas.specular.map != null ){
+
+							specularMap = textureLoader.load(this.basePath + materialDatas.specular.map);
+							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var normalMap = null;
+						if( materialDatas.normal.map != null ){
+
+							normalMap = textureLoader.load(this.basePath + materialDatas.normal.map);
+							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var bumpMap = null;
+						if( materialDatas.bump.map != null ){
+
+							bumpMap = textureLoader.load(this.basePath + materialDatas.bump.map);
+							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
+						var opacityMap = null
+						if( materialDatas.opacity.map != null ){
+
+							opacityMap = textureLoader.load(this.basePath + materialDatas.opacity.map);
+							opacityMap.wrapS = opacityMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+						};
+
 						material = new THREE.MeshPhongMaterial({
+							aoMap: ambientMap,
 							color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
+							map: diffuseMap,
+							specularMap: specularMap,
 							specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
 							shininess: materialDatas.specular.force,
-							normalScale: new THREE.Vector2(1.0, 1.0),
+							normalMap: normalMap,
+							normalScale: new THREE.Vector2(0.5, 0.5),
+							bumpMap: bumpMap,
 							bumpScale: 1.0,
 							opacity: materialDatas.opacity.value,
+							alphaMap: opacityMap,
 							alphaTest: 0,
 							transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
 							combine: THREE.MultiplyOperation,
 							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
 							fog: true
 						});
-
-						var textureLoader = new THREE.TextureLoader();
-
-						if( materialDatas.diffuse.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.diffuse.map, function( texture ){
-
-								texture.wrapS = texture.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-								material.map = texture;
-
-							});
-
-						};
-
-						if( materialDatas.ambient.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.ambient.map, function( texture ){
-
-								texture.wrapS = texture.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;							
-
-								material.aoMap = texture;
-
-							});
-
-						};
-
-						if( materialDatas.specular.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.specular.map, function( texture ){
-
-								texture.wrapS = texture.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;							
-
-								material.specularMap = texture;
-
-							});
-
-						};
-
-						if( materialDatas.normal.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.bump.map, function( texture ){
-
-								texture.wrapS = texture.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-								material.normalMap = texture;
-
-							});
-
-						};
-
-						if( materialDatas.bump.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.bump.map, function( texture ){
-
-								texture.wrapS = texture.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-							});
-
-						};
-
-						if( materialDatas.opacity.map != null ){
-
-							textureLoader.load(this.basePath + materialDatas.opacity.map, function( texture ){
-	
-								texture.wrapS = texture.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-								material.alphaMap = texture;
-
-							});
-
-						};
 
 					}
 					else {
