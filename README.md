@@ -28,6 +28,3 @@ then use the `objimg` command to generate the PNG image from your model:
 ## How to use the generated image after that?
 
 After having generated the PNG, you'll want to use it... No worries, all informations are on [the Github page of the main script](https://github.com/JordanDelcros/OBJImg)
-
-## Todo
- - support quadratic face parsing
