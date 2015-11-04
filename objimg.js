@@ -1344,6 +1344,11 @@
 
 				};
 
+			}
+			else if( type.substr(0, 6) == "shader" && datas.length > 1 ){
+
+				console.log("Handle Shader here.");
+
 			};
 
 		};

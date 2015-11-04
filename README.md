@@ -99,7 +99,36 @@ When an image is created, you can access it in the developer tools over resource
  - **onComplete:** [function(datas)] callback function with datas parameters (datas is is base64 encoded image)
  - **onError:** [function(error)] callback function when the script fail to generate image
 
-If the `obj`parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
+ If the `obj` parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
+
+##### OBJ support
+ - **v**: vertex coordinates
+ - **vt**: uv coordinates
+ - **vn**: normal direction
+ - **f**: face infos
+ - **o**: new object
+ - **g**: new group
+ - **mtllib**: material library to use
+ - **usemtl**: material name
+
+##### MTL support
+ - **newmtl**: new material
+ - **ka**: ambient color
+ - **kd**: diffuse color
+ - **ks**: specular color
+ - **ns**: specular force
+ - **d**: opacity
+ - **illum**: illumination mode
+ - **s**: smooth rendering
+ - **map_ka**: ambient occlusion texture
+ - **map_kd**: diffuse texture (albedo)
+ - **map_ks**: specular texture
+ - **map_ns**: specular force texture
+ - **map_kn**: normal texture (none standard)
+ - **map_bump**: bump texture
+ - **map_d**: opacity texture
+ - **shader_vertex**: vertex shader
+ - **shader_fragment**: fragment shader
 
 ## Do not compress images
 
@@ -108,4 +137,5 @@ You cant use image compression except lossless compression like OptiPNG. (The ob
 
 ## Todo
  - support quadratic face parsing
- - support custome shaders
+ - support custom shaders
+ - use `src` for image and obj parameters, make it more common
