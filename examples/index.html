@@ -77,12 +77,12 @@
 				OBJImg.generateIMG({
 					obj: "models/" + fileName + "/" + fileName + ".obj",
 					useWorker: false,
-					done: function( datas ){
+					onComplete: function( datas ){
 
 						generatedImage.src = datas;
 
 					},
-					error: function( error ){
+					onError: function( error ){
 
 						console.error(error);
 
@@ -147,8 +147,8 @@
 <body>
 	<nav>
 		<select name="obj">
-			<option value="predator">predator</option>
 			<option value="lara">lara croft</option>
+			<option value="predator">predator</option>
 			<option value="altair">altaïr</option>
 			<option value="geralt">geralt</option>
 			<option value="skull">skull</option>
