@@ -1,8 +1,8 @@
-(function( self ){
+(function( window ){
 
 	"use strict";
 
-	var insideWorker = self.document === undefined ? true : false;
+	var insideWorker = window.document === undefined ? true : false;
 	var scriptPath = (insideWorker == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") + "/" : "");
 
 	var useTHREE = (typeof THREE === "undefined") ? false : true;
@@ -754,6 +754,24 @@
 
 			};
 
+			var vertexShaderCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var vertexShader = "";
+
+			for( var character = 0; character < vertexShaderCharacters; character++ ){
+
+				vertexShader += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
+			var fragmentShaderCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+			var fragmentShader = "";
+
+			for( var character = 0; character < fragmentShaderCharacters; character++ ){
+
+				fragmentShader += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+			};
+
 			materials[material] = {
 				illumination: illumination,
 				smooth: smooth,
@@ -793,6 +811,10 @@
 					map: opacityMap || null,
 					clamp: opacityClamp || false,
 					value: opacity
+				},
+				shader: {
+					vertex: vertexShader || null,
+					fragment: fragmentShader || null
 				}
 			};
 
@@ -1209,6 +1231,10 @@
 						map: [],
 						clamp: false,
 						value: 1.0
+					},
+					shader: {
+						vertex: [],
+						fragment: []
 					}
 				};
 
@@ -1341,6 +1367,33 @@
 
 					materials[index].opacity.map = encodedMap;
 					materials[index].opacity.clamp = options.clamp;
+
+				};
+
+			}
+			else if( type.substr(0, 6) == "shader" && datas.length > 1 ){
+
+				var shader = datas[datas.length - 1] || null;
+				var encodedShader = new Array();
+
+				if( shader != null ){
+
+					for( var character = 0, characterLength = shader.length; character < characterLength; character++ ){
+
+						encodedShader[character] = OBJImg.dictionnary.indexOf(shader[character]);
+
+					};
+
+				};
+
+				if( type == "shader_v" ){
+
+					materials[index].shader.vertex = encodedShader;
+
+				}
+				else if( type == "shader_f"  ){
+
+					materials[index].shader.fragment = encodedShader;					
 
 				};
 
@@ -1884,6 +1937,44 @@
 
 			};
 
+			// Shader
+
+			var vertexShaderCharactersColor =  OBJImg.fn.getColorFromValue(materials[material].shader.vertex.length);
+
+			data[pixelIndex++] = vertexShaderCharactersColor.r;
+			data[pixelIndex++] = vertexShaderCharactersColor.g;
+			data[pixelIndex++] = vertexShaderCharactersColor.b;
+			data[pixelIndex++] = vertexShaderCharactersColor.a;
+
+			for( var character = 0, characterLength = materials[material].shader.vertex.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].shader.vertex[character]);
+
+				data[pixelIndex++] = characterColor.r;
+				data[pixelIndex++] = characterColor.g;
+				data[pixelIndex++] = characterColor.b;
+				data[pixelIndex++] = characterColor.a;
+
+			};
+
+			var fragmentShaderCharactersColor =  OBJImg.fn.getColorFromValue(materials[material].shader.fragment.length);
+
+			data[pixelIndex++] = fragmentShaderCharactersColor.r;
+			data[pixelIndex++] = fragmentShaderCharactersColor.g;
+			data[pixelIndex++] = fragmentShaderCharactersColor.b;
+			data[pixelIndex++] = fragmentShaderCharactersColor.a;
+
+			for( var character = 0, characterLength = materials[material].shader.fragment.length; character < characterLength; character++ ){
+
+				var characterColor = OBJImg.fn.getColorFromValue(materials[material].shader.fragment[character]);
+
+				data[pixelIndex++] = characterColor.r;
+				data[pixelIndex++] = characterColor.g;
+				data[pixelIndex++] = characterColor.b;
+				data[pixelIndex++] = characterColor.a;
+
+			};
+
 		};
 
 		var vertexMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / (bounds.vertex.max.w + Math.abs(bounds.vertex.min.w)));
@@ -2220,10 +2311,10 @@
 		module.exports = OBJImg;
 
 	}
-	else if( self != undefined ){
+	else if( window != undefined ){
 
-		self.OBJImg = OBJImg;
+		window.OBJImg = OBJImg;
 
 	};
 
-})(this);
+})(window);
