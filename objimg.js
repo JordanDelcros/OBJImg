@@ -1,8 +1,8 @@
-(function( self ){
+(function( window ){
 
 	"use strict";
 
-	var insideWorker = self.document === undefined ? true : false;
+	var insideWorker = window.document === undefined ? true : false;
 	var scriptPath = (insideWorker == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") + "/" : "");
 
 	var useTHREE = (typeof THREE === "undefined") ? false : true;
@@ -2311,10 +2311,10 @@
 		module.exports = OBJImg;
 
 	}
-	else if( self != undefined ){
+	else if( window != undefined ){
 
-		self.OBJImg = OBJImg;
+		window.OBJImg = OBJImg;
 
 	};
 
-})(this);
+})(window);
