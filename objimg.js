@@ -431,6 +431,7 @@
 							transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
 							combine: THREE.MultiplyOperation,
 							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
+							side: materialDatas.shader.side,
 							fog: true
 						});
 
@@ -621,6 +622,23 @@
 
 	OBJImg.dictionnary = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789";
 
+	OBJImg.constants = {
+		channel: {
+			rgb: 0,
+			r: 1,
+			g: 2,
+			b: 3,
+			rg: 4,
+			rb: 5,
+			gb: 6
+		},
+		side: {
+			front: 0,
+			back: 1,
+			double: 2
+		}
+	};
+
 	OBJImg.convertIMG = function( pixels ){
 
 		var pixelIndex = 0;
@@ -680,6 +698,7 @@
 			var ambientColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 			var ambientMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var ambientClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var ambientChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			var ambientMap = "";
 
@@ -693,6 +712,7 @@
 			var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var diffuseMap = "";
 			var diffuseClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var diffuseChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < diffuseMapCharacters; character++ ){
 
@@ -704,6 +724,7 @@
 			var specularMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var specularMap = "";
 			var specularClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var specularChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < specularMapCharacters; character++ ){
 
@@ -714,6 +735,7 @@
 			var specularForceMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var specularForceMap = "";
 			var specularForceClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var specularForceChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < specularForceMapCharacters; character++ ){
 
@@ -726,6 +748,7 @@
 			var normalMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var normalMap = "";
 			var normalClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var normalChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < normalMapCharacters; character++ ){
 
@@ -736,6 +759,7 @@
 			var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var bumpMap = "";
 			var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var bumpChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < bumpMapCharacters; character++ ){
 
@@ -747,12 +771,15 @@
 			var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var opacityMap = "";
 			var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+			var opacityChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			for( var character = 0; character < opacityMapCharacters; character++ ){
 
 				opacityMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 			};
+
+			var shaderSide = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			var vertexShaderCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 			var vertexShader = "";
@@ -778,6 +805,7 @@
 				ambient: {
 					map: ambientMap || null,
 					clamp: ambientClamp || false,
+					channel: ambientChannel || OBJImg.constants.channel.rgb,
 					r: ambientColor.r / 255,
 					g: ambientColor.g / 255,
 					b: ambientColor.b / 255
@@ -785,6 +813,7 @@
 				diffuse: {
 					map: diffuseMap || null,
 					clamp: diffuseClamp || false,
+					channel: diffuseChannel || OBJImg.constants.channel.rgb,
 					r: diffuseColor.r / 255,
 					g: diffuseColor.g / 255,
 					b: diffuseColor.b / 255
@@ -792,8 +821,10 @@
 				specular: {
 					map: specularMap || null,
 					clamp: specularClamp || false,
+					channel: specularChannel || OBJImg.constants.channel.rgb,
 					forceMap: specularForceMap || null,
 					forceClamp: specularForceClamp || null,
+					forceChannel: specularForceChannel || OBJImg.constants.channel.rgb,
 					force: specularForce,
 					r: specularColor.r / 255,
 					g: specularColor.g / 255,
@@ -801,18 +832,22 @@
 				},
 				normal: {
 					map: normalMap || null,
-					clamp: normalClamp || false
+					clamp: normalClamp || false,
+					channel: normalChannel || OBJImg.constants.channel.rgb
 				},
 				bump: {
 					map: bumpMap || null,
-					clamp: bumpClamp || false
+					clamp: bumpClamp || false,
+					channel: bumpChannel || OBJImg.constants.channel.rgb
 				},
 				opacity: {
 					map: opacityMap || null,
 					clamp: opacityClamp || false,
+					channel: opacityChannel || OBJImg.constants.channel.rgb,
 					value: opacity
 				},
 				shader: {
+					side: shaderSide || OBJImg.constants.side.front,
 					vertex: vertexShader || null,
 					fragment: fragmentShader || null
 				}
@@ -1198,6 +1233,7 @@
 					ambient: {
 						map: [],
 						clamp: false,
+						channel: OBJImg.constants.channel.rgb,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
@@ -1205,6 +1241,7 @@
 					diffuse: {
 						map: [],
 						clamp: false,
+						channel: OBJImg.constants.channel.rgb,
 						r: 1.0,
 						g: 1.0,
 						b: 1.0
@@ -1212,8 +1249,10 @@
 					specular: {
 						map: [],
 						clamp: false,
+						channel: OBJImg.constants.channel.rgb,
 						forceMap: [],
 						forceClamp: false,
+						forceChannel: OBJImg.constants.channel.rgb,
 						force: 1.0,
 						r: 1.0,
 						g: 1.0,
@@ -1221,18 +1260,22 @@
 					},
 					normal: {
 						map: [],
-						clamp: false
+						clamp: false,
+						channel: OBJImg.constants.channel.rgb
 					},
 					bump: {
 						map: [],
-						clamp: false
+						clamp: false,
+						channel: OBJImg.constants.channel.rgb
 					},
 					opacity: {
 						map: [],
 						clamp: false,
+						channel: OBJImg.constants.channel.rgb, 
 						value: 1.0
 					},
 					shader: {
+						side: OBJImg.constants.side.front,
 						vertex: [],
 						fragment: []
 					}
@@ -1306,7 +1349,8 @@
 				};
 
 				var options = {
-					clamp: true
+					clamp: true,
+					channel: OBJImg.constants.channel.rgb
 				};
 
 				for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -1323,6 +1367,11 @@
 
 						};
 
+					}
+					else if( optionType == "-imfchan" ){
+
+						options.channel = OBJImg.constants.channel[datas[++option]];
+
 					};
 
 				};
@@ -1331,44 +1380,56 @@
 
 					materials[index].ambient.map = encodedMap;
 					materials[index].ambient.clamp = options.clamp;
+					materials[index].ambient.channel = options.channel;
 
 				}
 				else if( type == "map_kd" ){
 
 					materials[index].diffuse.map = encodedMap;
 					materials[index].diffuse.clamp = options.clamp;
+					materials[index].diffuse.channel = options.channel;
 
 				}
 				else if( type == "map_ks" ){
 
 					materials[index].specular.map = encodedMap;
 					materials[index].specular.clamp = options.clamp;
+					materials[index].specular.channel = options.channel;
 
 				}
 				else if( type == "map_ns" ){
 
 					materials[index].specular.forceMap = encodedMap;
 					materials[index].specular.forceClamp = options.clamp;
+					materials[index].specular.channel = options.channel;
 
 				}
 				else if( type == "map_kn" ){
 
 					materials[index].normal.map = encodedMap;
 					materials[index].normal.clamp = options.clamp;
+					materials[index].normal.channel = options.channel;
 
 				}
 				else if( type == "map_bump" ){
 
 					materials[index].bump.map = encodedMap;
 					materials[index].bump.clamp = options.clamp;
+					materials[index].bump.channel = options.channel;
 
 				}
 				else if( type == "map_d" ){
 
 					materials[index].opacity.map = encodedMap;
 					materials[index].opacity.clamp = options.clamp;
+					materials[index].opacity.channel = options.channel;
 
 				};
+
+			}
+			else if( type == "shader_s" ){
+
+				materials[index].shader.side = OBJImg.constants.side[datas[1]];
 
 			}
 			else if( type.substr(0, 6) == "shader" && datas.length > 1 ){
@@ -1609,7 +1670,7 @@
 			textures: textureSplitting,
 			normals: normalSplitting,
 			faces: faceSplitting,
-			materials: 1 + (materials.length * 9 * 2),
+			materials: 1 + (materials.length * 11 * 2),
 			vertexMultiplicator: 1,
 			textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 			textureOffset: (textureSplitting > 0 ? 1 : 0),
@@ -1633,6 +1694,8 @@
 			pixelCount += materials[material].normal.map.length;
 			pixelCount += materials[material].bump.map.length;
 			pixelCount += materials[material].opacity.map.length;
+			pixelCount += materials[material].shader.vertex.length;
+			pixelCount += materials[material].shader.fragment.length;
 
 		};
 
@@ -1764,6 +1827,11 @@
 			data[pixelIndex++] = (materials[material].ambient.clamp == true ? 1 : 0);
 			data[pixelIndex++] = 255;
 
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].ambient.channel;
+			data[pixelIndex++] = 255;
+
 			for( var character = 0, characterLength = materials[material].ambient.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].ambient.map[character]);
@@ -1790,6 +1858,11 @@
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = (materials[material].diffuse.clamp == true ? 1 : 0);
+			data[pixelIndex++] = 255;
+
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].diffuse.channel;
 			data[pixelIndex++] = 255;
 
 			for( var character = 0, characterLength = materials[material].diffuse.map.length; character < characterLength; character++ ){
@@ -1820,6 +1893,11 @@
 			data[pixelIndex++] = (materials[material].specular.clamp == true ? 1 : 0);
 			data[pixelIndex++] = 255;
 
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].specular.channel;
+			data[pixelIndex++] = 255;
+
 			for( var character = 0, characterLength = materials[material].specular.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].specular.map[character]);
@@ -1841,6 +1919,11 @@
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = (materials[material].specular.forceClamp == true ? 1 : 0);
+			data[pixelIndex++] = 255;
+
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].specular.forceChannel;
 			data[pixelIndex++] = 255;
 
 			for( var character = 0, characterLength = materials[material].specular.forceMap.length; character < characterLength; character++ ){
@@ -1873,6 +1956,11 @@
 			data[pixelIndex++] = (materials[material].normal.clamp == true ? 1 : 0);
 			data[pixelIndex++] = 255;
 
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].normal.channel;
+			data[pixelIndex++] = 255;
+
 			for( var character = 0, characterLength = materials[material].normal.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].normal.map[character]);
@@ -1894,6 +1982,11 @@
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = 0;
 			data[pixelIndex++] = (materials[material].bump.clamp == true ? 1 : 0);
+			data[pixelIndex++] = 255;
+
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].bump.channel;
 			data[pixelIndex++] = 255;
 
 			for( var character = 0, characterLength = materials[material].bump.map.length; character < characterLength; character++ ){
@@ -1926,6 +2019,11 @@
 			data[pixelIndex++] = (materials[material].opacity.clamp == true ? 1 : 0);
 			data[pixelIndex++] = 255;
 
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = 0;
+			data[pixelIndex++] = materials[material].opacity.channel;
+			data[pixelIndex++] = 255;
+
 			for( var character = 0, characterLength = materials[material].opacity.map.length; character < characterLength; character++ ){
 
 				var characterColor = OBJImg.fn.getColorFromValue(materials[material].opacity.map[character]);
@@ -1937,9 +2035,14 @@
 
 			};
 
-			// Shader
+			var shaderSideColor = OBJImg.fn.getColorFromValue(materials[material].shader.side);
 
-			var vertexShaderCharactersColor =  OBJImg.fn.getColorFromValue(materials[material].shader.vertex.length);
+			data[pixelIndex++] = shaderSideColor.r;
+			data[pixelIndex++] = shaderSideColor.g;
+			data[pixelIndex++] = shaderSideColor.b;
+			data[pixelIndex++] = shaderSideColor.a;
+
+			var vertexShaderCharactersColor = OBJImg.fn.getColorFromValue(materials[material].shader.vertex.length);
 
 			data[pixelIndex++] = vertexShaderCharactersColor.r;
 			data[pixelIndex++] = vertexShaderCharactersColor.g;
@@ -1957,7 +2060,7 @@
 
 			};
 
-			var fragmentShaderCharactersColor =  OBJImg.fn.getColorFromValue(materials[material].shader.fragment.length);
+			var fragmentShaderCharactersColor = OBJImg.fn.getColorFromValue(materials[material].shader.fragment.length);
 
 			data[pixelIndex++] = fragmentShaderCharactersColor.r;
 			data[pixelIndex++] = fragmentShaderCharactersColor.g;
