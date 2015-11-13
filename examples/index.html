@@ -80,6 +80,7 @@
 					onComplete: function( datas ){
 
 						generatedImage.src = datas;
+						infos.style.opacity = 1;
 
 					},
 					onError: function( error ){
@@ -98,8 +99,6 @@
 					onLoad: function( obj ){
 
 						console.log("RAW datas:", obj, " (usefull for vanilla WebGL)");
-
-						infos.style.opacity = 1;
 
 					},
 					onError: function( error ){
@@ -147,6 +146,7 @@
 <body>
 	<nav>
 		<select name="obj">
+			<option value="eiffel">eiffel tower</option>
 			<option value="lara">lara croft</option>
 			<option value="predator">predator</option>
 			<option value="altair">altaïr</option>

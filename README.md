@@ -127,8 +127,9 @@ When an image is created, you can access it in the developer tools over resource
  - **map_kn**: normal texture (none standard)
  - **map_bump**: bump texture
  - **map_d**: opacity texture
- - **shader_vertex**: vertex shader
- - **shader_fragment**: fragment shader
+ - **shader_s**: rendering side
+ - **shader_v**: vertex shader
+ - **shader_f**: fragment shader
 
 ## Do not compress images
 

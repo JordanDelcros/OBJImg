@@ -1,0 +1,37 @@
+# Blender MTL File: 'None'
+# Material Count: 5
+
+newmtl main
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.500000 0.500000 0.500000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_d -imfchan r alpha.png
+shader_s double
+
+newmtl details
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.500000
+illum 6
+shader_s double
+map_Kd part1.png
+
+newmtl floors
+Ns 94.117647
+Ka 0.000000 0.000000 0.000000
+Kd 0.500000 0.500000 0.500000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.500000
+illum 6
+shader_s double
