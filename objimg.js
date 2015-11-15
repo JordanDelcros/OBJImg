@@ -429,6 +429,8 @@
 							alphaMap: opacityMap,
 							alphaTest: 0,
 							transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
+							depthTest: true,
+							depthWrite: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? false : true),
 							combine: THREE.MultiplyOperation,
 							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
 							side: materialDatas.shader.side,
