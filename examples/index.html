@@ -73,7 +73,7 @@
 
 			function doMagicThings( fileName ){
 
-				// Generate the image (only to show you what she look like)
+				// Generate the image (only to show you what she looks like)
 				OBJImg.generateIMG({
 					obj: "models/" + fileName + "/" + fileName + ".obj",
 					useWorker: false,
@@ -96,7 +96,7 @@
 					receiveShadow: false,
 					castShadow: false,
 					useWorker: false,
-					onLoad: function( obj ){
+					onComplete: function( obj ){
 
 						console.log("RAW datas:", obj, " (usefull for vanilla WebGL)");
 

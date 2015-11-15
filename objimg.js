@@ -103,9 +103,9 @@
 
 						};
 
-						if( options.onLoad instanceof Function ){
+						if( options.onComplete instanceof Function ){
 
-							options.onLoad.call(this, this.datas);
+							options.onComplete.call(this, this.datas);
 
 						};
 
@@ -157,9 +157,9 @@
 
 						};
 
-						if( options.onLoad instanceof Function ){
+						if( options.onComplete instanceof Function ){
 
-							options.onLoad.call(this, this.datas);
+							options.onComplete.call(this, this.datas);
 
 						};
 
@@ -196,9 +196,9 @@
 
 							};
 
-							if( options.onLoad instanceof Function ){
+							if( options.onComplete instanceof Function ){
 
-								options.onLoad.call(this, this.datas);
+								options.onComplete.call(this, this.datas);
 
 							};
 
@@ -243,9 +243,9 @@
 
 						};
 
-						if( options.onLoad instanceof Function ){
+						if( options.onComplete instanceof Function ){
 
-							options.onLoad.call(this, this.datas);
+							options.onComplete.call(this, this.datas);
 
 						};
 
