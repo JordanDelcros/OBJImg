@@ -127,35 +127,35 @@
 
 						for( var materialParameter in type ){
 
-							var parameter = type[materialParameter];
-
 							if( /\.(png|jpg|gif)$/.test(type[materialParameter]) ){
+
+								var map = type[materialParameter];
 
 								toLoad++;
 
-								parameter = new ImageParser(this.basePath + "/" + parameter, type.channel, function(){
+								new ImageParser(this.basePath + "/" + map, type.channel, function( materialIndex, materialType, materialParameter, image ){
 
-									console.info("LOADED MF");
+									loaded++;
 
-								});
+									this.datas.materials[materialIndex][materialType][materialParameter] = image;
 
-								// var image = new Image();
+									if( loaded == toLoad ){
 
-								// image.addEventListener("load", function(){
+										if( this.object3DNeedsUpdate == true ){
 
-								// 	loaded++;
+											this.setObject3D(this.object3DComplete);
 
-								// 	if( loaded == toLoad ){
+										};
 
-								// 		console.info("ALL IMAGE ARE LOADED");
+										if( this.simpleObject3DNeedsUpdate == true ){
 
-								// 	};
+											this.setSimpleObject3D(this.simpleObject3DComplete);
 
-								// }, false);
+										};
 
-								// image.src = this.basePath + "/" + this.datas.materials[materialIndex][type][parameter];
+									};
 
-								// this.datas.materials[materialIndex][type][parameter] = image;
+								}.bind(this, materialIndex, materialType, materialParameter));
 
 							};
 
@@ -165,22 +165,10 @@
 
 				};
 
-				if( this.object3DNeedsUpdate == true ){
+				// var completeEvent = document.createEvent("CustomEvent");
+				// completeEvent.initCustomEvent("complete", true, true, this.datas);
 
-					this.setObject3D(this.object3DComplete);
-
-				};
-
-				if( this.simpleObject3DNeedsUpdate == true ){
-
-					this.setSimpleObject3D(this.simpleObject3DComplete);
-
-				};
-
-				var completeEvent = document.createEvent("CustomEvent");
-				completeEvent.initCustomEvent("complete", true, true, this.datas);
-
-				this.dispatchEvent(completeEvent);
+				// this.dispatchEvent(completeEvent);
 
 			}.bind(this));
 
@@ -503,29 +491,31 @@
 						var opacityMap = null;
 						if( materialDatas.opacity.map != null ){
 
-							opacityMap = new THREE.Texture(materialDatas.opacity.map);
+							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping);
 							opacityMap.wrapS = opacityMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
+
+						console.log(opacityMap);
 
 						material = new THREE.MeshPhongMaterial({
 							aoMap: ambientMap,
 							color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
 							map: diffuseMap,
-							specularMap: specularMap,
+							specularMap: opacityMap,
 							specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
 							shininess: materialDatas.specular.force,
 							normalMap: normalMap,
 							normalScale: new THREE.Vector2(0.5, 0.5),
 							bumpMap: bumpMap,
 							bumpScale: 1.0,
-							opacity: materialDatas.opacity.value,
-							alphaMap: opacityMap,
-							alphaTest: 0,
-							transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
-							depthTest: true,
-							depthWrite: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? false : true),
-							combine: THREE.MultiplyOperation,
+							// opacity: materialDatas.opacity.value,
+							// alphaMap: opacityMap,
+							// alphaTest: 0,
+							// transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
+							// depthTest: true,
+							// depthWrite: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? false : true),
+							// combine: THREE.MultiplyOperation,
 							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
 							side: materialDatas.shader.side,
 							fog: true
@@ -2603,7 +2593,7 @@
 
 				if( channel == OBJImg.constants.channel.rgb ){
 
-					callback();
+					callback(this.image);
 
 				}
 				else {
@@ -2620,25 +2610,41 @@
 
 					if( channel == OBJImg.constants.channel.r ){
 
-						console.log("only r")
+						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
+
+							imageData.data[pixel + 1] = imageData.data[pixel];
+							imageData.data[pixel + 2] = imageData.data[pixel];
+
+						};
+
+					}
+					else if( channel == OBJImg.constants.channel.g ){
 
 						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
 
-							imageData.data[pixel + 1] = imageData[pixel];
-							imageData.data[pixel + 2] = imageData[pixel];
+							imageData.data[pixel] = imageData.data[pixel + 1];
+							imageData.data[pixel + 2] = imageData.data[pixel + 1];
+
+						};
+
+					}
+					else if( channel == OBJImg.constants.channel.b ){
+
+						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
+
+							imageData.data[pixel] = imageData.data[pixel + 2];
+							imageData.data[pixel + 1] = imageData.data[pixel + 2];
 
 						};
 
 					};
-
-					console.log(imageData.data[0], imageData.data[1], imageData.data[2], imageData.data[3]);
 
 					context.putImageData(imageData, 0, 0);
 
 					this.image = new Image();
 					this.image.src = canvas.toDataURL("image/png", 1.0);
 
-					document.body.appendChild(this.image);
+					callback(this.image);
 
 				};
 
@@ -2646,7 +2652,7 @@
 
 			this.image.src = url;
 
-			return this.image;
+			return this;
 
 		}
 	};
