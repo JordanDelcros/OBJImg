@@ -76,7 +76,7 @@
 				// Generate the image (only to show you what she looks like)
 				OBJImg.generateIMG({
 					obj: "models/" + fileName + "/" + fileName + ".obj",
-					useWorker: false,
+					useWorker: true,
 					onComplete: function( datas ){
 
 						generatedImage.src = datas;
@@ -95,17 +95,23 @@
 					image: "models/" + fileName + "/" + fileName + ".obj.png",
 					receiveShadow: false,
 					castShadow: false,
-					useWorker: false,
-					onComplete: function( obj ){
+					useWorker: true,
+					onComplete: function( event ){
 
-						console.log("RAW datas:", obj, " (usefull for vanilla WebGL)");
+						console.log("RAW datas:", event.detail, " (usefull for vanilla WebGL)");
 
 					},
-					onError: function( error ){
+					onError: function( event ){
 
-						console.error(error);
+						console.error(event);
 
 					}
+				});
+
+				obj.addEventListener("complete", function( event ){
+
+					console.log("complete from user!");
+
 				});
 
 				scene.remove(object3d);
