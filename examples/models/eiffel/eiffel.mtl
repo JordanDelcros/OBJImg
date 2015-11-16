@@ -23,7 +23,7 @@ Ni 1.000000
 d 0.500000
 illum 6
 shader_s double
-map_Kd part1.png
+#map_Kd part1.png
 
 newmtl floors
 Ns 94.117647

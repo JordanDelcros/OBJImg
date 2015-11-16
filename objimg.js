@@ -3,8 +3,11 @@
 	"use strict";
 
 	var INSIDE_WORKER = self.document == undefined ? true : false;
-	var SCRIPT_PATH = (INSIDE_WORKER == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") + "/" : "");
+
+	var SCRIPT_PATH = (INSIDE_WORKER == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") : "");
+	
 	var USE_THREE = (typeof THREE == "undefined") ? false : true;
+	
 	var SUPPORT_WORKER = (self.Worker != undefined);
 
 	if( INSIDE_WORKER == false && SUPPORT_WORKER == true ){
@@ -13,7 +16,7 @@
 
 			var blob = new Blob(["(" + function( SCRIPT_PATH ){
 
-				this.importScripts(SCRIPT_PATH + "objimg.js");
+				this.importScripts(SCRIPT_PATH + "/objimg.js");
 
 				this.addEventListener("message", function( event ){
 
@@ -111,11 +114,54 @@
 
 				this.datas = event.detail;
 
-				var textures = new Array();
+				var toLoad = 0;
+				var loaded = 0;
 
 				for( var materialIndex = 0, length = this.datas.materials.length; materialIndex < length; materialIndex++ ){
 
+					var material = this.datas.materials[materialIndex];
 
+					for( var materialType in material ){
+
+						var type = material[materialType];
+
+						for( var materialParameter in type ){
+
+							var parameter = type[materialParameter];
+
+							if( /\.(png|jpg|gif)$/.test(type[materialParameter]) ){
+
+								toLoad++;
+
+								parameter = new ImageParser(this.basePath + "/" + parameter, type.channel, function(){
+
+									console.info("LOADED MF");
+
+								});
+
+								// var image = new Image();
+
+								// image.addEventListener("load", function(){
+
+								// 	loaded++;
+
+								// 	if( loaded == toLoad ){
+
+								// 		console.info("ALL IMAGE ARE LOADED");
+
+								// 	};
+
+								// }, false);
+
+								// image.src = this.basePath + "/" + this.datas.materials[materialIndex][type][parameter];
+
+								// this.datas.materials[materialIndex][type][parameter] = image;
+
+							};
+
+						};
+
+					};
 
 				};
 
@@ -188,7 +234,12 @@
 
 			if( options.image instanceof Image ){
 
-				this.basePath = options.image.getAttribute("src").split("/").slice(0, -1).join("/") + "/";
+				Object.defineProperty(this, "basePath", {
+					configurable: false,
+					enumerable: true,
+					writable: false,
+					value: options.image.getAttribute("src").split("/").slice(0, -1).join("/")
+				});
 
 				if( options.image.complete == true ){
 
@@ -242,7 +293,12 @@
 			}
 			else {
 
-				this.basePath = options.image.split("/").slice(0, -1).join("/") + "/";
+				Object.defineProperty(this, "basePath", {
+					configurable: false,
+					enumerable: true,
+					writable: false,
+					value: options.image.split("/").slice(0, -1).join("/")
+				});
 
 				var image = new Image();
 
@@ -404,12 +460,10 @@
 
 					if( materialDatas != undefined ){
 
-						var textureLoader = new THREE.TextureLoader();
-
 						var diffuseMap = null;
 						if( materialDatas.diffuse.map != null ){
 
-							diffuseMap = textureLoader.load(this.basePath + materialDatas.diffuse.map);
+							diffuseMap = new THREE.Texture(materialDatas.diffuse.map);
 							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -417,7 +471,7 @@
 						var ambientMap = null;
 						if( materialDatas.ambient.map != null ){
 
-							ambientMap = textureLoader.load(this.basePath + materialDatas.ambient.map);
+							ambientMap = new THREE.Texture(materialDatas.ambient.map);
 							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -425,7 +479,7 @@
 						var specularMap = null;
 						if( materialDatas.specular.map != null ){
 
-							specularMap = textureLoader.load(this.basePath + materialDatas.specular.map);
+							specularMap = new THREE.Texture(materialDatas.specular.map);
 							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -433,7 +487,7 @@
 						var normalMap = null;
 						if( materialDatas.normal.map != null ){
 
-							normalMap = textureLoader.load(this.basePath + materialDatas.normal.map);
+							normalMap = new THREE.Texture(materialDatas.normal.map);
 							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -441,15 +495,15 @@
 						var bumpMap = null;
 						if( materialDatas.bump.map != null ){
 
-							bumpMap = textureLoader.load(this.basePath + materialDatas.bump.map);
+							bumpMap = new THREE.Texture(materialDatas.bump.map);
 							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
 
-						var opacityMap = null
+						var opacityMap = null;
 						if( materialDatas.opacity.map != null ){
 
-							opacityMap = textureLoader.load(this.basePath + materialDatas.opacity.map);
+							opacityMap = new THREE.Texture(materialDatas.opacity.map);
 							opacityMap.wrapS = opacityMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
 						};
@@ -679,14 +733,18 @@
 		writable: false,
 		enumerable: true,
 		value: {
+			shading: {
+				smooth: 0,
+				flat: 1
+			},
+			wrapping: {
+				clamp: 0
+			},
 			channel: {
 				rgb: 0,
 				r: 1,
 				g: 2,
-				b: 3,
-				rg: 4,
-				rb: 5,
-				gb: 6
+				b: 3
 			},
 			side: {
 				front: 0,
@@ -750,8 +808,6 @@
 			var faces = new Array(faceCount)
 
 			var materials = new Array(OBJImg.fn.getPixelValue(pixelIndex++, pixels));
-
-			var images = new Array();
 
 			for( var material = 0, length = materials.length; material < length; material++ ){
 
@@ -1123,8 +1179,7 @@
 				normals: normals,
 				faces: faces,
 				materials: materials,
-				objects: objects,
-				images: images
+				objects: objects
 			};
 
 		}
@@ -2529,6 +2584,74 @@
 
 		}
 	});
+
+	var ImageParser = function( url, channel, callback ){
+
+		return new ImageParser.fn.init(url, channel, callback);
+
+	};
+
+	ImageParser.fn = ImageParser.prototype = {
+		constructor: ImageParser,
+		init: function( url, channel, callback ){
+
+			console.info(url, channel);
+
+			this.image = new Image();
+
+			this.image.addEventListener("load", function( event ){
+
+				if( channel == OBJImg.constants.channel.rgb ){
+
+					callback();
+
+				}
+				else {
+
+					var canvas = document.createElement("canvas");
+					var context = canvas.getContext("2d");
+
+					canvas.width = this.image.naturalWidth;
+					canvas.height = this.image.naturalHeight;
+
+					context.drawImage(this.image, 0, 0, this.image.naturalWidth, this.image.naturalHeight);
+
+					var imageData = context.getImageData(0, 0, this.image.naturalWidth, this.image.naturalHeight);
+
+					if( channel == OBJImg.constants.channel.r ){
+
+						console.log("only r")
+
+						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
+
+							imageData.data[pixel + 1] = imageData[pixel];
+							imageData.data[pixel + 2] = imageData[pixel];
+
+						};
+
+					};
+
+					console.log(imageData.data[0], imageData.data[1], imageData.data[2], imageData.data[3]);
+
+					context.putImageData(imageData, 0, 0);
+
+					this.image = new Image();
+					this.image.src = canvas.toDataURL("image/png", 1.0);
+
+					document.body.appendChild(this.image);
+
+				};
+
+			}.bind(this), false);
+
+			this.image.src = url;
+
+			return this.image;
+
+		}
+	};
+
+	ImageParser.fn.init.prototype = ImageParser.fn;
 
 	if( typeof define !== "undefined" && define instanceof Function && define.amd != undefined ){
 

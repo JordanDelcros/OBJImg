@@ -20,6 +20,9 @@ html {
       display: block;
       margin: 0 auto;
       line-height: 20px; }
+  html body > img {
+    width: 200px;
+    height: auto; }
   html body canvas {
     width: 100%;
     height: 100%;
