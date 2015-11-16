@@ -79,6 +79,30 @@
 			this.simpleObject3DNeedsUpdate = false;
 			this.simpleObject3DComplete = null;
 
+			var onFinish = function( datas ){
+
+				this.datas = datas;
+
+				if( this.object3DNeedsUpdate == true ){
+
+					this.setObject3D(this.object3DComplete);
+
+				};
+
+				if( this.simpleObject3DNeedsUpdate == true ){
+
+					this.setSimpleObject3D(this.simpleObject3DComplete);
+
+				};
+
+				if( options.onComplete instanceof Function ){
+
+					options.onComplete.call(this, this.datas);
+
+				};
+
+			}.bind(this);
+
 			if( options.useWorker == true ){
 
 				var worker = new Worker(workerURL);
@@ -89,25 +113,7 @@
 
 					if( action == "convertIMG" ){
 
-						this.datas = event.data.content;
-
-						if( this.object3DNeedsUpdate == true ){
-
-							this.setObject3D(this.object3DComplete);
-
-						};
-
-						if( this.simpleObject3DNeedsUpdate == true ){
-
-							this.setSimpleObject3D(this.simpleObject3DComplete);
-
-						};
-
-						if( options.onComplete instanceof Function ){
-
-							options.onComplete.call(this, this.datas);
-
-						};
+						onFinish(event.data.content);
 
 					};
 
@@ -143,25 +149,7 @@
 					}
 					else {
 
-						this.datas = OBJImg.convertIMG(this.getPixels(options.image));
-
-						if( this.object3DNeedsUpdate == true ){
-
-							this.setObject3D(this.object3DComplete);
-
-						};
-
-						if( this.simpleObject3DNeedsUpdate == true ){
-
-							this.setSimpleObject3D(this.simpleObject3DComplete);
-
-						};
-
-						if( options.onComplete instanceof Function ){
-
-							options.onComplete.call(this, this.datas);
-
-						};
+						onFinish(OBJImg.convertIMG(this.getPixels(options.image)));
 
 					};
 
@@ -182,25 +170,7 @@
 						}
 						else {
 
-							this.datas = OBJImg.convertIMG(this.getPixels(options.image));
-
-							if( this.object3DNeedsUpdate == true ){
-
-								this.setObject3D(this.object3DComplete);
-
-							};
-
-							if( this.simpleObject3DNeedsUpdate == true ){
-
-								this.setSimpleObject3D(this.simpleObject3DComplete);
-
-							};
-
-							if( options.onComplete instanceof Function ){
-
-								options.onComplete.call(this, this.datas);
-
-							};
+							onFinish(OBJImg.convertIMG(this.getPixels(options.image)));
 
 						};
 
@@ -229,25 +199,7 @@
 					}
 					else {
 
-						this.datas = OBJImg.convertIMG(this.getPixels(image));
-
-						if( this.object3DNeedsUpdate == true ){
-
-							this.setObject3D(this.object3DComplete);
-
-						};
-
-						if( this.simpleObject3DNeedsUpdate == true ){
-
-							this.setSimpleObject3D(this.simpleObject3DComplete);
-
-						};
-
-						if( options.onComplete instanceof Function ){
-
-							options.onComplete.call(this, this.datas);
-
-						};
+						onFinish(OBJImg.convertIMG(this.getPixels(image)));
 
 					};
 
