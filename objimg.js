@@ -16,9 +16,9 @@
 
 			var blob = new Blob(["(" + function( SCRIPT_PATH ){
 
-				this.importScripts(SCRIPT_PATH + "/objimg.js");
+				self.importScripts(SCRIPT_PATH + "/objimg.js");
 
-				this.addEventListener("message", function( event ){
+				self.addEventListener("message", function( event ){
 
 					var action = event.data.action;
 
@@ -110,8 +110,6 @@
 
 			this.addEventListener("parse", function( event ){
 
-				console.info("PARSED", event);
-
 				this.datas = event.detail;
 
 				var toLoad = 0;
@@ -141,17 +139,10 @@
 
 									if( loaded == toLoad ){
 
-										if( this.object3DNeedsUpdate == true ){
+										var readyEvent = document.createEvent("CustomEvent");
+										readyEvent.initCustomEvent("ready", true, true, this.datas);
 
-											this.setObject3D(this.object3DComplete);
-
-										};
-
-										if( this.simpleObject3DNeedsUpdate == true ){
-
-											this.setSimpleObject3D(this.simpleObject3DComplete);
-
-										};
+										this.dispatchEvent(readyEvent);
 
 									};
 
@@ -165,16 +156,35 @@
 
 				};
 
-				// var completeEvent = document.createEvent("CustomEvent");
-				// completeEvent.initCustomEvent("complete", true, true, this.datas);
+				if( toLoad == 0 ){
 
-				// this.dispatchEvent(completeEvent);
+					var readyEvent = document.createEvent("CustomEvent");
+					readyEvent.initCustomEvent("ready", true, true, this.datas);
+
+					this.dispatchEvent(readyEvent);
+
+				};
 
 			}.bind(this));
 
-			this.addEventListener("complete", function( event ){
+			this.addEventListener("ready", function( event ){
 
-				console.info("COMPLETE !!!");
+				if( this.object3DNeedsUpdate == true ){
+
+					this.setObject3D(this.object3DComplete);
+
+				};
+
+				if( this.simpleObject3DNeedsUpdate == true ){
+
+					this.setSimpleObject3D(this.simpleObject3DComplete);
+
+				};
+
+				var completeEvent = document.createEvent("CustomEvent");
+				completeEvent.initCustomEvent("complete", true, true, this.datas);
+
+				this.dispatchEvent(completeEvent);
 
 			}.bind(this));
 
@@ -451,52 +461,62 @@
 						var diffuseMap = null;
 						if( materialDatas.diffuse.map != null ){
 
-							diffuseMap = new THREE.Texture(materialDatas.diffuse.map);
-							diffuseMap.wrapS = diffuseMap.wrapT = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							diffuseMap.needsUpdate = true;
 
 						};
 
 						var ambientMap = null;
 						if( materialDatas.ambient.map != null ){
 
-							ambientMap = new THREE.Texture(materialDatas.ambient.map);
-							ambientMap.wrapS = ambientMap.wrapT = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							ambientMap = new THREE.Texture(materialDatas.ambient.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							ambientMap.needsUpdate = true;
 
 						};
 
 						var specularMap = null;
 						if( materialDatas.specular.map != null ){
 
-							specularMap = new THREE.Texture(materialDatas.specular.map);
-							specularMap.wrapS = specularMap.wrapT = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							specularMap = new THREE.Texture(materialDatas.specular.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							specularMap.needsUpdate = true;
 
 						};
 
 						var normalMap = null;
 						if( materialDatas.normal.map != null ){
 
-							normalMap = new THREE.Texture(materialDatas.normal.map);
-							normalMap.wrapS = normalMap.wrapT = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							normalMap = new THREE.Texture(materialDatas.normal.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							normalMap.needsUpdate = true;
 
 						};
 
 						var bumpMap = null;
 						if( materialDatas.bump.map != null ){
 
-							bumpMap = new THREE.Texture(materialDatas.bump.map);
-							bumpMap.wrapS = bumpMap.wrapT = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							bumpMap = new THREE.Texture(materialDatas.bump.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							bumpMap.needsUpdate = true;
 
 						};
 
 						var opacityMap = null;
 						if( materialDatas.opacity.map != null ){
 
-							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping);
-							opacityMap.wrapS = opacityMap.wrapT = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 12);
+							opacityMap.needsUpdate = true;
 
 						};
-
-						console.log(opacityMap);
 
 						material = new THREE.MeshPhongMaterial({
 							aoMap: ambientMap,
@@ -511,10 +531,10 @@
 							bumpScale: 1.0,
 							opacity: materialDatas.opacity.value,
 							alphaMap: opacityMap,
-							alphaTest: 0,
-							transparent: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? true : false),
+							alphaTest: materialDatas.opacity.test,
+							transparent: ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false),
 							depthTest: true,
-							depthWrite: ((materialDatas.opacity.value < 1.0 || materialDatas.opacity.map != null) ? false : true),
+							depthWrite: true,
 							combine: THREE.MultiplyOperation,
 							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
 							side: materialDatas.shader.side,
@@ -923,6 +943,7 @@
 				var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
 				var opacityChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var opacityTest = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 
 				var opacityMap = null;
 
@@ -1003,7 +1024,8 @@
 						map: opacityMap,
 						clamp: opacityClamp,
 						channel: opacityChannel || OBJImg.constants.channel.rgb,
-						value: opacity
+						value: opacity,
+						test: opacityTest
 					},
 					shader: {
 						side: shaderSide || OBJImg.constants.side.front,
@@ -1446,7 +1468,8 @@
 							map: [],
 							clamp: false,
 							channel: OBJImg.constants.channel.rgb, 
-							value: 1.0
+							value: 1.0,
+							test: 0
 						},
 						shader: {
 							side: OBJImg.constants.side.front,
@@ -1524,7 +1547,8 @@
 
 					var options = {
 						clamp: true,
-						channel: OBJImg.constants.channel.rgb
+						channel: OBJImg.constants.channel.rgb,
+						test: 0
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -1535,16 +1559,17 @@
 
 							var value = datas[++option];
 
-							if( value == "off" || parseInt(value) == 0 ){
-
-								options.clamp = false;
-
-							};
+							options.clamp = (datas[++option] != "off") ? true : false;
 
 						}
 						else if( optionType == "-imfchan" ){
 
 							options.channel = OBJImg.constants.channel[datas[++option]];
+
+						}
+						else if( optionType == "-test" ){
+
+							options.test = parseFloat(datas[++option]);
 
 						};
 
@@ -1597,6 +1622,7 @@
 						materials[index].opacity.map = encodedMap;
 						materials[index].opacity.clamp = options.clamp;
 						materials[index].opacity.channel = options.channel;
+						materials[index].opacity.test = options.test;
 
 					};
 
@@ -1844,7 +1870,7 @@
 				textures: textureSplitting,
 				normals: normalSplitting,
 				faces: faceSplitting,
-				materials: 1 + (materials.length * 11 * 2),
+				materials: 1 + (materials.length * 12 * 2),
 				vertexMultiplicator: 1,
 				textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
 				textureOffset: (textureSplitting > 0 ? 1 : 0),
@@ -2196,6 +2222,11 @@
 				data[pixelIndex++] = 0;
 				data[pixelIndex++] = 0;
 				data[pixelIndex++] = materials[material].opacity.channel;
+				data[pixelIndex++] = 255;
+
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = Math.round(materials[material].opacity.test * 255);
 				data[pixelIndex++] = 255;
 
 				for( var character = 0, characterLength = materials[material].opacity.map.length; character < characterLength; character++ ){
@@ -2585,8 +2616,6 @@
 		constructor: ImageParser,
 		init: function( url, channel, callback ){
 
-			console.info(url, channel);
-
 			this.image = new Image();
 
 			this.image.addEventListener("load", function( event ){
@@ -2606,40 +2635,25 @@
 
 					context.drawImage(this.image, 0, 0, this.image.naturalWidth, this.image.naturalHeight);
 
-					var imageData = context.getImageData(0, 0, this.image.naturalWidth, this.image.naturalHeight);
+					this.imageData = context.getImageData(0, 0, this.image.naturalWidth, this.image.naturalHeight);
 
 					if( channel == OBJImg.constants.channel.r ){
 
-						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
-
-							imageData.data[pixel + 1] = imageData.data[pixel];
-							imageData.data[pixel + 2] = imageData.data[pixel];
-
-						};
+						this.isolateRed();
 
 					}
 					else if( channel == OBJImg.constants.channel.g ){
 
-						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
-
-							imageData.data[pixel] = imageData.data[pixel + 1];
-							imageData.data[pixel + 2] = imageData.data[pixel + 1];
-
-						};
+						this.isolateGreen();
 
 					}
 					else if( channel == OBJImg.constants.channel.b ){
 
-						for( var pixel = 0, length = imageData.data.length; pixel < length; pixel += 4 ){
-
-							imageData.data[pixel] = imageData.data[pixel + 2];
-							imageData.data[pixel + 1] = imageData.data[pixel + 2];
-
-						};
+						this.isolateBlue();
 
 					};
 
-					context.putImageData(imageData, 0, 0);
+					context.putImageData(this.imageData, 0, 0);
 
 					this.image = new Image();
 					this.image.src = canvas.toDataURL("image/png", 1.0);
@@ -2651,6 +2665,42 @@
 			}.bind(this), false);
 
 			this.image.src = url;
+
+			return this;
+
+		},
+		isolateRed: function(){
+
+			for( var pixel = 0, length = this.imageData.data.length; pixel < length; pixel += 4 ){
+
+				this.imageData.data[pixel + 1] = this.imageData.data[pixel];
+				this.imageData.data[pixel + 2] = this.imageData.data[pixel];
+
+			};
+
+			return this;
+
+		},
+		isolateGreen: function(){
+
+			for( var pixel = 0, length = this.imageData.data.length; pixel < length; pixel += 4 ){
+
+				this.imageData.data[pixel] = this.imageData.data[pixel + 1];
+				this.imageData.data[pixel + 2] = this.imageData.data[pixel + 1];
+
+			};
+
+			return this;
+
+		},
+		isolateBlue: function(){
+
+			for( var pixel = 0, length = this.imageData.data.length; pixel < length; pixel += 4 ){
+
+				this.imageData.data[pixel] = this.imageData.data[pixel + 2];
+				this.imageData.data[pixel + 1] = this.imageData.data[pixel + 2];
+
+			};
 
 			return this;
 
