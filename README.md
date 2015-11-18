@@ -116,7 +116,7 @@ When an image is created, you can access it in the developer tools over resource
  - **ns**: [float] specular force
  - **d**: [float] opacity
  - **illum**: [1|2|3|4|5|6|7|8|9|10] illumination mode
- - **s**: [on|off]smooth rendering
+ - **s**: [on|off] smooth or flat rendering
  - **map_ka**: [path] to ambient occlusion texture
  - **map_kd**: [path] to diffuse texture (albedo)
  - **map_ks**: [path] to specular texture
