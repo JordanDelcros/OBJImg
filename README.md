@@ -29,12 +29,11 @@ The `OBJImg` Class contains both methods to parse and generate the images.
 #### Import 3D model from image
 To import the model from an image, link the `objimg.js` script to your html then do this:
 ```javascript
-var model = new OBJImg({
+new OBJImg({
 	image: "path/to/model.png",
-	onLoad: function( datas ){
-	
-		// datas are all vertices, normals, uvs, faces, groups and materials
-		console.log("RAW datas: ", datas);
+	onComplete: function( datas ){
+
+		console.log("If requested, THREE object has been created", datas);
 	
 	}
 });
@@ -46,7 +45,7 @@ var model = new OBJImg({
  - **useWorker:** [boolean] define if the script will use worker to avoid main-thread freezing (default false)
  - **reveiveShadow:** [boolean] define if the THREE-JS object will receive shadows (default false)
  - **castShadow:** [boolean] define if the THREE-JS object will cast shadows (default false)
- - **onLoad:** [function(datas)] called when the datas are successfuly parsed from the image
+ - **onComplete:** [function(datas)] called when the datas are successfuly parsed from the image
  - **onError:** [function(error)] called when an error occurs
 
 ##### Methods
@@ -56,9 +55,7 @@ var model = new OBJImg({
 #### Use with THREE-JS (>= r73)
 ```javascript
 var model = new OBJImg({
-	image: "path/to/model.png",
-	receiveShadow: false,
-	castShadow: false
+	image: "path/to/model.png"
 }).getObject3D();
 
 scene.add(model);
@@ -77,13 +74,13 @@ It is very easy to implement, just link the `objimg.js` script to your html then
 OBJImg.generateIMG({
 	obj: "path/to/file.obj",
 	useWorker: true,
-	done: function( datas ){
+	onComplete: function( datas ){
 	
 		var image = new Image();
 		image.src = datas;
 	
 	},
-	error: function( error ){
+	onError: function( error ){
 	
 		console.error(error);
 	
@@ -102,34 +99,34 @@ When an image is created, you can access it in the developer tools over resource
  If the `obj` parameter is a path, the script will parse the content for a MTL lib (path to the MTL).
 
 ##### OBJ support
- - **v**: vertex coordinates
- - **vt**: uv coordinates
- - **vn**: normal direction
- - **f**: face infos
- - **o**: new object
- - **g**: new group
- - **mtllib**: material library to use
- - **usemtl**: material name
+ - **v**: [x y z] vertex coordinates
+ - **vt**: [x y z] uv coordinates
+ - **vn**: [x y z] normal direction
+ - **f**: [v/vt/vn v/vt/vn v/vt/vn] face infos (only support triangles yet)
+ - **o**: [name] of new object
+ - **g**: [name] of new group
+ - **mtllib**: [path] to material library to use
+ - **usemtl**: [name] of material to use
 
 ##### MTL support
- - **newmtl**: new material
- - **ka**: ambient color
- - **kd**: diffuse color
- - **ks**: specular color
- - **ns**: specular force
- - **d**: opacity
- - **illum**: illumination mode
- - **s**: smooth rendering
- - **map_ka**: ambient occlusion texture
- - **map_kd**: diffuse texture (albedo)
- - **map_ks**: specular texture
- - **map_ns**: specular force texture
- - **map_kn**: normal texture (none standard)
- - **map_bump**: bump texture
- - **map_d**: opacity texture
- - **shader_s**: rendering side
- - **shader_v**: vertex shader
- - **shader_f**: fragment shader
+ - **newmtl**: [name] of new material
+ - **ka**: [r g b] ambient color
+ - **kd**: [r g b] diffuse color
+ - **ks**: [r g b] specular color
+ - **ns**: [float] specular force
+ - **d**: [float] opacity
+ - **illum**: [1|2|3|4|5|6|7|8|9|10] illumination mode
+ - **s**: [on|off]smooth rendering
+ - **map_ka**: [path] to ambient occlusion texture
+ - **map_kd**: [path] to diffuse texture (albedo)
+ - **map_ks**: [path] to specular texture
+ - **map_ns**: [path] to specular force texture
+ - **map_kn**: [path] to normal texture (none standard)
+ - **map_bump**: [path] to bump texture
+ - **map_d**: [path] to opacity texture
+ - **shader_s**: [front|back|double] side to render (none standard)
+ - **shader_v**: [path] to vertex shader (none standard)
+ - **shader_f**: [path] to fragment shader (none standard)
 
 ## Do not compress images
 
