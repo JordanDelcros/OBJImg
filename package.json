@@ -3,7 +3,7 @@
 	"version": "1.4.1",
 	"description": "Compress OBJ/MTL 3D models into lightweights PNGs ready to be imported into (Web)GL and THREE-JS",
 	"author": "Jordan Delcros",
-	"keywords": ["obj", "mtl", "compression", "webgl", "3d", "three", "threejs", "three-js", "javascript"],
+	"keywords": ["obj", "mtl", "compression", "webgl", "3d", "three", "threejs", "three-js", "three.js", "javascript"],
 	"license": "MIT",
 	"preferGlobal": true,
 	"scripts": {
