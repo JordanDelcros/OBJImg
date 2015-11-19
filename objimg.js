@@ -119,13 +119,73 @@
 
 					var material = this.datas.materials[materialIndex];
 
+					if( material.shader.vertex != null ){
+
+						toLoad++;
+
+						new FileLoader(this.basePath + "/" + material.shader.vertex, function( data ){
+
+							loaded++;
+
+							material.shader.vertex = data;
+
+							if( loaded == toLoad ){
+
+								var readyEvent = document.createEvent("CustomEvent");
+								readyEvent.initCustomEvent("ready", true, true, this.datas);
+
+								this.dispatchEvent(readyEvent);
+
+							};
+
+						}.bind(this), function( error ){
+
+							var errorEvent = document.createEvent("CustomEvent");
+							errorEvent.initCustomEvent("error", true, true, "Cant load vertex shader (error " + error + ")");
+
+							this.dispatchEvent(errorEvent);
+
+						}.bind(this));
+
+					};
+
+					if( material.shader.fragment != null ){
+
+						toLoad++;
+
+						new FileLoader(this.basePath + "/" + material.shader.fragment, function( data ){
+
+							loaded++;
+
+							material.shader.fragment = data;
+
+							if( loaded == toLoad ){
+
+								var readyEvent = document.createEvent("CustomEvent");
+								readyEvent.initCustomEvent("ready", true, true, this.datas);
+
+								this.dispatchEvent(readyEvent);
+
+							};
+
+						}.bind(this), function( error ){
+
+							var errorEvent = document.createEvent("CustomEvent");
+							errorEvent.initCustomEvent("error", true, true, "Cant load fragment shader (error " + error + ")");
+
+							this.dispatchEvent(errorEvent);
+
+						}.bind(this));
+
+					};
+
 					for( var materialType in material ){
 
 						var type = material[materialType];
 
 						for( var materialParameter in type ){
 
-							if( /\.(png|jpg|gif)$/.test(type[materialParameter]) ){
+							if( typeof type[materialParameter] == "string" && /\.(png|jpg|gif)$/.test(type[materialParameter]) ){
 
 								var map = type[materialParameter];
 
@@ -458,16 +518,6 @@
 
 					if( materialDatas != undefined ){
 
-						var diffuseMap = null;
-						if( materialDatas.diffuse.map != null ){
-
-							var wrapMode = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
-
-							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
-							diffuseMap.needsUpdate = true;
-
-						};
-
 						var ambientMap = null;
 						if( materialDatas.ambient.map != null ){
 
@@ -475,6 +525,16 @@
 
 							ambientMap = new THREE.Texture(materialDatas.ambient.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
 							ambientMap.needsUpdate = true;
+
+						};
+
+						var diffuseMap = null;
+						if( materialDatas.diffuse.map != null ){
+
+							var wrapMode = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+
+							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							diffuseMap.needsUpdate = true;
 
 						};
 
@@ -518,28 +578,274 @@
 
 						};
 
-						material = new THREE.MeshPhongMaterial({
-							aoMap: ambientMap,
-							color: new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b),
-							map: diffuseMap,
-							specularMap: specularMap,
-							specular: new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b),
-							shininess: materialDatas.specular.force,
-							normalMap: normalMap,
-							normalScale: new THREE.Vector2(0.5, 0.5),
-							bumpMap: bumpMap,
-							bumpScale: 1.0,
-							opacity: materialDatas.opacity.value,
-							alphaMap: opacityMap,
-							alphaTest: materialDatas.opacity.test,
-							transparent: ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false),
-							depthTest: true,
-							depthWrite: true,
-							combine: THREE.MultiplyOperation,
-							shading: (materialDatas.smooth == true ? THREE.SmoothShading : THREE.FlatShading),
-							side: materialDatas.shader.side,
-							fog: true
-						});
+						var diffuseColor = new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b);
+						var specularColor = new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b);
+						var normalScale = new THREE.Vector2(0.5, 0.5);
+						var bumpScale = 1.0;
+						var transparent = ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false);
+						var depthTest = true;
+						var depthWrite = true;
+						var shading = (materialDatas.smooth == OBJImg.constants.shading.smooth ? THREE.SmoothShading : THREE.FlatShading);
+						var side = (materialDatas.shader.side == OBJImg.constants.side.front ? THREE.FrontSide : (materialDatas.shader.side == OBJImg.constants.side.back ? THREE.BackSide : THREE.DoubleSide));
+						var fog = true;
+
+						if( materialDatas.shader.vertex != null || materialDatas.shader.fragment != null ){
+
+							material = new THREE.ShaderMaterial({
+								uniforms: {
+									aoMap: {
+										type: "t",
+										value: ambientMap
+									},
+									aoMapIntensity: {
+										type: "f",
+										value: 1
+									},
+									diffuse: {
+										type: "c",
+										value: diffuseColor
+									},
+									map: {
+										type: "t",
+										value: diffuseMap
+									},
+									normalMap: {
+										type: "t",
+										value: normalMap
+									},
+									normalScale: {
+										type: "v2",
+										value: normalScale
+									},
+									specular: {
+										type: "c",
+										value: specularColor
+									},
+									specularMap: {
+										type: "t",
+										value: specularMap
+									},
+									bumpMap: {
+										type: "t",
+										value: bumpMap
+									},
+									bumpScale: {
+										type: "f",
+										value: bumpScale
+									},
+									alphaMap: {
+										type: "t",
+										value: opacityMap
+									},
+									opacity: {
+										type: "f",
+										value: materialDatas.opacity.value
+									},
+									shininess: {
+										type: "f",
+										value: materialDatas.specular.force
+									},
+									displacementBias: {
+										type: "f",
+										value: 0
+									},
+									displacementMap: {
+										type: "t",
+										value: null
+									},
+									displacementScale: {
+										type: "f",
+										value: 1
+									},
+									emmisive: {
+										type: "c",
+										value: new THREE.Color(0, 0, 0)
+									},
+									emissiveMap: {
+										type: "t",
+										value: null
+									},
+									envMap: {
+										type: "t",
+										value: null
+									},
+									flipEnvMap: {
+										type: "f",
+										value: -1
+									},
+									fogColor: {
+										type: "c",
+										value: new THREE.Color(1, 1, 1)
+									},
+									fogDensity: {
+										type: "f",
+										value: 0.00025
+									},
+									fogFar: {
+										type: "f",
+										value: 2000
+									},
+									fogNear: {
+										type: "f",
+										value: 1
+									},
+									lightMap: {
+										type: "t",
+										value: null
+									},
+									offsetRepeat: {
+										type: "v4",
+										value: new THREE.Vector4(0, 0, 1, 1)
+									},
+									reflectivity: {
+										type: "f",
+										value: 1
+									},
+									reflectionRatio: {
+										type: "f",
+										value: 0.98
+									},
+									shadowBias: {
+										type: "fv1",
+										value: []
+									},
+									shadowDarkness: {
+										type: "fv1",
+										value: []
+									},
+									shadowMap: {
+										type: "tv",
+										value: []
+									},
+									shadowMapSize: {
+										type: "v2v",
+										value: []
+									},
+									shadowMatrix: {
+										type: "m4v",
+										value: []
+									},
+									ambientLightColor: {
+										type: "fv",
+										value: []
+									},
+									pointLightColor: {
+										type: "fv",
+										value: []
+									},
+									pointLightDecay: {
+										type: "fv1",
+										value: []
+									},
+									pointLightDistance: {
+										type: "fv1",
+										value: []
+									},
+									pointLightPosition: {
+										type: "fv",
+										value: []
+									},
+									spotLightAngleCos: {
+										type: "fv1",
+										value: []
+									},
+									spotLightColor: {
+										type: "fv",
+										value: []
+									},
+									spotLightDecay: {
+										type: "fv1",
+										value: []
+									},
+									spotLightDirection: {
+										type: "fv",
+										value: []
+									},
+									spotLightDistance: {
+										type: "fv1",
+										value: []
+									},
+									spotLightExponent: {
+										type: "fv1",
+										value: []
+									},
+									spotLightPosition: {
+										type: "fv",
+										value: []
+									},
+									directionalLightColor: {
+										type: "fv",
+										value: []
+									},
+									directionalLightDirection: {
+										type: "fv",
+										value: []
+									},
+									hemisphereLightDirection: {
+										type: "fv",
+										value: []
+									},
+									hemisphereLightGroundColor: {
+										type: "fv",
+										value: []
+									},
+									hemisphereLightSkyColor: {
+										type: "fv",
+										value: []
+									}
+								},
+								vertexShader: THREE.ShaderLib.phong.vertexShader,
+								fragmentShader: THREE.ShaderLib.phong.fragmentShader,
+								alphaTest: materialDatas.opacity.test,
+								transparent: transparent,
+								side: side,
+								shading: shading,
+								depthTest: depthTest,
+								depthWrite: depthWrite,
+								lights: true,
+								fog: true
+							});
+
+							material.aoMap = (ambientMap != null ? true : false);
+							material.map = (diffuseMap != null ? true : false);
+							material.normalMap = (normalMap != null ? true : false);
+							material.specularMap = (specularMap != null ? true : false);
+							material.bumpMap = (bumpMap != null ? true : false);
+							material.alphaMap = (opacityMap != null ? true : false);
+							material.displacementMap = false;
+							material.emissiveMap = false;
+							material.envMap = false;
+							material.lightMap = false;
+
+							material.needsUpdate = true;
+
+						}
+						else {
+
+							material = new THREE.MeshPhongMaterial({
+								aoMap: ambientMap,
+								color: diffuseColor,
+								map: diffuseMap,
+								specularMap: specularMap,
+								specular: specularColor,
+								shininess: materialDatas.specular.force,
+								normalMap: normalMap,
+								normalScale: normalScale,
+								bumpMap: bumpMap,
+								bumpScale: bumpScale,
+								opacity: materialDatas.opacity.value,
+								alphaMap: opacityMap,
+								alphaTest: materialDatas.opacity.test,
+								transparent: transparent,
+								depthTest: depthTest,
+								depthWrite: depthWrite,
+								combine: THREE.MultiplyOperation,
+								shading: shading,
+								side: side,
+								fog: fog
+							});
+
+						};
 
 					}
 					else {
@@ -744,8 +1050,8 @@
 		enumerable: true,
 		value: {
 			shading: {
-				smooth: 0,
-				flat: 1
+				flat: 0,
+				smooth: 1
 			},
 			wrapping: {
 				clamp: 0
@@ -822,7 +1128,7 @@
 			for( var material = 0, length = materials.length; material < length; material++ ){
 
 				var illumination = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var smooth = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var smooth = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var ambientColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 				var ambientMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
@@ -1249,84 +1555,29 @@
 
 			if( isURL == true ){
 
-				var OBJRequest = new XMLHttpRequest();
+				new FileLoader(options.obj, function( data ){
 
-				OBJRequest.addEventListener("readystatechange", function( event ){
+					var obj = data;
 
-					if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
+					var mtlFile = (options.mtl || (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
 
-						var obj = this.responseText;
+					if( mtlFile != undefined ){
 
-						var mtlFile = (options.mtl || (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
+						new FileLoader("", function( data ){
 
-						if( mtlFile != undefined ){
-
-							var MTLRequest = new XMLHttpRequest();
-
-							MTLRequest.addEventListener("readystatechange", function( event ){
-
-								if( this.readyState == 4 && this.status >= 200 && this.status < 400 ){
-
-									var mtl = this.responseText;
-
-									if( options.useWorker == true ){
-
-										worker.postMessage({
-											action: "convertOBJ",
-											content: [obj, mtl]
-										});
-
-									}
-									else {
-
-										var pixels = OBJImg.convertOBJ(obj, mtl);
-										var square = Math.ceil(Math.sqrt(pixels.length / 4));
-
-										var imageData = context.createImageData(square, square);
-										imageData.data.set(pixels);
-
-										canvas.width = canvas.height = square;
-
-										context.putImageData(imageData, 0, 0);
-
-										if( options.onComplete instanceof Function ){
-
-											options.onComplete(canvas.toDataURL("image/png", 1.0));
-
-										};
-
-									};
-
-								}
-								else if( this.readyState == 4 ){
-
-									var errorEvent = document.createEvent("CustomEvent");
-									errorEvent.initCustomEvent("error", true, true, "Cant load mtl");
-
-									this.dispatchEvent(errorEvent);
-
-								};
-
-							}, false);
-
-							MTLRequest.open("GET", options.obj.split("/").slice(0, -1).join("/") + "/" + mtlFile, true);
-							MTLRequest.send(null);
-
-
-						}
-						else {
+							var mtl = data;
 
 							if( options.useWorker == true ){
 
 								worker.postMessage({
 									action: "convertOBJ",
-									content: [obj, ""]
+									content: [obj, mtl]
 								});
 
 							}
 							else {
 
-								var pixels = OBJImg.convertOBJ(obj, "");
+								var pixels = OBJImg.convertOBJ(obj, mtl);
 								var square = Math.ceil(Math.sqrt(pixels.length / 4));
 
 								var imageData = context.createImageData(square, square);
@@ -1344,22 +1595,56 @@
 
 							};
 
-						};
+						}, function( error ){
+
+							var errorEvent = document.createEvent("CustomEvent");
+							errorEvent.initCustomEvent("error", true, true, "Cant load mtl (error " + error + ")");
+
+							this.dispatchEvent(errorEvent);
+
+						}.bind(this));
 
 					}
-					else if( this.readyState == 4 ){
+					else {
 
-						var errorEvent = document.createEvent("CustomEvent");
-						errorEvent.initCustomEvent("error", true, true, "Cant load obj");
+						if( options.useWorker == true ){
 
-						this.dispatchEvent(errorEvent);
+							worker.postMessage({
+								action: "convertOBJ",
+								content: [obj, ""]
+							});
+
+						}
+						else {
+
+							var pixels = OBJImg.convertOBJ(obj, "");
+							var square = Math.ceil(Math.sqrt(pixels.length / 4));
+
+							var imageData = context.createImageData(square, square);
+							imageData.data.set(pixels);
+
+							canvas.width = canvas.height = square;
+
+							context.putImageData(imageData, 0, 0);
+
+							if( options.onComplete instanceof Function ){
+
+								options.onComplete(canvas.toDataURL("image/png", 1.0));
+
+							};
+
+						};
 
 					};
 
-				}, false);
+				}, function( error ){
 
-				OBJRequest.open("GET", options.obj, true);
-				OBJRequest.send(null);
+					var errorEvent = document.createEvent("CustomEvent");
+					errorEvent.initCustomEvent("error", true, true, "Cant load obj (error " + error + ")");
+
+					this.dispatchEvent(errorEvent);
+
+				}.bind(this));
 
 			}
 			else {
@@ -2708,6 +2993,51 @@
 	};
 
 	ImageParser.fn.init.prototype = ImageParser.fn;
+
+	var FileLoader = function( url, onComplete, onError ){
+
+		return new FileLoader.fn.init(url, onComplete, onError);
+
+	};
+
+	FileLoader.fn = FileLoader.prototype = {
+		constructor: FileLoader,
+		init: function( url, onComplete, onError ){
+
+			this.request = new XMLHttpRequest();
+
+			this.request.addEventListener("readystatechange", function( event ){
+
+				if( this.readyState == 4 ){
+
+					if( this.status >= 200 && this.status < 400 ){
+
+						onComplete(this.responseText);
+
+					}
+					else {
+
+						if( onError instanceof Function ){
+
+							onError(event.target.status);
+
+						};
+
+					};
+
+				};
+
+			}, false);
+
+			this.request.open("GET", url, true);
+			this.request.send(null);
+
+			return this;
+
+		}
+	};
+
+	FileLoader.fn.init.prototype = FileLoader.fn;
 
 	if( typeof define !== "undefined" && define instanceof Function && define.amd != undefined ){
 
