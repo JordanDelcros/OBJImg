@@ -125,8 +125,8 @@ When an image is created, you can access it in the developer tools over resource
  - **map_bump**: [path] to bump texture
  - **map_d**: [path] to opacity texture
  - **shader_s**: [front|back|double] side to render (none standard)
- - **shader_v**: [path] to vertex shader (none standard)
- - **shader_f**: [path] to fragment shader (none standard)
+ - **shader_v**: [path] to vertex shader (none standard, support all phong uniforms)
+ - **shader_f**: [path] to fragment shader (none standard, support all phong uniforms)
 
 ## Do not compress images
 

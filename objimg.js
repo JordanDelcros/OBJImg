@@ -123,11 +123,11 @@
 
 						toLoad++;
 
-						new FileLoader(this.basePath + "/" + material.shader.vertex, function( data ){
+						new FileLoader(this.basePath + "/" + material.shader.vertex, function( materialIndex, data ){
 
 							loaded++;
 
-							material.shader.vertex = data;
+							this.datas.materials[materialIndex].shader.vertex = data;
 
 							if( loaded == toLoad ){
 
@@ -138,7 +138,7 @@
 
 							};
 
-						}.bind(this), function( error ){
+						}.bind(this, materialIndex), function( error ){
 
 							var errorEvent = document.createEvent("CustomEvent");
 							errorEvent.initCustomEvent("error", true, true, "Cant load vertex shader (error " + error + ")");
@@ -153,11 +153,11 @@
 
 						toLoad++;
 
-						new FileLoader(this.basePath + "/" + material.shader.fragment, function( data ){
+						new FileLoader(this.basePath + "/" + material.shader.fragment, function( materialIndex, data ){
 
 							loaded++;
 
-							material.shader.fragment = data;
+							this.datas.materials[materialIndex].shader.fragment = data;
 
 							if( loaded == toLoad ){
 
@@ -168,7 +168,7 @@
 
 							};
 
-						}.bind(this), function( error ){
+						}.bind(this, materialIndex), function( error ){
 
 							var errorEvent = document.createEvent("CustomEvent");
 							errorEvent.initCustomEvent("error", true, true, "Cant load fragment shader (error " + error + ")");
@@ -794,8 +794,8 @@
 										value: []
 									}
 								},
-								vertexShader: THREE.ShaderLib.phong.vertexShader,
-								fragmentShader: THREE.ShaderLib.phong.fragmentShader,
+								vertexShader: materialDatas.shader.vertex,
+								fragmentShader: materialDatas.shader.fragment,
 								alphaTest: materialDatas.opacity.test,
 								transparent: transparent,
 								side: side,

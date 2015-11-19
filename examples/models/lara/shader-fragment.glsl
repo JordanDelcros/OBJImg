@@ -7,8 +7,6 @@ precision highp int;
 #define MAX_HEMI_LIGHTS 1
 #define MAX_SHADOWS 0
 #define GAMMA_FACTOR 2
-uniform mat4 viewMatrix;
-uniform vec3 cameraPosition;
 
 #define PHONG
 uniform vec3 diffuse;
