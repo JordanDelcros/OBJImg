@@ -95,16 +95,54 @@
 
 			if( USE_THREE == true ){
 
-				// this.castShadow = (options.castShadow || false);
-				// this.receiveShadow = (options.receiveShadow || false);
+				Object.defineProperty(this, "gl", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: (options.renderer || new THREE.WebGLRenderer())
+				});
 
-				this.object3D = new THREE.Object3D();
-				this.object3DNeedsUpdate = false;
-				this.object3DComplete = null;
-				
-				this.simpleObject3D = new THREE.Object3D();
-				this.simpleObject3DNeedsUpdate = false;
-				this.simpleObject3DComplete = null;
+				Object.defineProperty(this, "object3D", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: new THREE.Object3D()
+				});
+
+				Object.defineProperty(this, "object3DNeedsUpdate", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: false
+				});
+
+				Object.defineProperty(this, "object3DComplete", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: null
+				});
+
+				Object.defineProperty(this, "simpleObject3D", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: new THREE.Object3D()
+				});
+
+				Object.defineProperty(this, "simpleObject3DNeedsUpdate", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: false
+				});
+
+				Object.defineProperty(this, "simpleObject3DComplete", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: null
+				});
 
 			};
 
@@ -428,9 +466,7 @@
 
 			if( this.datas != null && USE_THREE == true ){
 
-				var renderer = new THREE.WebGLRenderer();
-
-				var anisotropy = renderer.getMaxAnisotropy();
+				var anisotropy = this.gl.getMaxAnisotropy();
 
 				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
