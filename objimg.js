@@ -428,10 +428,9 @@
 
 			if( this.datas != null && USE_THREE == true ){
 
-				var canvas = document.createElement("canvas");
-				var GL = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+				var renderer = new THREE.WebGLRenderer();
 
-				var anisotropy = GL.getParameter(GL.getExtension("EXT_texture_filter_anisotropic").MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+				var anisotropy = renderer.getMaxAnisotropy();
 
 				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
