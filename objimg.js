@@ -95,16 +95,54 @@
 
 			if( USE_THREE == true ){
 
-				// this.castShadow = (options.castShadow || false);
-				// this.receiveShadow = (options.receiveShadow || false);
+				Object.defineProperty(this, "gl", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: (options.renderer || new THREE.WebGLRenderer())
+				});
 
-				this.object3D = new THREE.Object3D();
-				this.object3DNeedsUpdate = false;
-				this.object3DComplete = null;
-				
-				this.simpleObject3D = new THREE.Object3D();
-				this.simpleObject3DNeedsUpdate = false;
-				this.simpleObject3DComplete = null;
+				Object.defineProperty(this, "object3D", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: new THREE.Object3D()
+				});
+
+				Object.defineProperty(this, "object3DNeedsUpdate", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: false
+				});
+
+				Object.defineProperty(this, "object3DComplete", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: null
+				});
+
+				Object.defineProperty(this, "simpleObject3D", {
+					configurable: false,
+					writable: false,
+					enumerable: false,
+					value: new THREE.Object3D()
+				});
+
+				Object.defineProperty(this, "simpleObject3DNeedsUpdate", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: false
+				});
+
+				Object.defineProperty(this, "simpleObject3DComplete", {
+					configurable: false,
+					writable: true,
+					enumerable: false,
+					value: null
+				});
 
 			};
 
@@ -428,6 +466,8 @@
 
 			if( this.datas != null && USE_THREE == true ){
 
+				var anisotropy = this.gl.getMaxAnisotropy();
+
 				for( var object = 0, length = this.datas.objects.length; object < length; object++ ){
 
 					var objectDatas = this.datas.objects[object];
@@ -523,7 +563,7 @@
 
 							var wrapMode = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							ambientMap = new THREE.Texture(materialDatas.ambient.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							ambientMap = new THREE.Texture(materialDatas.ambient.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							ambientMap.needsUpdate = true;
 
 						};
@@ -533,7 +573,7 @@
 
 							var wrapMode = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							diffuseMap.needsUpdate = true;
 
 						};
@@ -543,7 +583,7 @@
 
 							var wrapMode = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							specularMap = new THREE.Texture(materialDatas.specular.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							specularMap = new THREE.Texture(materialDatas.specular.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							specularMap.needsUpdate = true;
 
 						};
@@ -553,7 +593,7 @@
 
 							var wrapMode = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							normalMap = new THREE.Texture(materialDatas.normal.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							normalMap = new THREE.Texture(materialDatas.normal.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							normalMap.needsUpdate = true;
 
 						};
@@ -563,7 +603,7 @@
 
 							var wrapMode = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							bumpMap = new THREE.Texture(materialDatas.bump.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 1);
+							bumpMap = new THREE.Texture(materialDatas.bump.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							bumpMap.needsUpdate = true;
 
 						};
@@ -573,7 +613,7 @@
 
 							var wrapMode = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
 
-							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, 12);
+							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							opacityMap.needsUpdate = true;
 
 						};
