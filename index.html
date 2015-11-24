@@ -3,11 +3,11 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>OBJImg</title>
-	<link type="text/css" rel="stylesheet" media="all" href="resources/style.css"/>
-	<script type="text/javascript" src="resources/three/73/build/three.js"></script>
-	<script type="text/javascript" src="resources/three/73/src/loaders/objloader.js"></script>
-	<script type="text/javascript" src="resources/three/trackballcontrols.js"></script>
-	<script type="text/javascript" src="../objimg.js"></script>
+	<link type="text/css" rel="stylesheet" media="all" href="assets/style.css"/>
+	<script type="text/javascript" src="assets/scripts/three/73/build/three.js"></script>
+	<script type="text/javascript" src="assets/scripts/three/73/src/loaders/objloader.js"></script>
+	<script type="text/javascript" src="assets/scripts/three/trackballcontrols.js"></script>
+	<script type="text/javascript" src="objimg.js"></script>
 	<script type="text/javascript">
 
 		document.addEventListener("DOMContentLoaded", function(){
@@ -73,29 +73,31 @@
 
 			function doMagicThings( fileName ){
 
-				generatedImage.src = "models/" + fileName + "/" + fileName + ".obj.png";
+				generatedImage.src = "assets/models/" + fileName + "/" + fileName + ".obj.png";
 				infos.style.opacity = 1;
 
+				/*
 				// Generate the image (only to show you what she looks like)
-				// OBJImg.generateIMG({
-				// 	obj: "models/" + fileName + "/" + fileName + ".obj",
-				// 	useWorker: false,
-				// 	onComplete: function( datas ){
+				OBJImg.generateIMG({
+					obj: "models/" + fileName + "/" + fileName + ".obj",
+					useWorker: false,
+					onComplete: function( datas ){
 
-				// 		generatedImage.src = datas;
-				// 		infos.style.opacity = 1;
+						generatedImage.src = datas;
+						infos.style.opacity = 1;
 
-				// 	},
-				// 	onError: function( error ){
+					},
+					onError: function( error ){
 
-				// 		console.error(error);
+						console.error(error);
 
-				// 	}
-				// });
+					}
+				});
+				*/
 
 				// Generate the THREE-JS Object3D from the image.
 				var obj = new OBJImg({
-					image: "models/" + fileName + "/" + fileName + ".obj.png",
+					image: "assets/models/" + fileName + "/" + fileName + ".obj.png",
 					receiveShadow: false,
 					castShadow: false,
 					useWorker: false,
