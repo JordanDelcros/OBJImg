@@ -623,8 +623,8 @@
 						var normalScale = new THREE.Vector2(0.5, 0.5);
 						var bumpScale = 1.0;
 						var transparent = ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false);
-						var depthTest = true;
-						var depthWrite = true;
+						var depthTest = materialDatas.shader.depthTest;
+						var depthWrite = materialDatas.shader.depthWrite;
 						var shading = (materialDatas.smooth == OBJImg.constants.shading.smooth ? THREE.SmoothShading : THREE.FlatShading);
 						var side = (materialDatas.shader.side == OBJImg.constants.side.front ? THREE.FrontSide : (materialDatas.shader.side == OBJImg.constants.side.back ? THREE.BackSide : THREE.DoubleSide));
 						var fog = true;
