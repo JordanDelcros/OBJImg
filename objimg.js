@@ -2,11 +2,11 @@
 
 	"use strict";
 
-	var INSIDE_WORKER = self.document == undefined ? true : false;
+	var INSIDE_WORKER = (self.document == undefined ? true : false);
 
 	var SCRIPT_PATH = (INSIDE_WORKER == false ? Array.prototype.slice.call(document.querySelectorAll("script")).pop().src.split(/\//g).slice(0, -1).join("/") : "");
 	
-	var USE_THREE = (typeof THREE == "undefined") ? false : true;
+	var USE_THREE = (typeof THREE == "undefined" ? false : true);
 	
 	var SUPPORT_WORKER = (self.Worker != undefined);
 
@@ -561,7 +561,7 @@
 						var ambientMap = null;
 						if( materialDatas.ambient.map != null ){
 
-							var wrapMode = (materialDatas.ambient.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.ambient.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							ambientMap = new THREE.Texture(materialDatas.ambient.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							ambientMap.needsUpdate = true;
@@ -571,7 +571,7 @@
 						var diffuseMap = null;
 						if( materialDatas.diffuse.map != null ){
 
-							var wrapMode = (materialDatas.diffuse.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.diffuse.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							diffuseMap = new THREE.Texture(materialDatas.diffuse.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							diffuseMap.needsUpdate = true;
@@ -581,7 +581,7 @@
 						var specularMap = null;
 						if( materialDatas.specular.map != null ){
 
-							var wrapMode = (materialDatas.specular.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.specular.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							specularMap = new THREE.Texture(materialDatas.specular.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							specularMap.needsUpdate = true;
@@ -591,7 +591,7 @@
 						var normalMap = null;
 						if( materialDatas.normal.map != null ){
 
-							var wrapMode = (materialDatas.normal.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.normal.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							normalMap = new THREE.Texture(materialDatas.normal.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							normalMap.needsUpdate = true;
@@ -601,7 +601,7 @@
 						var bumpMap = null;
 						if( materialDatas.bump.map != null ){
 
-							var wrapMode = (materialDatas.bump.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.bump.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							bumpMap = new THREE.Texture(materialDatas.bump.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							bumpMap.needsUpdate = true;
@@ -611,7 +611,7 @@
 						var opacityMap = null;
 						if( materialDatas.opacity.map != null ){
 
-							var wrapMode = (materialDatas.opacity.clamp == true) ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping;
+							var wrapMode = (materialDatas.opacity.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
 
 							opacityMap = new THREE.Texture(materialDatas.opacity.map, THREE.UVMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
 							opacityMap.needsUpdate = true;
@@ -1061,9 +1061,9 @@
 		getColorFromValue: function( value ){
 
 			var g = Math.min(Math.floor(value / 255), 255);
-			var r = (g > 0) ? 255 : 0;
+			var r = (g > 0 ? 255 : 0);
 			var b = Math.floor(value - (r * g));
-			var a = ((r * g) + b) > 0 ? 255 : 0;
+			var a = (((r * g) + b) > 0 ? 255 : 0);
 
 			return {
 				r: r,
@@ -1172,7 +1172,7 @@
 
 				var ambientColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 				var ambientMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var ambientClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var ambientClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var ambientChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var ambientMap = null;
@@ -1191,7 +1191,7 @@
 
 				var diffuseColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 				var diffuseMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var diffuseClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var diffuseClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var diffuseChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var diffuseMap = null;
@@ -1210,7 +1210,7 @@
 
 				var specularColor = OBJImg.fn.getPixelColor(pixelIndex++, pixels);
 				var specularMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var specularClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var specularClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var specularChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var specularMap = null;
@@ -1228,7 +1228,7 @@
 				};
 
 				var specularForceMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var specularForceClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var specularForceClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var specularForceChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var specularForceMap = null;
@@ -1245,11 +1245,10 @@
 
 				};
 
-
 				var specularForce = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / (MAX / 1000);
 
 				var normalMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var normalClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var normalClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var normalChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var normalMap = null;
@@ -1267,7 +1266,7 @@
 				};
 
 				var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var bumpChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				var bumpMap = null;
@@ -1284,10 +1283,9 @@
 
 				};
 
-
 				var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 				var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
-				var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1) ? true : false;
+				var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var opacityChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var opacityTest = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 
@@ -1306,6 +1304,9 @@
 				};
 
 				var shaderSide = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+				var depthTest = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
+				var depthWrite = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 
 				var vertexShaderCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var vertexShader = "";
@@ -1375,6 +1376,8 @@
 					},
 					shader: {
 						side: shaderSide || OBJImg.constants.side.front,
+						depthTest: depthTest,
+						depthWrite: depthWrite,
 						vertex: vertexShader || null,
 						fragment: fragmentShader || null
 					}
@@ -1404,7 +1407,7 @@
 
 				};
 
-				var useMaterial = OBJImg.fn.getPixelColor(pixelIndex, pixels).a == 0 ? false : true;
+				var useMaterial = (OBJImg.fn.getPixelColor(pixelIndex, pixels).a == 0 ? false : true);
 				var materialID = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				objects[object] = {
@@ -1599,11 +1602,11 @@
 
 					var obj = data;
 
-					var mtlFile = (options.mtl || (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
+					var mtlFile = (options.mtl || options.obj.split("/").slice(0, -1).join("/") + "/" + (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
 
 					if( mtlFile != undefined ){
 
-						new FileLoader("", function( data ){
+						new FileLoader(mtlFile, function( data ){
 
 							var mtl = data;
 
@@ -1798,6 +1801,8 @@
 						},
 						shader: {
 							side: OBJImg.constants.side.front,
+							depthTest: true,
+							depthWrite: true,
 							vertex: [],
 							fragment: []
 						}
@@ -1842,7 +1847,7 @@
 				}
 				else if( type == "s" ){
 
-					materials[index].smooth = (datas[1] == "off" || parseInt(datas[1]) == 0) ? false : true;
+					materials[index].smooth = (datas[1] == "off" || parseInt(datas[1]) == 0 ? false : true);
 
 				}
 				else if( type == "tf" ){
@@ -1884,7 +1889,7 @@
 
 							var value = datas[++option];
 
-							options.clamp = (datas[++option] != "off") ? true : false;
+							options.clamp = (datas[++option] != "off" ? true : false);
 
 						}
 						else if( optionType == "-imfchan" ){
@@ -1955,6 +1960,16 @@
 				else if( type == "shader_s" ){
 
 					materials[index].shader.side = OBJImg.constants.side[datas[1]];
+
+				}
+				else if( type == "shader_dt" ){
+
+					materials[index].shader.depthTest = (datas[1] != "off" ? true : false);
+
+				}
+				else if( type == "shader_dw" ){
+
+					materials[index].shader.depthWrite = (datas[1] != "off" ? true : false);
 
 				}
 				else if( type.substr(0, 6) == "shader" && datas.length > 1 ){
@@ -2571,6 +2586,16 @@
 				data[pixelIndex++] = shaderSideColor.g;
 				data[pixelIndex++] = shaderSideColor.b;
 				data[pixelIndex++] = shaderSideColor.a;
+
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = (materials[material].shader.depthTest == true ? 1 : 0);
+				data[pixelIndex++] = 255;
+
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = (materials[material].shader.depthWrite == true ? 1 : 0);
+				data[pixelIndex++] = 255;
 
 				var vertexShaderCharactersColor = OBJImg.fn.getColorFromValue(materials[material].shader.vertex.length);
 
