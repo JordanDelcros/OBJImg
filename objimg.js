@@ -1077,11 +1077,11 @@
 
 	OBJImg.fn.init.prototype = OBJImg.fn;
 
-	Object.defineProperty(OBJImg, "dictionnary", {
+	Object.defineProperty(OBJImg, "dictionary", {
 		configurable: false,
 		writable: false,
 		enumerable: true,
-		value: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789"
+		value: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.-0123456789/"
 	});
 
 	Object.defineProperty(OBJImg, "constants", {
@@ -1183,7 +1183,7 @@
 
 					for( var character = 0; character < ambientMapCharacters; character++ ){
 
-						ambientMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						ambientMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1202,7 +1202,7 @@
 
 					for( var character = 0; character < diffuseMapCharacters; character++ ){
 
-						diffuseMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						diffuseMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1221,7 +1221,7 @@
 
 					for( var character = 0; character < specularMapCharacters; character++ ){
 
-						specularMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						specularMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1239,7 +1239,7 @@
 
 					for( var character = 0; character < specularForceMapCharacters; character++ ){
 
-						specularForceMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						specularForceMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1260,7 +1260,7 @@
 
 					for( var character = 0; character < normalMapCharacters; character++ ){
 
-						normalMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						normalMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1278,7 +1278,7 @@
 
 					for( var character = 0; character < bumpMapCharacters; character++ ){
 
-						bumpMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						bumpMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1299,7 +1299,7 @@
 
 					for( var character = 0; character < opacityMapCharacters; character++ ){
 
-						opacityMap += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+						opacityMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 					};
 
@@ -1312,7 +1312,7 @@
 
 				for( var character = 0; character < vertexShaderCharacters; character++ ){
 
-					vertexShader += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+					vertexShader += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 				};
 
@@ -1321,7 +1321,7 @@
 
 				for( var character = 0; character < fragmentShaderCharacters; character++ ){
 
-					fragmentShader += OBJImg.dictionnary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+					fragmentShader += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
 
 				};
 
@@ -1864,7 +1864,7 @@
 
 						for( var character = 0, characterLength = map.length; character < characterLength; character++ ){
 
-							encodedMap[character] = OBJImg.dictionnary.indexOf(map[character]);
+							encodedMap[character] = OBJImg.dictionary.indexOf(map[character]);
 
 						};
 
@@ -1966,7 +1966,7 @@
 
 						for( var character = 0, characterLength = shader.length; character < characterLength; character++ ){
 
-							encodedShader[character] = OBJImg.dictionnary.indexOf(shader[character]);
+							encodedShader[character] = OBJImg.dictionary.indexOf(shader[character]);
 
 						};
 
