@@ -1587,12 +1587,9 @@
 
 				worker.addEventListener("error", function( event ){
 
-					var errorEvent = document.createEvent("CustomEvent");
-					errorEvent.initCustomEvent("error", true, true, "worker error");
-					
-					this.dispatchEvent(errorEvent);
+					console.error("worker error");
 
-				}.bind(this), false);
+				}, false);
 
 			};
 
@@ -1602,11 +1599,11 @@
 
 					var obj = data;
 
-					var mtlFile = (options.mtl || options.obj.split("/").slice(0, -1).join("/") + "/" + (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
+					var mtlFile = (options.mtl || (obj.match(/(?:\n|^)\s*mtllib\s([^\n\r]+)/) || [])[1]);
 
 					if( mtlFile != undefined ){
 
-						new FileLoader(mtlFile, function( data ){
+						new FileLoader(options.obj.split("/").slice(0, -1).join("/") + "/" + mtlFile, function( data ){
 
 							var mtl = data;
 
@@ -1640,12 +1637,9 @@
 
 						}, function( error ){
 
-							var errorEvent = document.createEvent("CustomEvent");
-							errorEvent.initCustomEvent("error", true, true, "Cant load mtl (error " + error + ")");
+							console.error("Cant load mtl (error " + error + ")");
 
-							this.dispatchEvent(errorEvent);
-
-						}.bind(this));
+						});
 
 					}
 					else {
@@ -1682,12 +1676,9 @@
 
 				}, function( error ){
 
-					var errorEvent = document.createEvent("CustomEvent");
-					errorEvent.initCustomEvent("error", true, true, "Cant load obj (error " + error + ")");
+					console.error("Cant load obj (error " + error + ")");
 
-					this.dispatchEvent(errorEvent);
-
-				}.bind(this));
+				});
 
 			}
 			else {
@@ -2635,7 +2626,7 @@
 
 			};
 
-			var vertexMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / (bounds.vertex.max.w + Math.abs(bounds.vertex.min.w)));
+			var vertexMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.vertex.max.w + Math.abs(bounds.vertex.min.w)), 1));
 			var vertexMultiplicator = vertexMultiplicatorColor.r * vertexMultiplicatorColor.g + vertexMultiplicatorColor.b;
 
 			data[pixelIndex++] = vertexMultiplicatorColor.r;
