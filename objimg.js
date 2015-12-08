@@ -2170,6 +2170,7 @@
 
 			};
 
+
 			bounds.vertex.min.w = Math.min(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z);
 			bounds.vertex.max.w = Math.max(bounds.vertex.max.x, bounds.vertex.max.y, bounds.vertex.max.z);
 
@@ -2626,7 +2627,7 @@
 
 			};
 
-			var vertexMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.vertex.max.w + Math.abs(bounds.vertex.min.w)), 1));
+			var vertexMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.vertex.max.w + Math.abs(Math.max(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z, bounds.vertex.min.w))), 1));
 			var vertexMultiplicator = vertexMultiplicatorColor.r * vertexMultiplicatorColor.g + vertexMultiplicatorColor.b;
 
 			data[pixelIndex++] = vertexMultiplicatorColor.r;
