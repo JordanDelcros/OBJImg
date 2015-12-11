@@ -901,6 +901,8 @@
 
 					var mesh = new THREE.Mesh(geometry, material);
 
+					mesh.name = this.datas.objects[object].name;
+
 					// mesh.castShadow = this.castShadow;
 					// mesh.receiveShadow = this.receiveShadow;
 
@@ -1407,10 +1409,21 @@
 
 				};
 
+				var objectNameCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+				var objectName = "";
+
+				for( var character = 0; character < objectNameCharacters; character++ ){
+
+					objectName += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+				};
+
 				var useMaterial = (OBJImg.fn.getPixelColor(pixelIndex, pixels).a == 0 ? false : true);
 				var materialID = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 				objects[object] = {
+					name: objectName,
 					index: objectIndex,
 					faces: new Array(),
 					material: (useMaterial == true ? materialID : null)
@@ -2149,8 +2162,16 @@
 				}
 				else if( type == "o" || type == "g" ){
 
+					var nameMap = new Array();
+
+					for( var character = 0, characterLength = datas[1].length; character < characterLength; character++ ){
+
+						nameMap[character] = OBJImg.dictionary.indexOf(datas[1][character]);
+
+					};
+
 					objects.push({
-						name: datas[1],
+						name: nameMap,
 						material: null,
 						index: faces.length
 					});
@@ -2170,6 +2191,7 @@
 
 			};
 
+			console.warn(objects);
 
 			bounds.vertex.min.w = Math.min(bounds.vertex.min.x, bounds.vertex.min.y, bounds.vertex.min.z);
 			bounds.vertex.max.w = Math.max(bounds.vertex.max.x, bounds.vertex.max.y, bounds.vertex.max.z);
@@ -2216,18 +2238,24 @@
 				+ (normals.length * XYZ)
 				+ ((faces.length * ABC * vertexSplitting) + (faces.length * ABC * textureSplitting) + (faces.length * ABC * normalSplitting));
 
+			for( var object = 0, length = objects.length; object < length; object++ ){
+
+				pixelCount += 1 + objects[object].name.length;
+
+			};
+
 			for( var material = 0, length = materials.length; material < length; material++ ){
 
 				pixelCount += 3 * RGB;
-				pixelCount += materials[material].ambient.map.length;
-				pixelCount += materials[material].diffuse.map.length;
-				pixelCount += materials[material].specular.map.length;
-				pixelCount += materials[material].specular.forceMap.length;
-				pixelCount += materials[material].normal.map.length;
-				pixelCount += materials[material].bump.map.length;
-				pixelCount += materials[material].opacity.map.length;
-				pixelCount += materials[material].shader.vertex.length;
-				pixelCount += materials[material].shader.fragment.length;
+				pixelCount += 1 + materials[material].ambient.map.length;
+				pixelCount += 1 + materials[material].diffuse.map.length;
+				pixelCount += 1 + materials[material].specular.map.length;
+				pixelCount += 1 + materials[material].specular.forceMap.length;
+				pixelCount += 1 + materials[material].normal.map.length;
+				pixelCount += 1 + materials[material].bump.map.length;
+				pixelCount += 1 + materials[material].opacity.map.length;
+				pixelCount += 1 + materials[material].shader.vertex.length;
+				pixelCount += 1 + materials[material].shader.fragment.length;
 
 			};
 
@@ -2676,6 +2704,24 @@
 					data[pixelIndex++] = objectColor.a;
 
 					objectPass += objectIndex;
+
+				};
+
+				var objectNameCharactersColor = OBJImg.fn.getColorFromValue(objects[object].name.length);
+
+				data[pixelIndex++] = objectNameCharactersColor.r;
+				data[pixelIndex++] = objectNameCharactersColor.g;
+				data[pixelIndex++] = objectNameCharactersColor.b;
+				data[pixelIndex++] = objectNameCharactersColor.a;
+
+				for( var character = 0, characterLength = objects[object].name.length; character < characterLength; character++ ){
+
+					var characterColor = OBJImg.fn.getColorFromValue(objects[object].name[character]);
+
+					data[pixelIndex++] = characterColor.r;
+					data[pixelIndex++] = characterColor.g;
+					data[pixelIndex++] = characterColor.b;
+					data[pixelIndex++] = characterColor.a;
 
 				};
 
