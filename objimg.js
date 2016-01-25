@@ -93,6 +93,13 @@
 				value: new Array()
 			});
 
+			Object.defineProperty(this, "ready", {
+				configurable: false,
+				writable: true,
+				enumerable: false,
+				value: false
+			});
+
 			if( USE_THREE == true ){
 
 				Object.defineProperty(this, "gl", {
@@ -266,6 +273,8 @@
 			}.bind(this));
 
 			this.addEventListener("ready", function( event ){
+
+				this.ready = true;
 
 				if( this.object3DNeedsUpdate == true ){
 
@@ -923,7 +932,7 @@
 		},
 		getObject3D: function( onComplete ){
 
-			if( this.datas != null ){
+			if( this.ready == true ){
 
 				this.setObject3D(onComplete);
 
@@ -1013,7 +1022,7 @@
 		},
 		getSimpleObject3D: function( onComplete ){
 
-			if( this.datas != null ){
+			if( this.ready == true ){
 
 				this.setSimpleObject3D(onComplete);
 
