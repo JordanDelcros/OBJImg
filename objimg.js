@@ -2016,21 +2016,21 @@
 			var bounds = {
 				vertex: {
 					min: {
-						x: Infinity,
-						y: Infinity,
-						z: Infinity,
-						w: Infinity
+						x: 0,
+						y: 0,
+						z: 0,
+						w: 0
 					},
 					max: {
-						x: -Infinity,
-						y: -Infinity,
-						z: -Infinity,
-						w: -Infinity
+						x: -0,
+						y: -0,
+						z: -0,
+						w: -0
 					}
 				},
 				texture: {
-					min: Infinity,
-					max: -Infinity
+					min: 0,
+					max: -0
 				}
 			};
 
