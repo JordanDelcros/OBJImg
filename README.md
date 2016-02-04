@@ -122,6 +122,7 @@ When an image is created, you can access it in the developer tools over resource
  - **map_ks**: [path] to specular texture
  - **map_ns**: [path] to specular force texture
  - **map_kn**: [path] to normal texture (none standard)
+ - **map_ke**: [path] to environement texture (none standard)
  - **map_bump**: [path] to bump texture
  - **map_d**: [path] to opacity texture
  - **shader_s**: [front|back|double] side to render (none standard)

@@ -627,6 +627,16 @@
 
 						};
 
+						var environementMap = null;
+						if( materialDatas.environement.map != null ){
+
+							var wrapMode = (materialDatas.environement.clamp == true ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping);
+
+							environementMap = new THREE.Texture(materialDatas.environement.map, THREE.SphericalReflectionMapping, wrapMode, wrapMode, THREE.LinearFilter, THREE.LinearMipMapLinearFilter, THREE.RGBAFormat, THREE.UnsignedByteType, anisotropy);
+							environementMap.needsUpdate = true;
+
+						};
+
 						var diffuseColor = new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b);
 						var specularColor = new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b);
 						var normalScale = new THREE.Vector2(0.5, 0.5);
@@ -716,7 +726,7 @@
 									},
 									envMap: {
 										type: "t",
-										value: null
+										value: environementMap
 									},
 									flipEnvMap: {
 										type: "f",
@@ -863,7 +873,7 @@
 							material.alphaMap = (opacityMap != null ? true : false);
 							material.displacementMap = false;
 							material.emissiveMap = false;
-							material.envMap = false;
+							material.envMap = (environementMap != null ? true : false);
 							material.lightMap = false;
 
 							material.needsUpdate = true;
@@ -882,6 +892,7 @@
 								normalScale: normalScale,
 								bumpMap: bumpMap,
 								bumpScale: bumpScale,
+								envMap: environementMap,
 								opacity: materialDatas.opacity.value,
 								alphaMap: opacityMap,
 								alphaTest: materialDatas.opacity.test,
@@ -1294,6 +1305,24 @@
 
 				};
 
+				var environementMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var environementClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
+				var environementChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+				var environementMap = null;
+
+				if( environementMapCharacters > 0 ){
+
+					environementMap = "";
+
+					for( var character = 0; character < environementMapCharacters; character++ ){
+
+						environementMap += OBJImg.dictionary[OBJImg.fn.getPixelValue(pixelIndex++, pixels)];
+
+					};
+
+				};
+
 				var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 				var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
@@ -1378,6 +1407,11 @@
 						clamp: bumpClamp,
 						channel: bumpChannel || OBJImg.constants.channel.rgb
 					},
+					environement: {
+						map: environementMap,
+						clamp: environementClamp,
+						channel: environementChannel || OBJImg.constants.channel.rgb
+					},
 					opacity: {
 						map: opacityMap,
 						clamp: opacityClamp,
@@ -1397,6 +1431,8 @@
 			};
 
 			var vertexMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+
+			var normalMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 
 			if( textures.length > 0 ){
 
@@ -1474,9 +1510,9 @@
 
 			for( var normal = 0, length = normals.length; normal < length; normal++, pixelIndex += XYZ ){
 
-				var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / vertexMultiplicator) - 1;
-				var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / vertexMultiplicator) - 1;
-				var z = (OBJImg.fn.getPixelValue(pixelIndex + 2, pixels) / vertexMultiplicator) - 1;
+				var x = (OBJImg.fn.getPixelValue(pixelIndex, pixels) / normalMultiplicator) - 1;
+				var y = (OBJImg.fn.getPixelValue(pixelIndex + 1, pixels) / normalMultiplicator) - 1;
+				var z = (OBJImg.fn.getPixelValue(pixelIndex + 2, pixels) / normalMultiplicator) - 1;
 
 				normals[normal] = {
 					x: x,
@@ -1805,6 +1841,11 @@
 							clamp: false,
 							channel: OBJImg.constants.channel.rgb
 						},
+						environement: {
+							map: [],
+							clamp: false,
+							channel: OBJImg.constants.channel.rgb
+						},
 						opacity: {
 							map: [],
 							clamp: false,
@@ -1953,6 +1994,13 @@
 						materials[index].normal.channel = options.channel;
 
 					}
+					else if( type == "map_ke" ){
+
+						materials[index].environement.map = encodedMap;
+						materials[index].environement.clamp = options.clamp;
+						materials[index].environement.channel = options.channel;
+
+					}
 					else if( type == "map_bump" ){
 
 						materials[index].bump.map = encodedMap;
@@ -2037,6 +2085,20 @@
 						w: -0
 					}
 				},
+				normal: {
+					min: {
+						x: 0,
+						y: 0,
+						z: 0,
+						w: 0
+					},
+					max: {
+						x: -0,
+						y: -0,
+						z: -0,
+						w: -0
+					}
+				},
 				texture: {
 					min: 0,
 					max: -0
@@ -2054,41 +2116,14 @@
 					var y = parseFloat(datas[2]);
 					var z = parseFloat(datas[3]);
 
-					if( x < bounds.vertex.min.x ){
+					bounds.vertex.min.x = Math.min(x, bounds.vertex.min.x);
+					bounds.vertex.max.x = Math.max(x, bounds.vertex.max.x);
 
-						bounds.vertex.min.x = x;
+					bounds.vertex.min.y = Math.min(y, bounds.vertex.min.y);
+					bounds.vertex.max.y = Math.max(y, bounds.vertex.max.y);
 
-					};
-
-					if( x > bounds.vertex.max.x ){
-
-						bounds.vertex.max.x = x;
-
-					};
-
-					if( y < bounds.vertex.min.y ){
-
-						bounds.vertex.min.y = y;
-
-					};
-
-					if( y > bounds.vertex.max.y ){
-
-						bounds.vertex.max.y = y;
-
-					};
-
-					if( z < bounds.vertex.min.z ){
-
-						bounds.vertex.min.z = z;
-
-					};
-
-					if( z > bounds.vertex.max.z ){
-
-						bounds.vertex.max.z = z;
-
-					};
+					bounds.vertex.min.z = Math.min(z, bounds.vertex.min.z);
+					bounds.vertex.max.z = Math.max(z, bounds.vertex.max.z);
 
 					vertices.push({
 						x: x,
@@ -2105,17 +2140,8 @@
 					var min = Math.min(u, v);
 					var max = Math.max(u, v);
 
-					if( min < bounds.texture.min ){
-
-						bounds.texture.min = min;
-
-					};
-
-					if( max > bounds.texture.max ){
-
-						bounds.texture.max = max;
-
-					};
+					bounds.texture.min = Math.min(min, bounds.texture.min);
+					bounds.texture.max = Math.max(max, bounds.texture.max);
 
 					textures.push({
 						u: u,
@@ -2125,10 +2151,23 @@
 				}
 				else if( type == "vn" ){
 
+					var x = parseFloat(datas[1]);
+					var y = parseFloat(datas[2]);
+					var z = parseFloat(datas[3]);
+
+					bounds.normal.min.x = Math.min(x, bounds.normal.min.x);
+					bounds.normal.max.x = Math.max(x, bounds.normal.max.x);
+
+					bounds.normal.min.y = Math.min(y, bounds.normal.min.y);
+					bounds.normal.max.y = Math.max(y, bounds.normal.max.y);
+
+					bounds.normal.min.z = Math.min(z, bounds.normal.min.z);
+					bounds.normal.max.z = Math.max(z, bounds.normal.max.z);
+
 					normals.push({
-						x: parseFloat(datas[1]),
-						y: parseFloat(datas[2]),
-						z: parseFloat(datas[3])
+						x: x,
+						y: y,
+						z: z
 					});
 
 				}
@@ -2261,6 +2300,7 @@
 				pixelCount += 1 + materials[material].normal.map.length;
 				pixelCount += 1 + materials[material].bump.map.length;
 				pixelCount += 1 + materials[material].opacity.map.length;
+				pixelCount += 1 + materials[material].environement.map.length;
 				pixelCount += 1 + materials[material].shader.vertex.length;
 				pixelCount += 1 + materials[material].shader.fragment.length;
 
@@ -2567,6 +2607,34 @@
 
 				};
 
+				var environementMapCharactersColor = OBJImg.fn.getColorFromValue(materials[material].environement.map.length);
+
+				data[pixelIndex++] = environementMapCharactersColor.r;
+				data[pixelIndex++] = environementMapCharactersColor.g;
+				data[pixelIndex++] = environementMapCharactersColor.b;
+				data[pixelIndex++] = environementMapCharactersColor.a;
+
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = (materials[material].environement.clamp == true ? 1 : 0);
+				data[pixelIndex++] = 255;
+
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = 0;
+				data[pixelIndex++] = materials[material].environement.channel;
+				data[pixelIndex++] = 255;
+
+				for( var character = 0, characterLength = materials[material].environement.map.length; character < characterLength; character++ ){
+
+					var characterColor = OBJImg.fn.getColorFromValue(materials[material].environement.map[character]);
+
+					data[pixelIndex++] = characterColor.r;
+					data[pixelIndex++] = characterColor.g;
+					data[pixelIndex++] = characterColor.b;
+					data[pixelIndex++] = characterColor.a;
+
+				};
+
 				var opacityColor = OBJImg.fn.getColorFromValue(materials[material].opacity.value * 255);
 
 				data[pixelIndex++] = opacityColor.r;
@@ -2669,6 +2737,14 @@
 			data[pixelIndex++] = vertexMultiplicatorColor.g;
 			data[pixelIndex++] = vertexMultiplicatorColor.b;
 			data[pixelIndex++] = vertexMultiplicatorColor.a;
+
+			var normalMultiplicatorColor = OBJImg.fn.getColorFromValue(MAX / Math.max((bounds.normal.max.w + Math.abs(Math.min(bounds.normal.min.x, bounds.normal.min.y, bounds.normal.min.z, bounds.normal.min.w))) + 1, 1));
+			var normalMultiplicator = normalMultiplicatorColor.r * normalMultiplicatorColor.g + normalMultiplicatorColor.b;
+
+			data[pixelIndex++] = normalMultiplicatorColor.r;
+			data[pixelIndex++] = normalMultiplicatorColor.g;
+			data[pixelIndex++] = normalMultiplicatorColor.b;
+			data[pixelIndex++] = normalMultiplicatorColor.a;
 
 			if( textureSplitting > 0 ){
 
@@ -2825,21 +2901,21 @@
 
 			for( var normal = 0, length = normals.length; normal < length; normal++ ){
 
-				var xColor = OBJImg.fn.getColorFromValue((normals[normal].x + 1) * vertexMultiplicator);
+				var xColor = OBJImg.fn.getColorFromValue((normals[normal].x + 1) * normalMultiplicator);
 
 				data[pixelIndex++] = xColor.r;
 				data[pixelIndex++] = xColor.g;
 				data[pixelIndex++] = xColor.b;
 				data[pixelIndex++] = xColor.a;
 
-				var yColor = OBJImg.fn.getColorFromValue((normals[normal].y + 1) * vertexMultiplicator);
+				var yColor = OBJImg.fn.getColorFromValue((normals[normal].y + 1) * normalMultiplicator);
 
 				data[pixelIndex++] = yColor.r;
 				data[pixelIndex++] = yColor.g;
 				data[pixelIndex++] = yColor.b;
 				data[pixelIndex++] = yColor.a;
 
-				var zColor = OBJImg.fn.getColorFromValue((normals[normal].z + 1) * vertexMultiplicator);
+				var zColor = OBJImg.fn.getColorFromValue((normals[normal].z + 1) * normalMultiplicator);
 
 				data[pixelIndex++] = zColor.r;
 				data[pixelIndex++] = zColor.g;
