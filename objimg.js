@@ -758,7 +758,7 @@
 									},
 									reflectivity: {
 										type: "f",
-										value: 1
+										value: materialDatas.environement.reflectivity
 									},
 									reflectionRatio: {
 										type: "f",
@@ -893,6 +893,7 @@
 								bumpMap: bumpMap,
 								bumpScale: bumpScale,
 								envMap: environementMap,
+								reflectivity: materialDatas.environement.reflectivity,
 								opacity: materialDatas.opacity.value,
 								alphaMap: opacityMap,
 								alphaTest: materialDatas.opacity.test,
@@ -1323,6 +1324,8 @@
 
 				};
 
+				var reflectivity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / MAX;
+
 				var opacity = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / 255;
 				var opacityMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var opacityClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
@@ -1410,7 +1413,8 @@
 					environement: {
 						map: environementMap,
 						clamp: environementClamp,
-						channel: environementChannel || OBJImg.constants.channel.rgb
+						channel: environementChannel || OBJImg.constants.channel.rgb,
+						reflectivity: reflectivity
 					},
 					opacity: {
 						map: opacityMap,
@@ -1844,7 +1848,8 @@
 						environement: {
 							map: [],
 							clamp: false,
-							channel: OBJImg.constants.channel.rgb
+							channel: OBJImg.constants.channel.rgb,
+							reflectivity: 1.0
 						},
 						opacity: {
 							map: [],
@@ -1894,6 +1899,11 @@
 					materials[index].opacity.value = parseFloat(datas[1]);
 
 				}
+				else if( type == "ne" ){
+
+					materials[index].environement.reflectivity = parseFloat(datas[1]);
+
+				}
 				else if( type == "illum" ){
 
 					materials[index].illumination = parseInt(datas[1]);
@@ -1932,7 +1942,8 @@
 					var options = {
 						clamp: true,
 						channel: OBJImg.constants.channel.rgb,
-						test: 0
+						test: 0,
+						reflectivity: 1
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -2634,6 +2645,13 @@
 					data[pixelIndex++] = characterColor.a;
 
 				};
+
+				var reflectivityColor = OBJImg.fn.getColorFromValue(materials[material].environement.reflectivity * MAX);
+
+				data[pixelIndex++] = reflectivityColor.r;
+				data[pixelIndex++] = reflectivityColor.g;
+				data[pixelIndex++] = reflectivityColor.b;
+				data[pixelIndex++] = reflectivityColor.a;
 
 				var opacityColor = OBJImg.fn.getColorFromValue(materials[material].opacity.value * 255);
 
