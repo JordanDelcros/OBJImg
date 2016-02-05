@@ -114,6 +114,7 @@ When an image is created, you can access it in the developer tools over resource
  - **kd**: [r g b] diffuse color
  - **ks**: [r g b] specular color
  - **ns**: [float] specular force
+ - **ne**: [float] reflectivity force
  - **d**: [float] opacity
  - **illum**: [1|2|3|4|5|6|7|8|9|10] illumination mode
  - **s**: [on|off] smooth or flat rendering
