@@ -2272,8 +2272,8 @@
 				faces: faceSplitting,
 				materials: 1 + (materials.length * 12 * 2),
 				vertexMultiplicator: 1,
-				textureMultiplicator: (textureSplitting > 0 ? 1 : 0),
-				textureOffset: (textureSplitting > 0 ? 1 : 0),
+				textureMultiplicator: 1,
+				textureOffset: 1,
 				objects: 1 + (objects.length * faceSplitting),
 				pivot: 3
 			});
