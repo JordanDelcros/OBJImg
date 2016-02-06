@@ -2200,23 +2200,67 @@
 					var nb = parseInt(b[2]) - 1;
 					var nc = parseInt(c[2]) - 1;
 
-					faces.push({
-						vertices: {
-							a: (!isNaN(va) ? va : null),
-							b: (!isNaN(vb) ? vb : null),
-							c: (!isNaN(vc) ? vc : null)
-						},
-						textures: {
-							a: (!isNaN(ta) ? ta : null),
-							b: (!isNaN(tb) ? tb : null),
-							c: (!isNaN(tc) ? tc : null)
-						},
-						normals: {
-							a: (!isNaN(na) ? na : null),
-							b: (!isNaN(nb) ? nb : null),
-							c: (!isNaN(nc) ? nc : null)
-						}
-					});
+					if(!datas[4]){ //triganle face
+						faces.push({
+							vertices: {
+								a: (!isNaN(va) ? va : null),
+								b: (!isNaN(vb) ? vb : null),
+								c: (!isNaN(vc) ? vc : null)
+							},
+							textures: {
+								a: (!isNaN(ta) ? ta : null),
+								b: (!isNaN(tb) ? tb : null),
+								c: (!isNaN(tc) ? tc : null)
+							},
+							normals: {
+								a: (!isNaN(na) ? na : null),
+								b: (!isNaN(nb) ? nb : null),
+								c: (!isNaN(nc) ? nc : null)
+							}
+						});
+					}else{ //quadratic face - convert to 2 triangle face
+						var d = datas[4].split(/\//g);
+						var vd = parseInt(d[0]) - 1;
+						var td = parseInt(d[1]) - 1;
+						var nd = parseInt(d[2]) - 1;
+						
+						faces.push({
+							vertices: {
+								a: (!isNaN(va) ? va : null),
+								b: (!isNaN(vb) ? vb : null),
+								c: (!isNaN(vd) ? vd : null)
+							},
+							textures: {
+								a: (!isNaN(ta) ? ta : null),
+								b: (!isNaN(tb) ? tb : null),
+								c: (!isNaN(td) ? td : null)
+							},
+							normals: {
+								a: (!isNaN(na) ? na : null),
+								b: (!isNaN(nb) ? nb : null),
+								c: (!isNaN(nd) ? nd : null)
+							}
+						});
+						
+						faces.push({
+							vertices: {
+								a: (!isNaN(vb) ? vb : null),
+								b: (!isNaN(vc) ? vc : null),
+								c: (!isNaN(vd) ? vd : null)
+							},
+							textures: {
+								a: (!isNaN(tb) ? tb : null),
+								b: (!isNaN(tc) ? tc : null),
+								c: (!isNaN(td) ? td : null)
+							},
+							normals: {
+								a: (!isNaN(nb) ? nb : null),
+								b: (!isNaN(nc) ? nc : null),
+								c: (!isNaN(nd) ? nd : null)
+							}
+						});
+					
+					}
 
 				}
 				else if( type == "o" || type == "g" ){
