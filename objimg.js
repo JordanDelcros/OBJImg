@@ -2264,15 +2264,15 @@
 
 				}
 				else if( type == "o" || type == "g" ){
-
+					
 					var nameMap = new Array();
+					if(datas[1]){	
+						for( var character = 0, characterLength = datas[1].length; character < characterLength; character++ ){
 
-					for( var character = 0, characterLength = datas[1].length; character < characterLength; character++ ){
+							nameMap[character] = OBJImg.dictionary.indexOf(datas[1][character]);
 
-						nameMap[character] = OBJImg.dictionary.indexOf(datas[1][character]);
-
-					};
-
+						};
+					}
 					objects.push({
 						name: nameMap,
 						material: null,
