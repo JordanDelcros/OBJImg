@@ -1849,7 +1849,7 @@
 							map: [],
 							clamp: false,
 							channel: OBJImg.constants.channel.rgb,
-							reflectivity: 1.0
+							reflectivity: 0
 						},
 						opacity: {
 							map: [],
@@ -1942,8 +1942,7 @@
 					var options = {
 						clamp: true,
 						channel: OBJImg.constants.channel.rgb,
-						test: 0,
-						reflectivity: 1
+						test: 0
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
