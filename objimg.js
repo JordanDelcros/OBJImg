@@ -1926,10 +1926,12 @@
 				}
 				else if( type.substr(0, 3) == "map" && datas.length > 1 ){
 
-					var map = datas[datas.length - 1] || null;
+					var map = (datas[datas.length - 1] || null);
 					var encodedMap = new Array();
 
 					if( map != null ){
+
+						map = map.replace(/\\/g, "/");
 
 						for( var character = 0, characterLength = map.length; character < characterLength; character++ ){
 
@@ -2199,7 +2201,7 @@
 					var nb = parseInt(b[2]) - 1;
 					var nc = parseInt(c[2]) - 1;
 
-					if( datas.length == 3 ){
+					if( datas.length == 4 ){
 
 						faces.push({
 							vertices: {
