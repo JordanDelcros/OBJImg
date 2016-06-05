@@ -2,177 +2,19 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
-	<title>OBJImg</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-	<link type="text/css" rel="stylesheet" media="all" href="resources/style.css"/>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
-	<script type="text/javascript" src="resources/trackballcontrols.js"></script>
-	<script type="text/javascript" src="../objimg.js"></script>
+	<title>OBJimage</title>
+	<script type="text/javascript" src="../build/objimage.js"></script>
 	<script type="text/javascript">
 
 		document.addEventListener("DOMContentLoaded", function(){
 
-			var canvas = document.querySelector("canvas");
-			var OBJselector = document.querySelector("nav select[name='obj']");
-			var infos = document.querySelector("div#infos");
-			var generatedImage = infos.querySelector("img#generated");
-
-			var width = window.innerWidth;
-			var height = window.innerHeight;
-			var aspect = width / height;
-
-			var renderer = new THREE.WebGLRenderer({
-				canvas: canvas,
-				precision: "highp",
-				premultipliedAlpha: true,
-				alpha: true,
-				antialias: true
-			});
-
-			renderer.setSize(width, height);
-
-			var camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 10000);
-			camera.position.set(0, 0, 3);
-
-			var controls = new THREE.TrackballControls(camera, renderer.domElement);
-			controls.rotateSpeed = 2.0;
-			controls.zoomSpeed = 0.2;
-			controls.minDistance = 0;
-			controls.maxDistance = 1000;
-			controls.panSpeed = 0.4;
-			controls.noZoom = false;
-			controls.noPan = false;
-			controls.staticMoving = false;
-			controls.dynamicDampingFactor = 0.3;
-
-			window.addEventListener("resize", function( event ){
-
-				width = window.innerWidth;
-				height = window.innerHeight;
-
-				renderer.setSize(width, height);
-
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
-
-			}, false);
-
-			var scene = new THREE.Scene();
-
-			var ambient = new THREE.AmbientLight(0x000000);
-			scene.add(ambient);
-
-			var light = new THREE.PointLight(0xFFFFFF);
-			light.position.set(15, 5, 5);
-			scene.add(light);
-
-			var hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0x001133, 1);
-			scene.add(hemisphereLight);
-
-			var object3d = null;
-
-			function doMagicThings( fileName ){
-
-				generatedImage.src = "models/" + fileName + "/" + fileName + ".obj.png";
-				infos.style.opacity = 1;
-
-				// Generate the image (only to show you what she looks like)
-				// OBJImg.generateIMG({
-				// 	obj: "models/" + fileName + "/" + fileName + ".obj",
-				// 	useWorker: false,
-				// 	onComplete: function( datas ){
-
-				// 		generatedImage.src = datas;
-				// 		infos.style.opacity = 1;
-
-				// 	},
-				// 	onError: function( error ){
-
-				// 		console.error(error);
-
-				// 	}
-				// });
-
-				// Generate the THREE-JS Object3D from the image.
-				var obj = new OBJImg({
-					image: "models/" + fileName + "/" + fileName + ".obj.png",
-					receiveShadow: false,
-					castShadow: false,
-					useWorker: false,
-					renderer: renderer,
-					onComplete: function( event ){
-
-						console.log("RAW datas:", event.detail, " (usefull for vanilla WebGL)");
-
-					},
-					onError: function( event ){
-
-						console.error(event);
-
-					}
-				});
-
-				scene.remove(object3d);
-				controls.reset();
-
-				object3d = obj.getObject3D();
-				object3d.position.set(0, 0, 0);
-				scene.add(object3d);
-
-			};
-
-			OBJselector.addEventListener("change", function(){
-
-				doMagicThings(this.value);
-
-			}, false);
-
-			doMagicThings(OBJselector.value);
-
-			function render( now ){
-
-				window.requestAnimationFrame(render);
-
-				controls.update();
-
-				renderer.render(scene, camera);
-
-			};
-
-			window.requestAnimationFrame(render);
+			var square = new OBJImage("models/square.obj.png");
 
 		}, false);
 
 	</script>
 </head>
 <body>
-	<nav>
-		<select name="obj">
-			<option value="predator">predator</option>
-			<option value="lara">lara croft (huge model)</option>
-			<option value="altair">altaïr</option>
-			<option value="geralt">geralt</option>
-			<option value="skull">skull</option>
-			<option value="crysis">crysis</option>
-			<option value="harley">harley</option>
-			<option value="camaro">camaro ss</option>
-			<option value="delorean">delorean (very huge model)</option>
-			<option value="gun">gun</option>
-			<option value="leon">leon scott kennedy</option>
-			<option value="shuttle">shuttle</option>
-			<option value="stormtroopers">storm troopers</option>
-			<option value="teapot">teapot</option>
-			<option value="vanquish">vanquish</option>
-			<option value="eiffel">eiffel tower</option>
-			<option value="cube">cube</option>
-			<option value="sphere">sphere</option>
-			<option value="icosphere">icosphere</option>
-		</select>
-	</nav>
-	<canvas></canvas>
-	<div id="infos">
-		<img id="generated"/>
-		<p>The 3D model you can see is built from this image.</p>
-	</div>
+
 </body>
 </html>
