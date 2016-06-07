@@ -44,7 +44,7 @@ Ks 0 0 0
 illum 2
 Ns 121.887
 map_Kd pl0011.png
-map_bump pl0011_n.png
+map_bump -bm 5.5 pl0011_n.png
 bump pl0011_n.png
 map_opacity 
 map_d 

@@ -1843,7 +1843,8 @@
 						bump: {
 							map: [],
 							clamp: false,
-							channel: OBJImg.constants.channel.rgb
+							channel: OBJImg.constants.channel.rgb,
+							multiplier: 1.0
 						},
 						environement: {
 							map: [],
@@ -1944,7 +1945,8 @@
 					var options = {
 						clamp: true,
 						channel: OBJImg.constants.channel.rgb,
-						test: 0
+						test: 0,
+						multiplier: 1.0
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -1961,6 +1963,11 @@
 						else if( optionType == "-imfchan" ){
 
 							options.channel = OBJImg.constants.channel[datas[++option]];
+
+						}
+						else if( optionType == "-bm" ){
+
+							options.multiplier = parseFloat(datas[++option]);
 
 						}
 						else if( optionType == "-test" ){
@@ -2018,6 +2025,7 @@
 						materials[index].bump.map = encodedMap;
 						materials[index].bump.clamp = options.clamp;
 						materials[index].bump.channel = options.channel;
+						materials[index].bump.multiplier = options.multiplier;
 
 					}
 					else if( type == "map_d" ){
@@ -2656,6 +2664,18 @@
 				data[pixelIndex++] = 0;
 				data[pixelIndex++] = materials[material].bump.channel;
 				data[pixelIndex++] = 255;
+
+				var bumpMultiplerMultiplicator = Math.floor(MAX / materials[material].bump.multiplier);
+				var bumpMultiplerMultiplicatorColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator);
+
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.r;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.g;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.b;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.a;
+
+				var bumpMultiplierColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator * materials[material].bump.multiplier);
+
+				console.log(materials[material].bump.multiplier, bumpMultiplerMultiplicatorColor, bumpMultiplierColor);
 
 				for( var character = 0, characterLength = materials[material].bump.map.length; character < characterLength; character++ ){
 
