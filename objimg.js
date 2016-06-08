@@ -640,7 +640,7 @@
 						var diffuseColor = new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b);
 						var specularColor = new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b);
 						var normalScale = new THREE.Vector2(0.5, 0.5);
-						var bumpScale = 1.0;
+						var bumpScale = materialDatas.bump.multiplier;
 						var transparent = ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false);
 						var depthTest = materialDatas.shader.depthTest;
 						var depthWrite = materialDatas.shader.depthWrite;
@@ -1291,6 +1291,8 @@
 				var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var bumpChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var bumpMultiplierMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var bumpMultiplier = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / bumpMultiplierMultiplicator;
 
 				var bumpMap = null;
 
@@ -1408,7 +1410,8 @@
 					bump: {
 						map: bumpMap,
 						clamp: bumpClamp,
-						channel: bumpChannel || OBJImg.constants.channel.rgb
+						channel: bumpChannel || OBJImg.constants.channel.rgb,
+						multiplier: bumpMultiplier || 1.0
 					},
 					environement: {
 						map: environementMap,
@@ -2367,7 +2370,7 @@
 				pixelCount += 1 + materials[material].specular.map.length;
 				pixelCount += 1 + materials[material].specular.forceMap.length;
 				pixelCount += 1 + materials[material].normal.map.length;
-				pixelCount += 1 + materials[material].bump.map.length;
+				pixelCount += 3 + materials[material].bump.map.length;
 				pixelCount += 1 + materials[material].opacity.map.length;
 				pixelCount += 1 + materials[material].environement.map.length;
 				pixelCount += 1 + materials[material].shader.vertex.length;
@@ -2675,7 +2678,10 @@
 
 				var bumpMultiplierColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator * materials[material].bump.multiplier);
 
-				console.log(materials[material].bump.multiplier, bumpMultiplerMultiplicatorColor, bumpMultiplierColor);
+				data[pixelIndex++] = bumpMultiplierColor.r;
+				data[pixelIndex++] = bumpMultiplierColor.g;
+				data[pixelIndex++] = bumpMultiplierColor.b;
+				data[pixelIndex++] = bumpMultiplierColor.a;
 
 				for( var character = 0, characterLength = materials[material].bump.map.length; character < characterLength; character++ ){
 

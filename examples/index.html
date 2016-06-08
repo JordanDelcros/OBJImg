@@ -76,22 +76,22 @@
 				generatedImage.src = "models/" + fileName + "/" + fileName + ".obj.png";
 				infos.style.opacity = 1;
 
-				// Generate the image (only to show you what she looks like)
-				OBJImg.generateIMG({
-					obj: "models/" + fileName + "/" + fileName + ".obj",
-					useWorker: false,
-					onComplete: function( datas ){
+				// Generate the image (only to show you how it looks like)
+				// OBJImg.generateIMG({
+				// 	obj: "models/" + fileName + "/" + fileName + ".obj",
+				// 	useWorker: false,
+				// 	onComplete: function( datas ){
 
-						generatedImage.src = datas;
-						infos.style.opacity = 1;
+				// 		generatedImage.src = datas;
+				// 		infos.style.opacity = 1;
 
-					},
-					onError: function( error ){
+				// 	},
+				// 	onError: function( error ){
 
-						console.error(error);
+				// 		console.error(error);
 
-					}
-				});
+				// 	}
+				// });
 
 				// Generate the THREE-JS Object3D from the image.
 				var obj = new OBJImg({
@@ -148,22 +148,22 @@
 <body>
 	<nav>
 		<select name="obj">
-			<option value="leon">leon scott kennedy</option>
 			<option value="predator">predator</option>
 			<option value="lara">lara croft (huge model)</option>
 			<option value="altair">altaïr</option>
 			<option value="geralt">geralt</option>
 			<option value="skull">skull</option>
 			<option value="crysis">crysis</option>
-			<option value="harley">harley</option>
+			<option value="eiffel">eiffel tower</option>
 			<option value="camaro">camaro ss</option>
 			<option value="delorean">delorean (very huge model)</option>
 			<option value="gun">gun</option>
 			<option value="stormtroopers">storm troopers</option>
+			<option value="harley">harley</option>
 			<option value="shuttle">shuttle</option>
 			<option value="teapot">teapot</option>
 			<option value="vanquish">vanquish</option>
-			<option value="eiffel">eiffel tower</option>
+			<option value="leon">leon scott kennedy</option>
 			<option value="cube">cube</option>
 			<option value="sphere">sphere</option>
 			<option value="icosphere">icosphere</option>
