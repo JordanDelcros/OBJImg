@@ -640,7 +640,7 @@
 						var diffuseColor = new THREE.Color(materialDatas.diffuse.r, materialDatas.diffuse.g, materialDatas.diffuse.b);
 						var specularColor = new THREE.Color(materialDatas.specular.r, materialDatas.specular.g, materialDatas.specular.b);
 						var normalScale = new THREE.Vector2(0.5, 0.5);
-						var bumpScale = 1.0;
+						var bumpScale = materialDatas.bump.multiplier;
 						var transparent = ((materialDatas.opacity.value < 1.0 || opacityMap != null) ? true : false);
 						var depthTest = materialDatas.shader.depthTest;
 						var depthWrite = materialDatas.shader.depthWrite;
@@ -1291,6 +1291,8 @@
 				var bumpMapCharacters = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
 				var bumpClamp = (OBJImg.fn.getPixelValue(pixelIndex++, pixels) == 1 ? true : false);
 				var bumpChannel = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var bumpMultiplierMultiplicator = OBJImg.fn.getPixelValue(pixelIndex++, pixels);
+				var bumpMultiplier = OBJImg.fn.getPixelValue(pixelIndex++, pixels) / bumpMultiplierMultiplicator;
 
 				var bumpMap = null;
 
@@ -1408,7 +1410,8 @@
 					bump: {
 						map: bumpMap,
 						clamp: bumpClamp,
-						channel: bumpChannel || OBJImg.constants.channel.rgb
+						channel: bumpChannel || OBJImg.constants.channel.rgb,
+						multiplier: bumpMultiplier || 1.0
 					},
 					environement: {
 						map: environementMap,
@@ -1843,7 +1846,8 @@
 						bump: {
 							map: [],
 							clamp: false,
-							channel: OBJImg.constants.channel.rgb
+							channel: OBJImg.constants.channel.rgb,
+							multiplier: 1.0
 						},
 						environement: {
 							map: [],
@@ -1944,7 +1948,8 @@
 					var options = {
 						clamp: true,
 						channel: OBJImg.constants.channel.rgb,
-						test: 0
+						test: 0,
+						multiplier: 1.0
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -1961,6 +1966,11 @@
 						else if( optionType == "-imfchan" ){
 
 							options.channel = OBJImg.constants.channel[datas[++option]];
+
+						}
+						else if( optionType == "-bm" ){
+
+							options.multiplier = parseFloat(datas[++option]);
 
 						}
 						else if( optionType == "-test" ){
@@ -2018,6 +2028,7 @@
 						materials[index].bump.map = encodedMap;
 						materials[index].bump.clamp = options.clamp;
 						materials[index].bump.channel = options.channel;
+						materials[index].bump.multiplier = options.multiplier;
 
 					}
 					else if( type == "map_d" ){
@@ -2272,13 +2283,13 @@
 				else if( type == "o" || type == "g" ){
 
 					var nameMap = new Array();
+					if(datas[1]){
+						for( var character = 0, characterLength = datas[1].length; character < characterLength; character++ ){
 
-					for( var character = 0, characterLength = datas[1].length; character < characterLength; character++ ){
+							nameMap[character] = OBJImg.dictionary.indexOf(datas[1][character]);
 
-						nameMap[character] = OBJImg.dictionary.indexOf(datas[1][character]);
-
-					};
-
+						};
+					}
 					objects.push({
 						name: nameMap,
 						material: null,
@@ -2359,7 +2370,7 @@
 				pixelCount += 1 + materials[material].specular.map.length;
 				pixelCount += 1 + materials[material].specular.forceMap.length;
 				pixelCount += 1 + materials[material].normal.map.length;
-				pixelCount += 1 + materials[material].bump.map.length;
+				pixelCount += 3 + materials[material].bump.map.length;
 				pixelCount += 1 + materials[material].opacity.map.length;
 				pixelCount += 1 + materials[material].environement.map.length;
 				pixelCount += 1 + materials[material].shader.vertex.length;
@@ -2656,6 +2667,21 @@
 				data[pixelIndex++] = 0;
 				data[pixelIndex++] = materials[material].bump.channel;
 				data[pixelIndex++] = 255;
+
+				var bumpMultiplerMultiplicator = Math.floor(MAX / materials[material].bump.multiplier);
+				var bumpMultiplerMultiplicatorColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator);
+
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.r;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.g;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.b;
+				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.a;
+
+				var bumpMultiplierColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator * materials[material].bump.multiplier);
+
+				data[pixelIndex++] = bumpMultiplierColor.r;
+				data[pixelIndex++] = bumpMultiplierColor.g;
+				data[pixelIndex++] = bumpMultiplierColor.b;
+				data[pixelIndex++] = bumpMultiplierColor.a;
 
 				for( var character = 0, characterLength = materials[material].bump.map.length; character < characterLength; character++ ){
 
