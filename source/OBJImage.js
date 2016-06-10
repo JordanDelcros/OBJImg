@@ -1,6 +1,6 @@
 "use strict";
 
-// import ImageLoader from "components/image-loader.js";
+import FileLoader from "./components/FileLoader.js";
 
 export default class OBJImage {
 	constructor( path ){
@@ -10,7 +10,7 @@ export default class OBJImage {
 	}
 	initialize( path ){
 
-		console.log(path);
+		this.file = new FileLoader(path);
 
 		return this;
 
