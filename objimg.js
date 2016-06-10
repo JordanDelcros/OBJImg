@@ -1083,6 +1083,8 @@
 		},
 		getColorFromValue: function( value ){
 
+			value = Math.max(0, Math.min(MAX, value)) || 0;
+
 			var g = Math.min(Math.floor(value / 255), 255);
 			var r = (g > 0 ? 255 : 0);
 			var b = Math.floor(value - (r * g));
@@ -1411,7 +1413,7 @@
 						map: bumpMap,
 						clamp: bumpClamp,
 						channel: bumpChannel || OBJImg.constants.channel.rgb,
-						multiplier: bumpMultiplier || 1.0
+						multiplier: bumpMultiplier || 0
 					},
 					environement: {
 						map: environementMap,
@@ -1847,7 +1849,7 @@
 							map: [],
 							clamp: false,
 							channel: OBJImg.constants.channel.rgb,
-							multiplier: 1.0
+							multiplier: 0.0
 						},
 						environement: {
 							map: [],
@@ -1949,7 +1951,7 @@
 						clamp: true,
 						channel: OBJImg.constants.channel.rgb,
 						test: 0,
-						multiplier: 1.0
+						multiplier: 0.0
 					};
 
 					for( var option = 1, optionLength = datas.length; option < optionLength; option++ ){
@@ -2671,12 +2673,15 @@
 				var bumpMultiplerMultiplicator = Math.floor(MAX / materials[material].bump.multiplier);
 				var bumpMultiplerMultiplicatorColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator);
 
+
 				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.r;
 				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.g;
 				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.b;
 				data[pixelIndex++] = bumpMultiplerMultiplicatorColor.a;
 
 				var bumpMultiplierColor = OBJImg.fn.getColorFromValue(bumpMultiplerMultiplicator * materials[material].bump.multiplier);
+
+				console.log(bumpMultiplierColor)
 
 				data[pixelIndex++] = bumpMultiplierColor.r;
 				data[pixelIndex++] = bumpMultiplierColor.g;
