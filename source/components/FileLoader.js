@@ -1,49 +1,51 @@
-import { TYPE } from "./Constants.js";
+export const FileType = {
+	IMAGE: 0,
+	OBJ: 1,
+	MTL: 2,
+	JSON: 3,
+	TEXT: 4
+};
 
 export default class FileLoader {
-	constructor( path ){
+	constructor( path, onComplete, onFail ){
 
-		return this.initialize(path);
+		return this.initialize(path, onComplete, onFail);
 
 	}
-	initialize( path ){
+	initialize( path, onComplete, onFail ){
 
 		this.path = path;
 
 		if( /\.(png|jpe?g|gif|bmp)$/.test(this.path) ){
 
-			this.type = TYPE.IMAGE;
+			this.type = FileType.IMAGE;
 
-			this.content = FileLoader.loadImage(this.path, ( image )=>{
-
-				console.log(image);
-
-			}, ( error )=>{
-
-				console.error(error);
-
-			});
+			this.content = FileLoader.loadImage.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.obj$/g.test(this.path) ){
 
-			this.type = TYPE.OBJ;
+			this.type = FileType.OBJ;
 
-			this.content = FileLoader.loadText();
+			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.mtl$/g.test(this.path) ){
 
-			this.type = TYPE.MTL;
+			this.type = FileType.MTL;
 
-			this.content = FileLoader.loadText();
+			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.json$/g.test(this.path) ){
 
-			this.type = TYPE.JSON;
+			this.type = FileType.JSON;
 
-			this.content = FileLoader.loadText(this.path);
+			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+
+				onComplete(JSON.parse(data), type);
+
+			}, onFail);
 
 		};
 
@@ -54,30 +56,33 @@ export default class FileLoader {
 
 FileLoader.loadImage = function FileLoaderLoadImage( path, onComplete, onFail ){
 
-	console.log("LOAD IMAGE");
-
 	var image = new Image();
 
-	image.addEventListener("load", onComplete.bind(this, image), false);
-	image.addEventListener("error", onFail.bind(this), false);
+	image.addEventListener("load", ()=>{
+
+		onComplete(image, this.type || FileType.IMAGE);
+
+	}, false);
+
+	image.addEventListener("error", ()=>{
+
+		onFail();
+
+	}, false);
 
 	image.src = path;
 
-	return image;
+	return null;
 
 };
 
 FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
-	console.log("LOAD TEXT", path);
-
-	var text = new String();
-
 	var request = new XMLHttpRequest();
 
 	request.addEventListener("readystatechange", ( event )=>{
 
-		if( event.target.readyState == XMLHttpRequest.UNSED ){
+		if( event.target.readyState == XMLHttpRequest.UNSEND ){
 
 		}
 		else if( event.target.readyState == XMLHttpRequest.OPENED ){
@@ -93,8 +98,12 @@ FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
 			if( event.target.status >= 200 && event.target.status < 400 ){
 
+				onComplete(event.target.responseText, this.type || FileType.TEXT);
+
 			}
 			else if( event.target.status >= 400 ){
+
+				onFail();
 
 			};
 
@@ -106,6 +115,6 @@ FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
 	request.send(null);
 
-	return text;
+	return null;
 
 };

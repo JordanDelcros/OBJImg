@@ -8,9 +8,13 @@
 
 		document.addEventListener("DOMContentLoaded", function(){
 
-			var compressedModel = new OBJImage("models/cube/cube.json");
+			new OBJImage("models/cube/cube.obj", {
+				onLoad: function( data ){
 
-			console.warn(compressedModel);
+					console.log("ON LOAD", data);
+
+				}
+			});
 
 		}, false);
 
