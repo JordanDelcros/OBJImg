@@ -43,13 +43,18 @@ export default class FileLoader {
 
 			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
 
-				onComplete(JSON.parse(data), type);
+				onComplete(JSON.parse(data), type, path);
 
 			}, onFail);
 
 		};
 
 		return this;
+
+	}
+	getBasePath(){
+
+		return this.path.split(/\//).slice(0, -1).join("/");
 
 	}
 };
@@ -60,7 +65,7 @@ FileLoader.loadImage = function FileLoaderLoadImage( path, onComplete, onFail ){
 
 	image.addEventListener("load", ()=>{
 
-		onComplete(image, this.type || FileType.IMAGE);
+		onComplete(image, (this.type || FileType.IMAGE), path);
 
 	}, false);
 
@@ -98,7 +103,7 @@ FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
 			if( event.target.status >= 200 && event.target.status < 400 ){
 
-				onComplete(event.target.responseText, this.type || FileType.TEXT);
+				onComplete(event.target.responseText, (this.type || FileType.TEXT), path);
 
 			}
 			else if( event.target.status >= 400 ){

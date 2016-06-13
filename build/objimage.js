@@ -37,18 +37,21 @@ var OBJImage = function () {
 	_createClass(OBJImage, [{
 		key: "initialize",
 		value: function initialize(path, options) {
+			var _this = this;
 
-			this.file = new _FileLoader2.default(path, function (fileData, type) {
+			this.file = new _FileLoader2.default(path, function (fileData, type, path) {
+
+				var basePath = _this.file.getBasePath();
 
 				if (type == _FileLoader.FileType.IMAGE) {
 
-					(0, _ParseImage2.default)(fileData, function () {});
+					(0, _ParseImage2.default)(fileData, basePath, function () {});
 				} else if (type == _FileLoader.FileType.OBJ) {
 
-					(0, _ParseOBJ2.default)(fileData, function () {});
+					(0, _ParseOBJ2.default)(fileData, basePath, function () {});
 				} else if (type == _FileLoader.FileType.MTL) {} else if (type == _FileLoader.FileType.JSON) {
 
-					(0, _ParseJSON2.default)(fileData, function () {});
+					(0, _ParseJSON2.default)(fileData, basePath, function () {});
 				};
 			}, function (error) {
 
@@ -79,7 +82,51 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":2,"./methods/ParseImage.js":6,"./methods/ParseJSON.js":7,"./methods/ParseOBJ.js":8}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":3,"./methods/ParseImage.js":11,"./methods/ParseJSON.js":12,"./methods/ParseOBJ.js":14}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Face = function () {
+	function Face(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC) {
+		_classCallCheck(this, Face);
+
+		return this.initialize(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC);
+	}
+
+	_createClass(Face, [{
+		key: "initialize",
+		value: function initialize(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC) {
+
+			this.vertexA = parseInt(vertexA) - 1;
+			this.vertexB = parseInt(vertexB) - 1;
+			this.vertexC = parseInt(vertexC) - 1;
+
+			this.normalA = parseInt(normalA) - 1;
+			this.normalB = parseInt(normalB) - 1;
+			this.normalC = parseInt(normalC) - 1;
+
+			this.textureA = parseInt(textureA) - 1;
+			this.textureB = parseInt(textureB) - 1;
+			this.textureC = parseInt(textureC) - 1;
+
+			return this;
+		}
+	}]);
+
+	return Face;
+}();
+
+exports.default = Face;
+;
+
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -132,11 +179,17 @@ var FileLoader = function () {
 
 				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
 
-					onComplete(JSON.parse(data), type);
+					onComplete(JSON.parse(data), type, path);
 				}, onFail);
 			};
 
 			return this;
+		}
+	}, {
+		key: "getBasePath",
+		value: function getBasePath() {
+
+			return this.path.split(/\//).slice(0, -1).join("/");
 		}
 	}]);
 
@@ -153,7 +206,7 @@ FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
 
 	image.addEventListener("load", function () {
 
-		onComplete(image, _this.type || FileType.IMAGE);
+		onComplete(image, _this.type || FileType.IMAGE, path);
 	}, false);
 
 	image.addEventListener("error", function () {
@@ -177,7 +230,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 
 			if (event.target.status >= 200 && event.target.status < 400) {
 
-				onComplete(event.target.responseText, _this2.type || FileType.TEXT);
+				onComplete(event.target.responseText, _this2.type || FileType.TEXT, path);
 			} else if (event.target.status >= 400) {
 
 				onFail();
@@ -192,7 +245,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 	return null;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -201,76 +254,116 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _ModelObject = require("./ModelObject.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _ModelObject2 = _interopRequireDefault(_ModelObject);
+var Material = function () {
+	function Material(name) {
+		_classCallCheck(this, Material);
 
-var _Vertex = require("./Vertex.js");
+		return this.initialize(name);
+	}
 
-var _Vertex2 = _interopRequireDefault(_Vertex);
+	_createClass(Material, [{
+		key: "initialize",
+		value: function initialize(name) {
+
+			this.name = name;
+
+			this.smooth = true;
+
+			this.specular = {
+				force: 1
+			};
+
+			return this;
+		}
+	}, {
+		key: "setSpecularForce",
+		value: function setSpecularForce(force) {
+
+			this.specular.force = parseFloat(force);
+
+			return this;
+		}
+	}]);
+
+	return Material;
+}();
+
+exports.default = Material;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Material = require("./Material.js");
+
+var _Material2 = _interopRequireDefault(_Material);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ModelData = function () {
-	function ModelData() {
-		_classCallCheck(this, ModelData);
+var MaterialLibrary = function () {
+	function MaterialLibrary() {
+		_classCallCheck(this, MaterialLibrary);
 
-		return this.initialize();
+		this.materials = new Array();
+
+		this.initialize();
 	}
 
-	_createClass(ModelData, [{
+	_createClass(MaterialLibrary, [{
 		key: "initialize",
 		value: function initialize() {
 
-			this.defaultObject = new _ModelObject2.default("default");
+			this.defaultMaterial = new _Material2.default("default");
 
-			this.currentObject = null;
+			this.currentMaterial = null;
 
-			this.objects = new Array();
-
-			this.vertices = new Array();
+			this.materials = new Array();
 
 			return this;
 		}
 	}, {
-		key: "addObject",
-		value: function addObject(name) {
+		key: "addMaterial",
+		value: function addMaterial(name) {
 
-			var object = new _ModelObject2.default(name);
+			var material = new _Material2.default(name);
 
-			this.currentObject = object;
+			this.currentMaterial = material;
 
-			this.objects.push(object);
+			this.materials.push(material);
 
 			return this;
 		}
 	}, {
-		key: "addVertex",
-		value: function addVertex(x, y, z) {
+		key: "addSpecularForce",
+		value: function addSpecularForce(force) {
 
-			var index = this.vertices.push(new _Vertex2.default(x, y, z));
+			if (this.currentMaterial != null) {
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addVertex(index);
+				this.currentMaterial.setSpecularForce(force);
 			} else {
 
-				this.defaultObject.addVertex(index);
+				this.defaultMaterial.setSpecularForce(force);
 			};
 
 			return this;
 		}
 	}]);
 
-	return ModelData;
+	return MaterialLibrary;
 }();
 
-exports.default = ModelData;
-;
+exports.default = MaterialLibrary;
 
-},{"./ModelObject.js":4,"./Vertex.js":5}],4:[function(require,module,exports){
+},{"./Material.js":4}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -281,20 +374,26 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ModelObject = function () {
-	function ModelObject(name) {
-		_classCallCheck(this, ModelObject);
+var Model = function () {
+	function Model(name) {
+		_classCallCheck(this, Model);
 
 		return this.initialize(name);
 	}
 
-	_createClass(ModelObject, [{
+	_createClass(Model, [{
 		key: "initialize",
 		value: function initialize(name) {
 
 			this.setName(name);
 
 			this.vertices = new Array();
+
+			this.normals = new Array();
+
+			this.textures = new Array();
+
+			this.faces = new Array();
 
 			return this;
 		}
@@ -316,14 +415,285 @@ var ModelObject = function () {
 
 			return this;
 		}
+	}, {
+		key: "addNormal",
+		value: function addNormal(index) {
+
+			this.normals.push(index);
+
+			return this;
+		}
+	}, {
+		key: "addTexture",
+		value: function addTexture(index) {
+
+			this.textures.push(index);
+
+			return this;
+		}
+	}, {
+		key: "addFace",
+		value: function addFace(index) {
+
+			this.faces.push(index);
+
+			return this;
+		}
+	}, {
+		key: "setMaterial",
+		value: function setMaterial(name) {
+
+			this.material = name;
+
+			return this;
+		}
 	}]);
 
-	return ModelObject;
+	return Model;
 }();
 
-exports.default = ModelObject;
+exports.default = Model;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Model = require("./Model.js");
+
+var _Model2 = _interopRequireDefault(_Model);
+
+var _Vertex = require("./Vertex.js");
+
+var _Vertex2 = _interopRequireDefault(_Vertex);
+
+var _Normal = require("./Normal.js");
+
+var _Normal2 = _interopRequireDefault(_Normal);
+
+var _Texture = require("./Texture.js");
+
+var _Texture2 = _interopRequireDefault(_Texture);
+
+var _Face = require("./Face.js");
+
+var _Face2 = _interopRequireDefault(_Face);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ModelData = function () {
+	function ModelData() {
+		_classCallCheck(this, ModelData);
+
+		return this.initialize();
+	}
+
+	_createClass(ModelData, [{
+		key: "initialize",
+		value: function initialize() {
+
+			this.defaultObject = new _Model2.default("default");
+
+			this.currentObject = null;
+
+			this.materialLibrary = null;
+
+			this.objects = new Array();
+
+			this.vertices = new Array();
+
+			this.normals = new Array();
+
+			this.textures = new Array();
+
+			this.faces = new Array();
+
+			return this;
+		}
+	}, {
+		key: "addObject",
+		value: function addObject(name) {
+
+			var object = new _Model2.default(name);
+
+			this.currentObject = object;
+
+			this.objects.push(object);
+
+			return this;
+		}
+	}, {
+		key: "addVertex",
+		value: function addVertex(x, y, z) {
+
+			var index = this.vertices.push(new _Vertex2.default(x, y, z)) - 1;
+
+			if (this.currentObject != null) {
+
+				this.currentObject.addVertex(index);
+			} else {
+
+				this.defaultObject.addVertex(index);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addNormal",
+		value: function addNormal(x, y, z) {
+
+			var index = this.normals.push(new _Normal2.default(x, y, z)) - 1;
+
+			if (this.currentObject != null) {
+
+				this.currentObject.addNormal(index);
+			} else {
+
+				this.defaultObject.addNormal(index);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addTexture",
+		value: function addTexture(u, v) {
+
+			var index = this.textures.push(new _Texture2.default(u, v)) - 1;
+
+			if (this.currentObject != null) {
+
+				this.currentObject.addTexture(index);
+			} else {
+
+				this.defaultObject.addTexture(index);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addFace",
+		value: function addFace(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC) {
+
+			var index = this.faces.push(new _Face2.default(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC)) - 1;
+
+			if (this.currentObject != null) {
+
+				this.currentObject.addFace(index);
+			} else {
+
+				this.defaultObject.addFace(index);
+			};
+
+			return this;
+		}
+	}, {
+		key: "setMaterialLibrary",
+		value: function setMaterialLibrary(materialLibrary) {
+
+			this.materialLibrary = materialLibrary;
+
+			return this;
+		}
+	}, {
+		key: "addMaterial",
+		value: function addMaterial(name) {
+
+			if (this.currentObject != null) {
+
+				this.currentObject.setMaterial(name);
+			} else {
+
+				this.defaultObject.setMaterial(name);
+			};
+
+			return this;
+		}
+	}]);
+
+	return ModelData;
+}();
+
+exports.default = ModelData;
+;
+
+},{"./Face.js":2,"./Model.js":6,"./Normal.js":8,"./Texture.js":9,"./Vertex.js":10}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Normal = function () {
+	function Normal(x, y, z) {
+		_classCallCheck(this, Normal);
+
+		return this.initialize(x, y, z);
+	}
+
+	_createClass(Normal, [{
+		key: "initialize",
+		value: function initialize(x, y, z) {
+
+			this.x = parseFloat(x);
+			this.y = parseFloat(y);
+			this.z = parseFloat(z);
+
+			return this;
+		}
+	}]);
+
+	return Normal;
+}();
+
+exports.default = Normal;
+;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Texture = function () {
+	function Texture(u, v) {
+		_classCallCheck(this, Texture);
+
+		return this.initialize(u, v);
+	}
+
+	_createClass(Texture, [{
+		key: "initialize",
+		value: function initialize(u, v) {
+
+			this.u = parseFloat(u);
+			this.v = parseFloat(v);
+
+			return this;
+		}
+	}]);
+
+	return Texture;
+}();
+
+exports.default = Texture;
+;
+
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -359,7 +729,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],6:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -368,7 +738,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = ParseImage;
 function ParseImage(image, onComplete) {};
 
-},{}],7:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -380,7 +750,45 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],8:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = ParseMTL;
+
+var _MaterialLibrary = require("../components/MaterialLibrary.js");
+
+var _MaterialLibrary2 = _interopRequireDefault(_MaterialLibrary);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ParseMTL(mtl, basePath, onComplete) {
+
+	var materialLibrary = new _MaterialLibrary2.default();
+
+	mtl.split(/\n+/).forEach(function (value, index, array) {
+
+		var info = value.split(/\s+/).filter(Boolean);
+
+		var type = info[0].toLowerCase();
+
+		// console.log(info);
+
+		if (type == "newmtl") {
+
+			materialLibrary.addMaterial(info[1]);
+		} else if (type == "ns") {
+
+			materialLibrary.addSpecularForce(info[1]);
+		};
+	});
+
+	onComplete(materialLibrary);
+};
+
+},{"../components/MaterialLibrary.js":5}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -388,19 +796,34 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = ParseOBJ;
 
+var _ParseMTL = require("./ParseMTL.js");
+
+var _ParseMTL2 = _interopRequireDefault(_ParseMTL);
+
 var _ModelData = require("../components/ModelData.js");
 
 var _ModelData2 = _interopRequireDefault(_ModelData);
 
+var _FileLoader = require("../components/FileLoader.js");
+
+var _FileLoader2 = _interopRequireDefault(_FileLoader);
+
+var _MaterialLibrary = require("../components/MaterialLibrary.js");
+
+var _MaterialLibrary2 = _interopRequireDefault(_MaterialLibrary);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ParseOBJ(obj, onComplete) {
+function ParseOBJ(obj, basePath, onComplete) {
 
 	var model = new _ModelData2.default();
 
-	obj.split(/\n/).forEach(function (value, index, array) {
+	var parseOBJComplete = false;
+	var parseMTLComplete = true;
 
-		var info = value.split(/\s+/);
+	obj.split(/\n+/).forEach(function (value, index, array) {
+
+		var info = value.split(/\s+/).filter(Boolean);
 
 		var type = info[0];
 
@@ -414,11 +837,71 @@ function ParseOBJ(obj, onComplete) {
 			var z = info[3];
 
 			model.addVertex(x, y, z);
+		} else if (type == "vn") {
+
+			var x = info[1];
+			var y = info[2];
+			var z = info[3];
+
+			model.addNormal(x, y, z);
+		} else if (type == "vt") {
+
+			var u = info[1];
+			var v = info[2];
+
+			model.addTexture(u, v);
+		} else if (type == "f") {
+
+			var a = info[1].split(/\//);
+			var b = info[2].split(/\//);
+			var c = info[3].split(/\//);
+
+			var vertexA = a[0];
+			var vertexB = b[0];
+			var vertexC = c[0];
+
+			var normalA = a[1];
+			var normalB = b[1];
+			var normalC = c[1];
+
+			var textureA = a[1];
+			var textureB = b[1];
+			var textureC = c[1];
+
+			model.addFace(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC);
+		} else if (type == "mtllib") {
+
+			parseMTLComplete = false;
+
+			var materialLibraryPath = basePath + "/" + info[1];
+
+			var file = new _FileLoader2.default(materialLibraryPath, function (fileData, type, path) {
+
+				(0, _ParseMTL2.default)(fileData, file.getBasePath(), function (materialLibrary) {
+
+					parseMTLComplete = true;
+
+					model.setMaterialLibrary(materialLibrary);
+
+					if (parseOBJComplete == true && parseMTLComplete == true) {
+
+						console.log("FINISH", model);
+					};
+				});
+			});
+		} else if (type == "usemtl") {
+
+			model.addMaterial(info[1]);
 		};
 	});
 
-	console.log(model);
+	parseOBJComplete = true;
+
+	if (parseOBJComplete == true && parseMTLComplete == true) {
+
+		console.log("FINISH", model);
+	};
 };
 
-},{"../components/ModelData.js":3}]},{},[1])(1)
+},{"../components/FileLoader.js":3,"../components/MaterialLibrary.js":5,"../components/ModelData.js":7,"./ParseMTL.js":13}]},{},[1])(1)
 });

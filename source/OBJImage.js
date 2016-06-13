@@ -13,11 +13,13 @@ export default class OBJImage {
 	}
 	initialize( path, options ){
 
-		this.file = new FileLoader(path, ( fileData, type )=>{
+		this.file = new FileLoader(path, ( fileData, type, path )=>{
+
+			var basePath = this.file.getBasePath();
 
 			if( type == FileType.IMAGE ){
 
-				ParseImage(fileData, ()=>{
+				ParseImage(fileData, basePath, ()=>{
 
 					
 
@@ -26,7 +28,7 @@ export default class OBJImage {
 			}
 			else if( type == FileType.OBJ ){
 
-				ParseOBJ(fileData, ()=>{
+				ParseOBJ(fileData, basePath, ()=>{
 
 
 
@@ -40,7 +42,7 @@ export default class OBJImage {
 			}
 			else if( type == FileType.JSON ){
 
-				ParseJSON(fileData, ()=>{
+				ParseJSON(fileData, basePath, ()=>{
 
 
 
