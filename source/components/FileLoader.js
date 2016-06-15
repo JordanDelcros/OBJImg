@@ -1,9 +1,9 @@
 export const FileType = {
-	IMAGE: 0,
-	OBJ: 1,
-	MTL: 2,
-	JSON: 3,
-	TEXT: 4
+	image: 0,
+	obj: 1,
+	mtl: 2,
+	json: 3,
+	text: 4
 };
 
 export default class FileLoader {
@@ -18,28 +18,28 @@ export default class FileLoader {
 
 		if( /\.(png|jpe?g|gif|bmp)$/.test(this.path) ){
 
-			this.type = FileType.IMAGE;
+			this.type = FileType.image;
 
 			this.content = FileLoader.loadImage.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.obj$/g.test(this.path) ){
 
-			this.type = FileType.OBJ;
+			this.type = FileType.obj;
 
 			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.mtl$/g.test(this.path) ){
 
-			this.type = FileType.MTL;
+			this.type = FileType.mtl;
 
 			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 
 		}
 		else if( /\.json$/g.test(this.path) ){
 
-			this.type = FileType.JSON;
+			this.type = FileType.json;
 
 			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
 
@@ -65,7 +65,7 @@ FileLoader.loadImage = function FileLoaderLoadImage( path, onComplete, onFail ){
 
 	image.addEventListener("load", ()=>{
 
-		onComplete(image, (this.type || FileType.IMAGE), path);
+		onComplete(image, (this.type || FileType.image), path);
 
 	}, false);
 

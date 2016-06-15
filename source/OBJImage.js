@@ -17,7 +17,7 @@ export default class OBJImage {
 
 			var basePath = this.file.getBasePath();
 
-			if( type == FileType.IMAGE ){
+			if( type == FileType.image ){
 
 				ParseImage(fileData, basePath, ()=>{
 
@@ -26,7 +26,7 @@ export default class OBJImage {
 				});
 
 			}
-			else if( type == FileType.OBJ ){
+			else if( type == FileType.obj ){
 
 				ParseOBJ(fileData, basePath, ()=>{
 
@@ -35,12 +35,12 @@ export default class OBJImage {
 				});
 
 			}
-			else if( type == FileType.MTL ){
+			else if( type == FileType.mtl ){
 
 
 
 			}
-			else if( type == FileType.JSON ){
+			else if( type == FileType.json ){
 
 				ParseJSON(fileData, basePath, ()=>{
 

@@ -43,13 +43,13 @@ var OBJImage = function () {
 
 				var basePath = _this.file.getBasePath();
 
-				if (type == _FileLoader.FileType.IMAGE) {
+				if (type == _FileLoader.FileType.image) {
 
 					(0, _ParseImage2.default)(fileData, basePath, function () {});
-				} else if (type == _FileLoader.FileType.OBJ) {
+				} else if (type == _FileLoader.FileType.obj) {
 
 					(0, _ParseOBJ2.default)(fileData, basePath, function () {});
-				} else if (type == _FileLoader.FileType.MTL) {} else if (type == _FileLoader.FileType.JSON) {
+				} else if (type == _FileLoader.FileType.mtl) {} else if (type == _FileLoader.FileType.json) {
 
 					(0, _ParseJSON2.default)(fileData, basePath, function () {});
 				};
@@ -82,7 +82,112 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":3,"./methods/ParseImage.js":11,"./methods/ParseJSON.js":12,"./methods/ParseOBJ.js":14}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":4,"./methods/ParseImage.js":12,"./methods/ParseJSON.js":13,"./methods/ParseOBJ.js":15}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var LetterLibrary = exports.LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-—_.#0123456789";
+
+var Dictionary = function () {
+	function Dictionary(source) {
+		_classCallCheck(this, Dictionary);
+
+		return this.initialize(source);
+	}
+
+	_createClass(Dictionary, [{
+		key: "initialize",
+		value: function initialize(source) {
+
+			this.letters = new Array();
+
+			if (typeof source == "string") {
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+
+					for (var _iterator = source[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var _letter = _step.value;
+
+
+						this.letters.push(LetterLibrary.indexOf(_letter));
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				;
+			} else if (source instanceof Array) {
+
+				this.letters = source.slice(0);
+			};
+
+			return this;
+		}
+	}, {
+		key: "toString",
+		value: function toString() {
+
+			var string = "";
+
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
+
+			try {
+				for (var _iterator2 = this.letters[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var _letter2 = _step2.value;
+
+
+					string += LetterLibrary[_letter2];
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+
+			;
+
+			return letter;
+		}
+	}]);
+
+	return Dictionary;
+}();
+
+exports.default = Dictionary;
+
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -126,7 +231,7 @@ var Face = function () {
 exports.default = Face;
 ;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -138,11 +243,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var FileType = exports.FileType = {
-	IMAGE: 0,
-	OBJ: 1,
-	MTL: 2,
-	JSON: 3,
-	TEXT: 4
+	image: 0,
+	obj: 1,
+	mtl: 2,
+	json: 3,
+	text: 4
 };
 
 var FileLoader = function () {
@@ -160,22 +265,22 @@ var FileLoader = function () {
 
 			if (/\.(png|jpe?g|gif|bmp)$/.test(this.path)) {
 
-				this.type = FileType.IMAGE;
+				this.type = FileType.image;
 
 				this.content = FileLoader.loadImage.call(this, this.path, onComplete, onFail);
 			} else if (/\.obj$/g.test(this.path)) {
 
-				this.type = FileType.OBJ;
+				this.type = FileType.obj;
 
 				this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 			} else if (/\.mtl$/g.test(this.path)) {
 
-				this.type = FileType.MTL;
+				this.type = FileType.mtl;
 
 				this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
 			} else if (/\.json$/g.test(this.path)) {
 
-				this.type = FileType.JSON;
+				this.type = FileType.json;
 
 				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
 
@@ -206,7 +311,7 @@ FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
 
 	image.addEventListener("load", function () {
 
-		onComplete(image, _this.type || FileType.IMAGE, path);
+		onComplete(image, _this.type || FileType.image, path);
 	}, false);
 
 	image.addEventListener("error", function () {
@@ -245,7 +350,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 	return null;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -255,6 +360,19 @@ Object.defineProperty(exports, "__esModule", {
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChannelType = exports.ChannelType = {
+	rgb: 0,
+	r: 1,
+	g: 2,
+	b: 3
+};
+
+var SideType = exports.SideType = {
+	front: 0,
+	back: 1,
+	double: 2
+};
 
 var Material = function () {
 	function Material(name) {
@@ -271,17 +389,250 @@ var Material = function () {
 
 			this.smooth = true;
 
+			this.illumination = 2;
+
+			this.ambient = {
+				red: 1,
+				green: 1,
+				blue: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.diffuse = {
+				red: 1,
+				green: 1,
+				blue: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
 			this.specular = {
-				force: 1
+				red: 1,
+				green: 1,
+				blue: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.specularForce = {
+				value: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.opacity = {
+				value: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.environement = {
+				reflectivity: 0,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.shader = {
+				side: SideType.front,
+				depthTest: true,
+				depthWrite: true,
+				vertex: null,
+				fragment: null
 			};
 
 			return this;
 		}
 	}, {
+		key: "setSmooth",
+		value: function setSmooth() {
+			var smooth = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+
+			this.smooth = smooth == true || parseInt(smooth) == 1 || smooth == "on" ? true : false;
+
+			return this;
+		}
+	}, {
+		key: "setIllumination",
+		value: function setIllumination() {
+			var illumination = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+
+
+			this.illumination = parseInt(illumination);
+
+			return this;
+		}
+	}, {
+		key: "setAmbientColor",
+		value: function setAmbientColor() {
+			var red = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+			var green = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+			var blue = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
+
+
+			this.ambient.red = parseFloat(red);
+			this.ambient.green = parseFloat(green);
+			this.ambient.blue = parseFloat(blue);
+
+			return this;
+		}
+	}, {
+		key: "setDiffuseColor",
+		value: function setDiffuseColor() {
+			var red = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+			var green = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+			var blue = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
+
+
+			this.diffuse.red = parseFloat(red);
+			this.diffuse.green = parseFloat(green);
+			this.diffuse.blue = parseFloat(blue);
+
+			return this;
+		}
+	}, {
+		key: "setSpecularColor",
+		value: function setSpecularColor() {
+			var red = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+			var green = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+			var blue = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
+
+
+			this.specular.red = parseFloat(red);
+			this.specular.green = parseFloat(green);
+			this.specular.blue = parseFloat(blue);
+
+			return this;
+		}
+	}, {
 		key: "setSpecularForce",
-		value: function setSpecularForce(force) {
+		value: function setSpecularForce() {
+			var force = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+
 
 			this.specular.force = parseFloat(force);
+
+			return this;
+		}
+	}, {
+		key: "setOpacity",
+		value: function setOpacity() {
+			var opacity = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+
+
+			this.opacity.value = opacity;
+
+			return this;
+		}
+	}, {
+		key: "setOpacityTest",
+		value: function setOpacityTest() {
+			var test = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+
+
+			this.opacity.test = test;
+
+			return this;
+		}
+	}, {
+		key: "setEnvironementReflectivity",
+		value: function setEnvironementReflectivity() {
+			var reflectivity = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+
+
+			this.environement.reflectivity = reflectivity;
+
+			return this;
+		}
+	}, {
+		key: "setMap",
+		value: function setMap(map) {
+			var path = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+
+			if (this[map] != undefined) {
+
+				this[map].map = path;
+			};
+
+			return this;
+		}
+	}, {
+		key: "setMapClamp",
+		value: function setMapClamp(map) {
+			var clamp = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+
+			if (this[map] != undefined) {
+
+				this[map].clamp = clamp == true || parseInt(clamp) == 1 || clamp == "on";
+			};
+
+			return this;
+		}
+	}, {
+		key: "setMapChannel",
+		value: function setMapChannel(map) {
+			var channel = arguments.length <= 1 || arguments[1] === undefined ? "rgb" : arguments[1];
+
+
+			if (this[map] != undefined) {
+
+				this[map].channel = ChannelType[channel];
+			};
+
+			return this;
+		}
+	}, {
+		key: "setShaderSide",
+		value: function setShaderSide() {
+			var side = arguments.length <= 0 || arguments[0] === undefined ? "front" : arguments[0];
+
+
+			this.shader.side = side;
+
+			return this;
+		}
+	}, {
+		key: "setShaderDepthTest",
+		value: function setShaderDepthTest() {
+			var depthTest = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+
+			this.shader.depthTest = depthTest == true || parseInt(depthTest) == 1 || depthTest == "on";
+		}
+	}, {
+		key: "setShaderDepthWrite",
+		value: function setShaderDepthWrite() {
+			var depthWrite = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+
+			this.shader.depthWrite = depthWrite == true || parseInt(depthWrite) == 1 || depthWrite == "on";
+		}
+	}, {
+		key: "setShaderVertex",
+		value: function setShaderVertex() {
+			var path = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+
+			this.shader.vertex = path;
+
+			return this;
+		}
+	}, {
+		key: "setShaderFragment",
+		value: function setShaderFragment() {
+			var path = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+
+			this.shader.fragment = path;
 
 			return this;
 		}
@@ -292,7 +643,7 @@ var Material = function () {
 
 exports.default = Material;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -343,6 +694,76 @@ var MaterialLibrary = function () {
 			return this;
 		}
 	}, {
+		key: "addSmooth",
+		value: function addSmooth(smooth) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setSmooth(smooth);
+			} else {
+
+				this.defaultMaterial.setSmooth(smooth);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addIllumination",
+		value: function addIllumination(illumination) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setIllumination(illumination);
+			} else {
+
+				this.defaultMaterial.setIllumination(illumination);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addAmbientColor",
+		value: function addAmbientColor(red, green, blue) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setAmbientColor(red, green, blue);
+			} else {
+
+				this.defaultMaterial.setAmbientColor(red, green, blue);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addDiffuseColor",
+		value: function addDiffuseColor(red, green, blue) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setDiffuseColor(red, green, blue);
+			} else {
+
+				this.defaultMaterial.setDiffuseColor(red, green, blue);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addSpecularColor",
+		value: function addSpecularColor(red, green, blue) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setSpecularColor(red, green, blue);
+			} else {
+
+				this.defaultMaterial.setSpecularColor(red, green, blue);
+			};
+
+			return this;
+		}
+	}, {
 		key: "addSpecularForce",
 		value: function addSpecularForce(force) {
 
@@ -356,6 +777,160 @@ var MaterialLibrary = function () {
 
 			return this;
 		}
+	}, {
+		key: "addOpacity",
+		value: function addOpacity(opacity) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setOpacity(opacity);
+			} else {
+
+				this.defaultMaterial.setOpacity(opacity);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addOpacityTest",
+		value: function addOpacityTest(test) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setOpacityTest(test);
+			} else {
+
+				this.defaultMaterial.setOpacityTest(test);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addEnvironementReflectivity",
+		value: function addEnvironementReflectivity(reflectivity) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setEnvironementReflectivity(reflectivity);
+			} else {
+
+				this.defaultMaterial.setEnvironementReflectivity(reflectivity);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addMap",
+		value: function addMap(map, path) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setMap(map, path);
+			} else {
+
+				this.defaultMaterial.setMap(map, path);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addMapClamp",
+		value: function addMapClamp(map, clamp) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setMapClamp(map, clamp);
+			} else {
+
+				this.defaultMaterial.setMapClamp(map, clamp);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addMapChannel",
+		value: function addMapChannel(map, channel) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setMapChannel(map, channel);
+			} else {
+
+				this.defaultMaterial.setMapChannel(map, channel);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addShaderSide",
+		value: function addShaderSide(side) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setShaderSide(side);
+			} else {
+
+				this.defaultMaterial.setShaderSide(side);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addShaderDepthTest",
+		value: function addShaderDepthTest(depthTest) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setShaderDepthTest(depthTest);
+			} else {
+
+				this.defaultMaterial.setShaderDepthTest(depthTest);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addShaderDepthWrite",
+		value: function addShaderDepthWrite(depthWrite) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setShaderDepthWrite(depthWrite);
+			} else {
+
+				this.defaultMaterial.setShaderDepthWrite(depthWrite);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addShaderVertex",
+		value: function addShaderVertex(path) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setShaderVertex(path);
+			} else {
+
+				this.defaultMaterial.setShaderVertex(path);
+			};
+
+			return this;
+		}
+	}, {
+		key: "addShaderFragment",
+		value: function addShaderFragment(path) {
+
+			if (this.currentMaterial != null) {
+
+				this.currentMaterial.setShaderFragment(path);
+			} else {
+
+				this.defaultMaterial.setShaderFragment(path);
+			};
+
+			return this;
+		}
 	}]);
 
 	return MaterialLibrary;
@@ -363,7 +938,7 @@ var MaterialLibrary = function () {
 
 exports.default = MaterialLibrary;
 
-},{"./Material.js":4}],6:[function(require,module,exports){
+},{"./Material.js":5}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -454,7 +1029,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -622,7 +1197,7 @@ var ModelData = function () {
 exports.default = ModelData;
 ;
 
-},{"./Face.js":2,"./Model.js":6,"./Normal.js":8,"./Texture.js":9,"./Vertex.js":10}],8:[function(require,module,exports){
+},{"./Face.js":3,"./Model.js":7,"./Normal.js":9,"./Texture.js":10,"./Vertex.js":11}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -658,7 +1233,7 @@ var Normal = function () {
 exports.default = Normal;
 ;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -693,7 +1268,7 @@ var Texture = function () {
 exports.default = Texture;
 ;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -729,7 +1304,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -738,7 +1313,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = ParseImage;
 function ParseImage(image, onComplete) {};
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -750,19 +1325,35 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.MapType = undefined;
 exports.default = ParseMTL;
 
 var _MaterialLibrary = require("../components/MaterialLibrary.js");
 
 var _MaterialLibrary2 = _interopRequireDefault(_MaterialLibrary);
 
+var _Dictionary = require("../components/Dictionary.js");
+
+var _Dictionary2 = _interopRequireDefault(_Dictionary);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MapType = exports.MapType = {
+	map_ka: "ambient",
+	map_kd: "diffuse",
+	map_ks: "specular",
+	map_ns: "specularForce",
+	map_kn: "normal",
+	map_ke: "environement",
+	map_bump: "bump",
+	map_d: "opacity"
+};
 
 function ParseMTL(mtl, basePath, onComplete) {
 
@@ -779,16 +1370,75 @@ function ParseMTL(mtl, basePath, onComplete) {
 		if (type == "newmtl") {
 
 			materialLibrary.addMaterial(info[1]);
+		} else if (type == "s") {
+
+			materialLibrary.addSmooth(info[1]);
+		} else if (type == "illum") {
+
+			materialLibrary.addIllumination(info[1]);
+		} else if (type == "ka") {
+
+			materialLibrary.addAmbientColor(info[1], info[2], info[3]);
+		} else if (type == "kd") {
+
+			materialLibrary.addDiffuseColor(info[1], info[2], info[3]);
+		} else if (type == "ks") {
+
+			materialLibrary.addSpecularColor(info[1], info[2], info[3]);
 		} else if (type == "ns") {
 
 			materialLibrary.addSpecularForce(info[1]);
+		} else if (type == "d") {
+
+			materialLibrary.addOpacity(info[1]);
+		} else if (type == "ne") {
+
+			materialLibrary.addEnvionementReflectivity(info[1]);
+		} else if (type.substr(0, 3) == "map") {
+
+			var mapType = MapType[type];
+
+			var path = info.pop();
+
+			materialLibrary.addMap(mapType, path);
+
+			for (var optionIndex = 1, length = info.length; optionIndex < length; optionIndex++) {
+
+				var option = info[optionIndex];
+
+				if (option == "-clamp") {
+
+					materialLibrary.addMapClamp(mapType, info[++optionIndex]);
+				} else if (option == "-imfchan") {
+
+					materialLibrary.addMapChannel(mapType, info[++optionIndex]);
+				} else if (option == "-test") {
+
+					materialLibrary.addOpacityTest(info[++optionIndex]);
+				};
+			};
+		} else if (type == "shader_s") {
+
+			materialLibrary.addShaderSide(info[1]);
+		} else if (type == "shader_dt") {
+
+			materialLibrary.addShaderDepthTest(info[1]);
+		} else if (type == "shader_dw") {
+
+			materialLibrary.addShaderDepthWrite(info[1]);
+		} else if (type == "shader_v") {
+
+			materialLibrary.addShaderVertex(info[1]);
+		} else if (type == "shader_f") {
+
+			materialLibrary.addShaderFragment(info[1]);
 		};
 	});
 
 	onComplete(materialLibrary);
 };
 
-},{"../components/MaterialLibrary.js":5}],14:[function(require,module,exports){
+},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":6}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -903,5 +1553,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":3,"../components/MaterialLibrary.js":5,"../components/ModelData.js":7,"./ParseMTL.js":13}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelData.js":8,"./ParseMTL.js":14}]},{},[1])(1)
 });
