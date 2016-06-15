@@ -694,6 +694,43 @@ var MaterialLibrary = function () {
 			return this;
 		}
 	}, {
+		key: "getMaterial",
+		value: function getMaterial(name) {
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+
+				for (var _iterator = this.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var material = _step.value;
+
+
+					if (material.name == name) {
+
+						return material;
+					};
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+
+			;
+
+			return null;
+		}
+	}, {
 		key: "addSmooth",
 		value: function addSmooth(smooth) {
 
@@ -960,15 +997,34 @@ var Model = function () {
 		key: "initialize",
 		value: function initialize(name) {
 
+			this.groups = new Array();
+
+			this.addGroup(null, true);
+
+			this.groups[this.groups.length - 1].default = true;
+
 			this.setName(name);
 
-			this.vertices = new Array();
+			return this;
+		}
+	}, {
+		key: "addGroup",
+		value: function addGroup(name) {
 
-			this.normals = new Array();
+			if (this.groups[this.groups.length - 1] && this.groups[this.groups.length - 1].default == true) {
 
-			this.textures = new Array();
+				delete this.groups[this.groups.length - 1].default;
 
-			this.faces = new Array();
+				this.setName(name);
+			} else {
+
+				this.groups.push({
+					vertices: new Array(),
+					normals: new Array(),
+					textures: new Array(),
+					faces: new Array()
+				});
+			};
 
 			return this;
 		}
@@ -978,7 +1034,7 @@ var Model = function () {
 			var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
 
-			this.name = name;
+			this.groups[this.groups.length - 1].name = name;
 
 			return this;
 		}
@@ -986,7 +1042,7 @@ var Model = function () {
 		key: "addVertex",
 		value: function addVertex(index) {
 
-			this.vertices.push(index);
+			this.groups[this.groups.length - 1].vertices.push(index);
 
 			return this;
 		}
@@ -994,7 +1050,7 @@ var Model = function () {
 		key: "addNormal",
 		value: function addNormal(index) {
 
-			this.normals.push(index);
+			this.groups[this.groups.length - 1].normals.push(index);
 
 			return this;
 		}
@@ -1002,7 +1058,7 @@ var Model = function () {
 		key: "addTexture",
 		value: function addTexture(index) {
 
-			this.textures.push(index);
+			this.groups[this.groups.length - 1].textures.push(index);
 
 			return this;
 		}
@@ -1010,7 +1066,7 @@ var Model = function () {
 		key: "addFace",
 		value: function addFace(index) {
 
-			this.faces.push(index);
+			this.groups[this.groups.length - 1].faces.push(index);
 
 			return this;
 		}
@@ -1018,7 +1074,7 @@ var Model = function () {
 		key: "setMaterial",
 		value: function setMaterial(name) {
 
-			this.material = name;
+			this.groups[this.groups.length - 1].material = name;
 
 			return this;
 		}
@@ -1062,14 +1118,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ModelData = function () {
-	function ModelData() {
-		_classCallCheck(this, ModelData);
+var ModelLibrary = function () {
+	function ModelLibrary() {
+		_classCallCheck(this, ModelLibrary);
 
 		return this.initialize();
 	}
 
-	_createClass(ModelData, [{
+	_createClass(ModelLibrary, [{
 		key: "initialize",
 		value: function initialize() {
 
@@ -1100,6 +1156,20 @@ var ModelData = function () {
 			this.currentObject = object;
 
 			this.objects.push(object);
+
+			return this;
+		}
+	}, {
+		key: "addGroup",
+		value: function addGroup(name) {
+
+			if (this.currentObject != null) {
+
+				this.currentObject.addGroup(name);
+			} else {
+
+				this.defaultObject.addGroup(name);
+			};
 
 			return this;
 		}
@@ -1191,10 +1261,10 @@ var ModelData = function () {
 		}
 	}]);
 
-	return ModelData;
+	return ModelLibrary;
 }();
 
-exports.default = ModelData;
+exports.default = ModelLibrary;
 ;
 
 },{"./Face.js":3,"./Model.js":7,"./Normal.js":9,"./Texture.js":10,"./Vertex.js":11}],9:[function(require,module,exports){
@@ -1450,9 +1520,9 @@ var _ParseMTL = require("./ParseMTL.js");
 
 var _ParseMTL2 = _interopRequireDefault(_ParseMTL);
 
-var _ModelData = require("../components/ModelData.js");
+var _ModelLibrary = require("../components/ModelLibrary.js");
 
-var _ModelData2 = _interopRequireDefault(_ModelData);
+var _ModelLibrary2 = _interopRequireDefault(_ModelLibrary);
 
 var _FileLoader = require("../components/FileLoader.js");
 
@@ -1466,7 +1536,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function ParseOBJ(obj, basePath, onComplete) {
 
-	var model = new _ModelData2.default();
+	var model = new _ModelLibrary2.default();
 
 	var parseOBJComplete = false;
 	var parseMTLComplete = true;
@@ -1480,6 +1550,9 @@ function ParseOBJ(obj, basePath, onComplete) {
 		if (type == "o") {
 
 			model.addObject(info[1]);
+		} else if (type == "g") {
+
+			model.addGroup(info[1]);
 		} else if (type == "v") {
 
 			var x = info[1];
@@ -1553,5 +1626,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelData.js":8,"./ParseMTL.js":14}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":14}]},{},[1])(1)
 });

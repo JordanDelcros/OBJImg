@@ -6,57 +6,78 @@ export default class Model {
 	}
 	initialize( name ){
 
+		this.groups = new Array();
+
+		this.addGroup(null, true);
+
+		this.groups[this.groups.length - 1].default = true;
+
 		this.setName(name);
 
-		this.vertices = new Array();
+		return this;
 
-		this.normals = new Array();
+	}
+	addGroup( name ){
 
-		this.textures = new Array();
+		if( this.groups[this.groups.length - 1] && this.groups[this.groups.length - 1].default == true ){
 
-		this.faces = new Array();
+			delete this.groups[this.groups.length - 1].default;
+
+			this.setName(name);
+
+		}
+		else {
+
+			this.groups.push({
+				vertices: new Array(),
+				normals: new Array(),
+				textures: new Array(),
+				faces: new Array()
+			});
+
+		};
 
 		return this;
 
 	}
 	setName( name = null ){
 
-		this.name = name;
+		this.groups[this.groups.length - 1].name = name;
 
 		return this;
 
 	}
 	addVertex( index ){
 
-		this.vertices.push(index);
+		this.groups[this.groups.length - 1].vertices.push(index);
 
 		return this;
 
 	}
 	addNormal( index ){
 
-		this.normals.push(index);
+		this.groups[this.groups.length - 1].normals.push(index);
 
 		return this;
 
 	}
 	addTexture( index ){
 
-		this.textures.push(index);
+		this.groups[this.groups.length - 1].textures.push(index);
 
 		return this;
 
 	}
 	addFace( index ){
 
-		this.faces.push(index);
+		this.groups[this.groups.length - 1].faces.push(index);
 
 		return this;
 
 	}
 	setMaterial( name ){
 
-		this.material = name;
+		this.groups[this.groups.length - 1].material = name;
 
 		return this;
 

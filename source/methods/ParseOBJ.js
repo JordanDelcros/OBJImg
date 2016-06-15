@@ -1,11 +1,11 @@
 import ParseMTL from "./ParseMTL.js";
-import ModelData from "../components/ModelData.js";
+import ModelLibrary from "../components/ModelLibrary.js";
 import FileLoader from "../components/FileLoader.js";
 import MaterialLibrary from "../components/MaterialLibrary.js";
 
 export default function ParseOBJ( obj, basePath, onComplete ){
 
-	var model = new ModelData();
+	var model = new ModelLibrary();
 
 	var parseOBJComplete = false;
 	var parseMTLComplete = true;
@@ -19,6 +19,11 @@ export default function ParseOBJ( obj, basePath, onComplete ){
 		if( type == "o" ){
 
 			model.addObject(info[1]);
+
+		}
+		else if( type == "g" ){
+
+			model.addGroup(info[1]);
 
 		}
 		else if( type == "v" ){

@@ -4,7 +4,7 @@ import Normal from "./Normal.js";
 import Texture from "./Texture.js";
 import Face from "./Face.js";
 
-export default class ModelData {
+export default class ModelLibrary {
 	constructor(){
 
 		return this.initialize();
@@ -38,6 +38,22 @@ export default class ModelData {
 		this.currentObject = object;
 
 		this.objects.push(object);
+
+		return this;
+
+	}
+	addGroup( name ){
+
+		if( this.currentObject != null ){
+
+			this.currentObject.addGroup(name);
+
+		}
+		else {
+
+			this.defaultObject.addGroup(name);
+
+		};
 
 		return this;
 

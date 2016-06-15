@@ -30,6 +30,21 @@ export default class MaterialLibrary {
 		return this;
 
 	}
+	getMaterial( name ){
+
+		for( let material of this.materials ){
+
+			if( material.name == name ){
+
+				return material;
+
+			};
+
+		};
+
+		return null;
+
+	}
 	addSmooth( smooth ){
 
 		if( this.currentMaterial != null ){
