@@ -710,39 +710,45 @@ var MaterialLibrary = function () {
 	}, {
 		key: "getMaterial",
 		value: function getMaterial(name) {
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
 
-			try {
+			if (typeof name == "string") {
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
 
-				for (var _iterator = this.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var material = _step.value;
-
-
-					if (material.name == name) {
-
-						return material;
-					};
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
 				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
+
+					for (var _iterator = this.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var material = _step.value;
+
+
+						if (material.name == name) {
+
+							return material;
+						};
 					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
 				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
 					}
 				}
-			}
 
-			;
+				;
+			} else if (typeof name == "number") {
 
-			return null;
+				return this.materials[name];
+			};
+
+			return undefined;
 		}
 	}, {
 		key: "addSmooth",
@@ -942,6 +948,51 @@ var Model = function () {
 			return this;
 		}
 	}, {
+		key: "getGroup",
+		value: function getGroup() {
+			var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+
+			if (typeof name == "string") {
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+
+					for (var _iterator = this.groups[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var group = _step.value;
+
+
+						if (group.name == name) {
+
+							return group;
+						};
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				;
+			} else if (typeof name == "number") {
+
+				return this.groups[name];
+			};
+
+			return undefined;
+		}
+	}, {
 		key: "setName",
 		value: function setName() {
 			var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
@@ -1042,12 +1093,6 @@ var ModelLibrary = function () {
 		key: "initialize",
 		value: function initialize() {
 
-			this.defaultObject = new _Model2.default("default");
-
-			this.currentObject = null;
-
-			this.materialLibrary = null;
-
 			this.objects = new Array();
 
 			this.vertices = new Array();
@@ -1058,31 +1103,78 @@ var ModelLibrary = function () {
 
 			this.faces = new Array();
 
+			this.materialLibrary = null;
+
+			this.addObject(null);
+
+			this.objects[this.objects.length - 1].default = true;
+
 			return this;
 		}
 	}, {
 		key: "addObject",
 		value: function addObject(name) {
 
-			var object = new _Model2.default(name);
+			if (this.objects[this.objects.length - 1] && this.objects[this.objects.length - 1].default == true) {
 
-			this.currentObject = object;
+				delete this.objects[this.objects.length - 1].default;
 
-			this.objects.push(object);
+				this.objects[this.objects.length - 1].setName(name);
+			} else {
+
+				this.objects.push(new _Model2.default(name));
+			};
 
 			return this;
+		}
+	}, {
+		key: "getObject",
+		value: function getObject(name) {
+
+			if (typeof name == "string") {
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+
+					for (var _iterator = this.objects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var object = _step.value;
+
+
+						if (object.name == name) {
+
+							return object;
+						};
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				;
+			} else if (typeof name == "number") {
+
+				return this.objects[name];
+			};
+
+			return undefined;
 		}
 	}, {
 		key: "addGroup",
 		value: function addGroup(name) {
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addGroup(name);
-			} else {
-
-				this.defaultObject.addGroup(name);
-			};
+			this.objects[this.objects.length - 1].addGroup(name);
 
 			return this;
 		}
@@ -1092,13 +1184,7 @@ var ModelLibrary = function () {
 
 			var index = this.vertices.push(new _Vertex2.default(x, y, z)) - 1;
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addVertex(index);
-			} else {
-
-				this.defaultObject.addVertex(index);
-			};
+			this.objects[this.objects.length - 1].addVertex(index);
 
 			return this;
 		}
@@ -1108,13 +1194,7 @@ var ModelLibrary = function () {
 
 			var index = this.normals.push(new _Normal2.default(x, y, z)) - 1;
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addNormal(index);
-			} else {
-
-				this.defaultObject.addNormal(index);
-			};
+			this.objects[this.objects.length - 1].addNormal(index);
 
 			return this;
 		}
@@ -1124,13 +1204,7 @@ var ModelLibrary = function () {
 
 			var index = this.textures.push(new _Texture2.default(u, v)) - 1;
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addTexture(index);
-			} else {
-
-				this.defaultObject.addTexture(index);
-			};
+			this.objects[this.objects.length - 1].addTexture(index);
 
 			return this;
 		}
@@ -1140,13 +1214,7 @@ var ModelLibrary = function () {
 
 			var index = this.faces.push(new _Face2.default(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC)) - 1;
 
-			if (this.currentObject != null) {
-
-				this.currentObject.addFace(index);
-			} else {
-
-				this.defaultObject.addFace(index);
-			};
+			this.objects[this.objects.length - 1].addFace(index);
 
 			return this;
 		}
@@ -1162,13 +1230,7 @@ var ModelLibrary = function () {
 		key: "addMaterial",
 		value: function addMaterial(name) {
 
-			if (this.currentObject != null) {
-
-				this.currentObject.setMaterial(name);
-			} else {
-
-				this.defaultObject.setMaterial(name);
-			};
+			this.objects[this.objects.length - 1].setMaterial(name);
 
 			return this;
 		}

@@ -40,6 +40,31 @@ export default class Model {
 		return this;
 
 	}
+	getGroup( name = null ){
+
+		if( typeof name == "string" ){
+
+			for( let group of this.groups ){
+
+				if( group.name == name ){
+
+					return group;
+
+				};
+
+			};
+			
+		}
+		else if( typeof name == "number" ){
+
+			return this.groups[name];
+
+		};
+
+		return undefined;
+
+
+	}
 	setName( name = null ){
 
 		this.groups[this.groups.length - 1].name = name;

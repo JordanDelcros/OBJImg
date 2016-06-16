@@ -39,17 +39,26 @@ export default class MaterialLibrary {
 	}
 	getMaterial( name ){
 
-		for( let material of this.materials ){
+		if( typeof name == "string" ){
 
-			if( material.name == name ){
+			for( let material of this.materials ){
 
-				return material;
+				if( material.name == name ){
+
+					return material;
+
+				};
 
 			};
 
+		}
+		else if( typeof name == "number" ){
+
+			return this.materials[name];
+
 		};
 
-		return null;
+		return undefined;
 
 	}
 	addSmooth( smooth ){
