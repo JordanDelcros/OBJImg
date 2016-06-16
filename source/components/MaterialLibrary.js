@@ -10,22 +10,29 @@ export default class MaterialLibrary {
 	}
 	initialize(){
 
-		this.defaultMaterial = new Material("default");
-
-		this.currentMaterial = null;
-
 		this.materials = new Array();
+
+		this.addMaterial(null);
+
+		this.materials[this.materials.length - 1].default = true;
 
 		return this;
 
 	}
 	addMaterial( name ){
 
-		var material = new Material(name);
+		if( this.materials[this.materials.length - 1] && this.materials[this.materials.length - 1].default == true ){
 
-		this.currentMaterial = material;
+			delete this.materials[this.materials.length - 1].default;
 
-		this.materials.push(material);
+			this.materials[this.materials.length - 1].setName(name);
+
+		}
+		else {
+
+			this.materials.push(new Material(name));
+
+		};
 
 		return this;
 
@@ -47,274 +54,121 @@ export default class MaterialLibrary {
 	}
 	addSmooth( smooth ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setSmooth(smooth);
-
-		}
-		else {
-
-			this.defaultMaterial.setSmooth(smooth);
-
-		};
+		this.materials[this.materials.length - 1].setSmooth(smooth);
 
 		return this;
 
 	}
 	addIllumination( illumination ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setIllumination(illumination);
-
-		}
-		else {
-
-			this.defaultMaterial.setIllumination(illumination);
-
-		};
+		this.materials[this.materials.length - 1].setIllumination(illumination);
 
 		return this;
 
 	}
 	addAmbientColor( red, green, blue ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setAmbientColor(red, green, blue);
-
-		}
-		else {
-
-			this.defaultMaterial.setAmbientColor(red, green, blue);
-
-		};
+		this.materials[this.materials.length - 1].setAmbientColor(red, green, blue);
 
 		return this;
 
 	}
 	addDiffuseColor( red, green, blue ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setDiffuseColor(red, green, blue);
-
-		}
-		else {
-
-			this.defaultMaterial.setDiffuseColor(red, green, blue);
-
-		};
+		this.materials[this.materials.length - 1].setDiffuseColor(red, green, blue);
 
 		return this;
 
 	}
 	addSpecularColor( red, green, blue ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setSpecularColor(red, green, blue);
-
-		}
-		else {
-
-			this.defaultMaterial.setSpecularColor(red, green, blue);
-
-		};
+		this.materials[this.materials.length - 1].setSpecularColor(red, green, blue);
 
 		return this;
 
 	}
 	addSpecularForce( force ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setSpecularForce(force);
-
-		}
-		else {
-
-			this.defaultMaterial.setSpecularForce(force);
-
-		};
+		this.materials[this.materials.length - 1].setSpecularForce(force);
 
 		return this;
 
 	}
 	addOpacity( opacity ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setOpacity(opacity);
-
-		}
-		else {
-
-			this.defaultMaterial.setOpacity(opacity);
-
-		};
+		this.materials[this.materials.length - 1].setOpacity(opacity);
 
 		return this;
 
 	}
 	addOpacityTest( test ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setOpacityTest(test);
-
-		}
-		else {
-
-			this.defaultMaterial.setOpacityTest(test);
-
-		};
+		this.materials[this.materials.length - 1].setOpacityTest(test);
 
 		return this;
 
 	}
 	addEnvironementReflectivity( reflectivity ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setEnvironementReflectivity(reflectivity);
-
-		}
-		else {
-
-			this.defaultMaterial.setEnvironementReflectivity(reflectivity);
-
-		};
+		this.materials[this.materials.length - 1].setEnvironementReflectivity(reflectivity);
 
 		return this;
 
 	}
 	addMap( map, path ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setMap(map, path);
-
-		}
-		else {
-
-			this.defaultMaterial.setMap(map, path);
-
-		};
+		this.materials[this.materials.length - 1].setMap(map, path);
 
 		return this;
 
 	}
 	addMapClamp( map, clamp ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setMapClamp(map, clamp);
-
-		}
-		else {
-
-			this.defaultMaterial.setMapClamp(map, clamp);
-
-		};
+		this.materials[this.materials.length - 1].setMapClamp(map, clamp);
 
 		return this;
 
 	}
 	addMapChannel( map, channel ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setMapChannel(map, channel);
-
-		}
-		else {
-
-			this.defaultMaterial.setMapChannel(map, channel);
-
-		};
+		this.materials[this.materials.length - 1].setMapChannel(map, channel);
 
 		return this;
 
 	}
 	addShaderSide( side ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setShaderSide(side);
-
-		}
-		else {
-
-			this.defaultMaterial.setShaderSide(side);
-
-		};
+		this.materials[this.materials.length - 1].setShaderSide(side);
 
 		return this;
 
 	}
 	addShaderDepthTest( depthTest ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setShaderDepthTest(depthTest);
-
-		}
-		else {
-
-			this.defaultMaterial.setShaderDepthTest(depthTest);
-
-		};
+		this.materials[this.materials.length - 1].setShaderDepthTest(depthTest);
 
 		return this;
 
 	}
 	addShaderDepthWrite( depthWrite ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setShaderDepthWrite(depthWrite);
-
-		}
-		else {
-
-			this.defaultMaterial.setShaderDepthWrite(depthWrite);
-
-		};
+		this.materials[this.materials.length - 1].setShaderDepthWrite(depthWrite);
 
 		return this;
 
 	}
 	addShaderVertex( path ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setShaderVertex(path);
-
-		}
-		else {
-
-			this.defaultMaterial.setShaderVertex(path);
-
-		};
+		this.materials[this.materials.length - 1].setShaderVertex(path);
 
 		return this;
 
 	}
 	addShaderFragment( path ){
 
-		if( this.currentMaterial != null ){
-
-			this.currentMaterial.setShaderFragment(path);
-
-		}
-		else {
-
-			this.defaultMaterial.setShaderFragment(path);
-
-		};
+		this.materials[this.materials.length - 1].setShaderFragment(path);
 
 		return this;
 
 	}
-}
+};

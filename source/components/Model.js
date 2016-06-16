@@ -8,7 +8,7 @@ export default class Model {
 
 		this.groups = new Array();
 
-		this.addGroup(null, true);
+		this.addGroup(null);
 
 		this.groups[this.groups.length - 1].default = true;
 

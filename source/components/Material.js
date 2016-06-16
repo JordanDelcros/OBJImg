@@ -19,11 +19,11 @@ export default class Material {
 	}
 	initialize( name ){
 
-		this.name = name;
+		this.setName(name);
 
-		this.smooth = true;
+		this.setSmooth(true);
 
-		this.illumination = 2;
+		this.setIllumination(2);
 
 		this.ambient = {
 			red: 1,
@@ -80,6 +80,13 @@ export default class Material {
 			vertex: null,
 			fragment: null
 		};
+
+		return this;
+
+	}
+	setName( name = null ){
+
+		this.name = name;
 
 		return this;
 
