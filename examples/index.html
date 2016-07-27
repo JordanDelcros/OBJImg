@@ -3,18 +3,64 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>OBJimage</title>
+	<style type="text/css">
+
+		* {
+			margin: 0;
+			border: 0;
+			outline: 0;
+		}
+
+	</style>
+	<script type="text/javascript" src="../node_modules/three-js/three.js"></script>
 	<script type="text/javascript" src="../build/objimage.js"></script>
 	<script type="text/javascript">
 
 		document.addEventListener("DOMContentLoaded", function(){
 
-			new OBJImage("models/lara/lara.obj", {
-				onLoad: function( data ){
+			var renderer = new THREE.WebGLRenderer({
+				antialias: true
+			});
 
-					console.log("ON LOAD", data);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setPixelRatio(window.devicePixelRatio);
+
+			document.body.appendChild(renderer.domElement);
+
+			var scene = new THREE.Scene();
+
+			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+			// MAGIC THINGS
+
+			OBJImage.defineTHREE(THREE);
+
+			new OBJImage("models/cube/cube.obj", {
+				onLoad: function( file ){
+
+					console.log("ON LOAD", file);
+
+				},
+				onParse: function( modelLibrary ){
+
+					new OBJImage.MeshGenerator(modelLibrary);
+
+					console.log("ON PARSE", modelLibrary);
 
 				}
 			});
+
+			//
+
+			function update(){
+
+				window.requestAnimationFrame(update);
+
+				renderer.render(scene, camera);
+
+			};
+
+			window.requestAnimationFrame(update);
 
 		}, false);
 

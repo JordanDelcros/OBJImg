@@ -7,34 +7,56 @@ export const FileType = {
 };
 
 export default class FileLoader {
-	constructor( path, onComplete, onFail ){
+	constructor( path ){
 
-		return this.initialize(path, onComplete, onFail);
+		return this.initialize(path);
 
 	}
-	initialize( path, onComplete, onFail ){
+	initialize( path ){
 
 		this.path = path;
+
+		this.basePath = this.path.split(/\//).slice(0, -1).join("/");
+
+		this.data = null;
 
 		if( /\.(png|jpe?g|gif|bmp)$/.test(this.path) ){
 
 			this.type = FileType.image;
 
-			this.content = FileLoader.loadImage.call(this, this.path, onComplete, onFail);
+			this.content = FileLoader.loadImage.call(this, this.path, ( data, type )=>{
+
+				this.data = data;
+
+				this.completeHandler(this);
+
+			}, this.errorHandler);
 
 		}
 		else if( /\.obj$/g.test(this.path) ){
 
 			this.type = FileType.obj;
 
-			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
+			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+
+				this.data = data;
+
+				this.completeHandler(this);
+
+			}, this.errorHandler);
 
 		}
 		else if( /\.mtl$/g.test(this.path) ){
 
 			this.type = FileType.mtl;
 
-			this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
+			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+
+				this.data = data;
+
+				this.completeHandler(this);
+
+			}, this.errorHandler);
 
 		}
 		else if( /\.json$/g.test(this.path) ){
@@ -43,18 +65,37 @@ export default class FileLoader {
 
 			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
 
-				onComplete(JSON.parse(data), type, path);
+				this.data = JSON.parse(data);
 
-			}, onFail);
+				this.completeHandler(this);
+
+			}, this.errorHandler);
 
 		};
 
 		return this;
 
 	}
-	getBasePath(){
+	catch( callback ){
 
-		return this.path.split(/\//).slice(0, -1).join("/");
+		this.errorHandler = callback || function( error ){
+
+			throw error;
+
+		};
+
+		return this;
+
+	}
+	then( callback ){
+
+		this.completeHandler = callback || function( file ){
+
+			console.info("OBJImage — FileLoader", file);
+
+		};
+
+		return this;
 
 	}
 };

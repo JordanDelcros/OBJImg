@@ -4,6 +4,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.THREE = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -23,9 +24,15 @@ var _ParseJSON = require("./methods/ParseJSON.js");
 
 var _ParseJSON2 = _interopRequireDefault(_ParseJSON);
 
+var _MeshGenerator = require("./tools/MeshGenerator.js");
+
+var _MeshGenerator2 = _interopRequireDefault(_MeshGenerator);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var THREE = exports.THREE = null;
 
 var OBJImage = function () {
 	function OBJImage(path, options) {
@@ -37,23 +44,31 @@ var OBJImage = function () {
 	_createClass(OBJImage, [{
 		key: "initialize",
 		value: function initialize(path, options) {
-			var _this = this;
 
-			this.file = new _FileLoader2.default(path, function (fileData, type, path) {
+			new _FileLoader2.default(path).then(function (file) {
 
-				var basePath = _this.file.getBasePath();
+				if (options.onLoad instanceof Function) {
 
-				if (type == _FileLoader.FileType.image) {
-
-					(0, _ParseImage2.default)(fileData, basePath, function () {});
-				} else if (type == _FileLoader.FileType.obj) {
-
-					(0, _ParseOBJ2.default)(fileData, basePath, function () {});
-				} else if (type == _FileLoader.FileType.mtl) {} else if (type == _FileLoader.FileType.json) {
-
-					(0, _ParseJSON2.default)(fileData, basePath, function () {});
+					options.onLoad(file);
 				};
-			}, function (error) {
+
+				if (file.type == _FileLoader.FileType.image) {
+
+					(0, _ParseImage2.default)(file.data, file.basePath, function () {});
+				} else if (file.type == _FileLoader.FileType.obj) {
+
+					(0, _ParseOBJ2.default)(file.data, file.basePath, function (modelLibrary) {
+
+						if (options.onParse instanceof Function) {
+
+							options.onParse(modelLibrary);
+						};
+					});
+				} else if (file.type == _FileLoader.FileType.mtl) {} else if (file.type == _FileLoader.FileType.json) {
+
+					(0, _ParseJSON2.default)(file.data, file.basePath, function () {});
+				};
+			}).catch(function (error) {
 
 				console.log("NOOOO", error);
 			});
@@ -67,6 +82,15 @@ var OBJImage = function () {
 
 exports.default = OBJImage;
 
+
+OBJImage.defineTHREE = function (THREELibrary) {
+
+	console.log("define three", THREELibrary);
+
+	exports.THREE = THREE = THREELibrary;
+};
+
+OBJImage.MeshGenerator = _MeshGenerator2.default;
 
 if (typeof define !== "undefined" && define instanceof Function && define.amd !== undefined) {
 
@@ -82,7 +106,7 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":4,"./methods/ParseImage.js":12,"./methods/ParseJSON.js":13,"./methods/ParseOBJ.js":15}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":4,"./methods/ParseImage.js":12,"./methods/ParseJSON.js":13,"./methods/ParseOBJ.js":15,"./tools/MeshGenerator.js":16}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -251,50 +275,88 @@ var FileType = exports.FileType = {
 };
 
 var FileLoader = function () {
-	function FileLoader(path, onComplete, onFail) {
+	function FileLoader(path) {
 		_classCallCheck(this, FileLoader);
 
-		return this.initialize(path, onComplete, onFail);
+		return this.initialize(path);
 	}
 
 	_createClass(FileLoader, [{
 		key: "initialize",
-		value: function initialize(path, onComplete, onFail) {
+		value: function initialize(path) {
+			var _this = this;
 
 			this.path = path;
+
+			this.basePath = this.path.split(/\//).slice(0, -1).join("/");
+
+			this.data = null;
 
 			if (/\.(png|jpe?g|gif|bmp)$/.test(this.path)) {
 
 				this.type = FileType.image;
 
-				this.content = FileLoader.loadImage.call(this, this.path, onComplete, onFail);
+				this.content = FileLoader.loadImage.call(this, this.path, function (data, type) {
+
+					_this.data = data;
+
+					_this.completeHandler(_this);
+				}, this.errorHandler);
 			} else if (/\.obj$/g.test(this.path)) {
 
 				this.type = FileType.obj;
 
-				this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
+				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
+
+					_this.data = data;
+
+					_this.completeHandler(_this);
+				}, this.errorHandler);
 			} else if (/\.mtl$/g.test(this.path)) {
 
 				this.type = FileType.mtl;
 
-				this.content = FileLoader.loadText.call(this, this.path, onComplete, onFail);
+				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
+
+					_this.data = data;
+
+					_this.completeHandler(_this);
+				}, this.errorHandler);
 			} else if (/\.json$/g.test(this.path)) {
 
 				this.type = FileType.json;
 
 				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
 
-					onComplete(JSON.parse(data), type, path);
-				}, onFail);
+					_this.data = JSON.parse(data);
+
+					_this.completeHandler(_this);
+				}, this.errorHandler);
 			};
 
 			return this;
 		}
 	}, {
-		key: "getBasePath",
-		value: function getBasePath() {
+		key: "catch",
+		value: function _catch(callback) {
 
-			return this.path.split(/\//).slice(0, -1).join("/");
+			this.errorHandler = callback || function (error) {
+
+				throw error;
+			};
+
+			return this;
+		}
+	}, {
+		key: "then",
+		value: function then(callback) {
+
+			this.completeHandler = callback || function (file) {
+
+				console.info("OBJImage — FileLoader", file);
+			};
+
+			return this;
 		}
 	}]);
 
@@ -305,13 +367,13 @@ exports.default = FileLoader;
 ;
 
 FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
-	var _this = this;
+	var _this2 = this;
 
 	var image = new Image();
 
 	image.addEventListener("load", function () {
 
-		onComplete(image, _this.type || FileType.image, path);
+		onComplete(image, _this2.type || FileType.image, path);
 	}, false);
 
 	image.addEventListener("error", function () {
@@ -325,7 +387,7 @@ FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
 };
 
 FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
-	var _this2 = this;
+	var _this3 = this;
 
 	var request = new XMLHttpRequest();
 
@@ -335,7 +397,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 
 			if (event.target.status >= 200 && event.target.status < 400) {
 
-				onComplete(event.target.responseText, _this2.type || FileType.TEXT, path);
+				onComplete(event.target.responseText, _this3.type || FileType.TEXT, path);
 			} else if (event.target.status >= 400) {
 
 				onFail();
@@ -1597,9 +1659,45 @@ function ParseOBJ(obj, basePath, onComplete) {
 
 	if (parseOBJComplete == true && parseMTLComplete == true) {
 
-		console.log("FINISH", model);
+		onComplete(model);
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":14}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":14}],16:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _OBJImage = require("../OBJImage.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MeshGenerator = function () {
+	function MeshGenerator(modelLibrary) {
+		_classCallCheck(this, MeshGenerator);
+
+		return this.initialize(modelLibrary);
+	}
+
+	_createClass(MeshGenerator, [{
+		key: "initialize",
+		value: function initialize(modelLibrary) {
+
+			console.warn(_OBJImage.THREE);
+
+			return this;
+		}
+	}]);
+
+	return MeshGenerator;
+}();
+
+exports.default = MeshGenerator;
+;
+
+},{"../OBJImage.js":1}]},{},[1])(1)
 });

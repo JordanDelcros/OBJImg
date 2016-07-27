@@ -5,6 +5,10 @@ import ParseImage from "./methods/ParseImage.js";
 import ParseOBJ from "./methods/ParseOBJ.js";
 import ParseJSON from "./methods/ParseJSON.js";
 
+import MeshGenerator from "./tools/MeshGenerator.js";
+
+export var THREE = null;
+
 export default class OBJImage {
 	constructor( path, options ){
 
@@ -13,53 +17,74 @@ export default class OBJImage {
 	}
 	initialize( path, options ){
 
-		this.file = new FileLoader(path, ( fileData, type, path )=>{
+		new FileLoader(path)
+			.then(( file )=>{
 
-			var basePath = this.file.getBasePath();
+				if( options.onLoad instanceof Function ){
 
-			if( type == FileType.image ){
+					options.onLoad(file);
 
-				ParseImage(fileData, basePath, ()=>{
+				};
 
-					
+				if( file.type == FileType.image ){
 
-				});
+					ParseImage(file.data, file.basePath, ()=>{
 
-			}
-			else if( type == FileType.obj ){
+						
 
-				ParseOBJ(fileData, basePath, ()=>{
+					});
 
+				}
+				else if( file.type == FileType.obj ){
 
+					ParseOBJ(file.data, file.basePath, ( modelLibrary )=>{
 
-				});
+						if( options.onParse instanceof Function ){
 
-			}
-			else if( type == FileType.mtl ){
-
-
-
-			}
-			else if( type == FileType.json ){
-
-				ParseJSON(fileData, basePath, ()=>{
+							options.onParse(modelLibrary);
 
 
+						};
 
-				});
+					});
 
-			};
+				}
+				else if( file.type == FileType.mtl ){
 
-		}, ( error )=>{
 
-			console.log("NOOOO", error);
 
-		});
+				}
+				else if( file.type == FileType.json ){
+
+					ParseJSON(file.data, file.basePath, ()=>{
+
+
+
+					});
+
+				};
+
+			})
+			.catch(( error )=>{
+
+				console.log("NOOOO", error);
+
+			});
 
 		return this;
 
 	}
 }
+
+OBJImage.defineTHREE = ( THREELibrary )=>{
+
+	console.log("define three", THREELibrary);
+
+	THREE = THREELibrary;
+
+};
+
+OBJImage.MeshGenerator = MeshGenerator;
 
 if( typeof define !== "undefined" && define instanceof Function && define.amd !== undefined ){
 

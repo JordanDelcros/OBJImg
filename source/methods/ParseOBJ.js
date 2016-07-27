@@ -110,7 +110,7 @@ export default function ParseOBJ( obj, basePath, onComplete ){
 
 	if( parseOBJComplete == true && parseMTLComplete == true ){
 
-		console.log("FINISH", model)
+		onComplete(model);
 
 	};
 
