@@ -6,8 +6,7 @@
   "scripts": {
     "postinstall": "if [ ! -d './build' ]; then mkdir ./build; fi && npm run build",
     "build": "browserify ./source/OBJImage.js --standalone OBJImage -t [babelify --presets es2015] --outfile ./build/objimage.js",
-    "start": "watchify ./source/OBJImage.js --standalone OBJImage -t [babelify --presets es2015] --outfile ./build/objimage.js",
-    "server": "http-server ./examples -p 3000 -o | npm start"
+    "start": "watchify ./source/OBJImage.js --standalone OBJImage -t [babelify --presets es2015] --outfile ./build/objimage.js"
   },
   "repository": {
     "type": "git",

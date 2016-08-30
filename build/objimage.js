@@ -24,7 +24,7 @@ var _ParseJSON = require("./methods/ParseJSON.js");
 
 var _ParseJSON2 = _interopRequireDefault(_ParseJSON);
 
-var _MeshGenerator = require("./tools/MeshGenerator.js");
+var _MeshGenerator = require("./methods/MeshGenerator.js");
 
 var _MeshGenerator2 = _interopRequireDefault(_MeshGenerator);
 
@@ -70,7 +70,7 @@ var OBJImage = function () {
 				};
 			}).catch(function (error) {
 
-				console.log("NOOOO", error);
+				throw error;
 			});
 
 			return this;
@@ -106,7 +106,7 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":4,"./methods/ParseImage.js":12,"./methods/ParseJSON.js":13,"./methods/ParseOBJ.js":15,"./tools/MeshGenerator.js":16}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":4,"./methods/MeshGenerator.js":12,"./methods/ParseImage.js":13,"./methods/ParseJSON.js":14,"./methods/ParseOBJ.js":16}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1415,12 +1415,62 @@ exports.default = Vertex;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _OBJImage = require("../OBJImage.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MeshGenerator = function () {
+	function MeshGenerator(modelLibrary) {
+		_classCallCheck(this, MeshGenerator);
+
+		return this.initialize(modelLibrary);
+	}
+
+	_createClass(MeshGenerator, [{
+		key: "initialize",
+		value: function initialize(modelLibrary) {
+
+			console.warn("MESH GENERATOR", modelLibrary);
+
+			var indices = new Uint32Array(modelLibrary.faces.length * 3);
+
+			for (var index = 0; index < indices.length; index++) {
+
+				indices[index] = index;
+			};
+
+			var positions = new Float32Array(modelLibrary.faces.length * 3 * 3);
+
+			for (var faceIndex = 0, faceLength = modelLibrary.faces.length; faceIndex < faceLength; faceIndex++) {
+
+				console.log(faceIndex);
+			};
+
+			return this;
+		}
+	}]);
+
+	return MeshGenerator;
+}();
+
+exports.default = MeshGenerator;
+;
+
+},{"../OBJImage.js":1}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = ParseImage;
 function ParseImage(image, onComplete) {};
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1432,7 +1482,7 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1545,7 +1595,7 @@ function ParseMTL(mtl, basePath, onComplete) {
 	onComplete(materialLibrary);
 };
 
-},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":6}],15:[function(require,module,exports){
+},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":6}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1663,41 +1713,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":14}],16:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _OBJImage = require("../OBJImage.js");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MeshGenerator = function () {
-	function MeshGenerator(modelLibrary) {
-		_classCallCheck(this, MeshGenerator);
-
-		return this.initialize(modelLibrary);
-	}
-
-	_createClass(MeshGenerator, [{
-		key: "initialize",
-		value: function initialize(modelLibrary) {
-
-			console.warn(_OBJImage.THREE);
-
-			return this;
-		}
-	}]);
-
-	return MeshGenerator;
-}();
-
-exports.default = MeshGenerator;
-;
-
-},{"../OBJImage.js":1}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":15}]},{},[1])(1)
 });

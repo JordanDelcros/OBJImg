@@ -43,9 +43,9 @@
 				},
 				onParse: function( modelLibrary ){
 
-					new OBJImage.MeshGenerator(modelLibrary);
+					console.log("ON PARSE", modelLibrary, model);
 
-					console.log("ON PARSE", modelLibrary);
+					var model = new OBJImage.MeshGenerator(modelLibrary);
 
 				}
 			});

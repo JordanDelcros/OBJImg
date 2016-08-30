@@ -4,8 +4,7 @@ import FileLoader, {FileType} from "./components/FileLoader.js";
 import ParseImage from "./methods/ParseImage.js";
 import ParseOBJ from "./methods/ParseOBJ.js";
 import ParseJSON from "./methods/ParseJSON.js";
-
-import MeshGenerator from "./tools/MeshGenerator.js";
+import MeshGenerator from "./methods/MeshGenerator.js";
 
 export var THREE = null;
 
@@ -67,7 +66,7 @@ export default class OBJImage {
 			})
 			.catch(( error )=>{
 
-				console.log("NOOOO", error);
+				throw error;
 
 			});
 
