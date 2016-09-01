@@ -85,8 +85,6 @@ exports.default = OBJImage;
 
 OBJImage.defineTHREE = function (THREELibrary) {
 
-	console.log("define three", THREELibrary);
-
 	exports.THREE = THREE = THREELibrary;
 };
 
@@ -231,19 +229,26 @@ var Face = function () {
 
 	_createClass(Face, [{
 		key: "initialize",
-		value: function initialize(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC) {
+		value: function initialize(vertexA, vertexB, vertexC) {
+			var normalA = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+			var normalB = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
+			var normalC = arguments.length <= 5 || arguments[5] === undefined ? null : arguments[5];
+			var textureA = arguments.length <= 6 || arguments[6] === undefined ? null : arguments[6];
+			var textureB = arguments.length <= 7 || arguments[7] === undefined ? null : arguments[7];
+			var textureC = arguments.length <= 8 || arguments[8] === undefined ? null : arguments[8];
+
 
 			this.vertexA = parseInt(vertexA) - 1;
 			this.vertexB = parseInt(vertexB) - 1;
 			this.vertexC = parseInt(vertexC) - 1;
 
-			this.normalA = parseInt(normalA) - 1;
-			this.normalB = parseInt(normalB) - 1;
-			this.normalC = parseInt(normalC) - 1;
+			this.normalA = parseInt(normalA) - 1 || null;
+			this.normalB = parseInt(normalB) - 1 || null;
+			this.normalC = parseInt(normalC) - 1 || null;
 
-			this.textureA = parseInt(textureA) - 1;
-			this.textureB = parseInt(textureB) - 1;
-			this.textureC = parseInt(textureC) - 1;
+			this.textureA = parseInt(textureA) - 1 || null;
+			this.textureB = parseInt(textureB) - 1 || null;
+			this.textureC = parseInt(textureC) - 1 || null;
 
 			return this;
 		}
@@ -288,7 +293,7 @@ var FileLoader = function () {
 
 			this.path = path;
 
-			this.basePath = this.path.split(/\//).slice(0, -1).join("/");
+			this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
 
 			this.data = null;
 
@@ -1000,10 +1005,12 @@ var Model = function () {
 			} else {
 
 				this.groups.push({
+					name: null,
 					vertices: new Array(),
 					normals: new Array(),
 					textures: new Array(),
-					faces: new Array()
+					faces: new Array(),
+					material: null
 				});
 			};
 
@@ -1424,6 +1431,10 @@ var _OBJImage = require("../OBJImage.js");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var TRIANGLE = 3;
+var VERTEX = 3;
+var TEXTURE = 2;
+
 var MeshGenerator = function () {
 	function MeshGenerator(modelLibrary) {
 		_classCallCheck(this, MeshGenerator);
@@ -1437,21 +1448,199 @@ var MeshGenerator = function () {
 
 			console.warn("MESH GENERATOR", modelLibrary);
 
-			var indices = new Uint32Array(modelLibrary.faces.length * 3);
+			var materials = new Object();
 
-			for (var index = 0; index < indices.length; index++) {
+			if (modelLibrary.materialLibrary != null) {
 
-				indices[index] = index;
+				var textureLoader = new _OBJImage.THREE.TextureLoader();
+
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = modelLibrary.materialLibrary.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var material = _step.value;
+
+
+						console.log(material);
+
+						materials[material.name] = new _OBJImage.THREE.MeshPhongMaterial({
+							color: new _OBJImage.THREE.Color(material.red, material.green, material.blue),
+							map: material.diffuse.map != null ? textureLoader.load(material.diffuse.map) : null,
+							shininess: material.specular.force,
+							opacity: material.opacity.value,
+							transparent: material.opacity.value < 1 ? true : false
+						});
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				;
 			};
 
-			var positions = new Float32Array(modelLibrary.faces.length * 3 * 3);
+			var objects = new _OBJImage.THREE.Object3D();
 
-			for (var faceIndex = 0, faceLength = modelLibrary.faces.length; faceIndex < faceLength; faceIndex++) {
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
 
-				console.log(faceIndex);
-			};
+			try {
+				for (var _iterator2 = modelLibrary.objects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var object = _step2.value;
 
-			return this;
+
+					var objectContainer = new _OBJImage.THREE.Object3D();
+
+					var _iteratorNormalCompletion3 = true;
+					var _didIteratorError3 = false;
+					var _iteratorError3 = undefined;
+
+					try {
+						for (var _iterator3 = object.groups[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							var group = _step3.value;
+
+
+							var geometry = new _OBJImage.THREE.BufferGeometry();
+
+							var indices = new Uint32Array(group.faces.length * 3);
+
+							for (var index = 0; index < indices.length; index++) {
+
+								indices[index] = index;
+							};
+
+							var positions = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
+
+							var normals = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
+
+							var uvs = new Float32Array(group.faces.length * TRIANGLE * TEXTURE);
+
+							for (var faceIndex = 0, faceLength = group.faces.length; faceIndex < faceLength; faceIndex++) {
+
+								var face = modelLibrary.faces[group.faces[faceIndex]];
+
+								var computedFaceVertexIndex = faceIndex * TRIANGLE * VERTEX;
+								var computedFaceTextureIndex = faceIndex * TRIANGLE * TEXTURE;
+
+								positions[computedFaceVertexIndex + 0] = modelLibrary.vertices[face.vertexA].x;
+								positions[computedFaceVertexIndex + 1] = modelLibrary.vertices[face.vertexA].y;
+								positions[computedFaceVertexIndex + 2] = modelLibrary.vertices[face.vertexA].z;
+
+								positions[computedFaceVertexIndex + 3] = modelLibrary.vertices[face.vertexB].x;
+								positions[computedFaceVertexIndex + 4] = modelLibrary.vertices[face.vertexB].y;
+								positions[computedFaceVertexIndex + 5] = modelLibrary.vertices[face.vertexB].z;
+
+								positions[computedFaceVertexIndex + 6] = modelLibrary.vertices[face.vertexC].x;
+								positions[computedFaceVertexIndex + 7] = modelLibrary.vertices[face.vertexC].y;
+								positions[computedFaceVertexIndex + 8] = modelLibrary.vertices[face.vertexC].z;
+
+								if (face.normalA != null && face.normalB != null && face.normalC != null) {
+
+									normals[computedFaceVertexIndex + 0] = modelLibrary.normals[face.normalA].x;
+									normals[computedFaceVertexIndex + 1] = modelLibrary.normals[face.normalA].y;
+									normals[computedFaceVertexIndex + 2] = modelLibrary.normals[face.normalA].z;
+
+									normals[computedFaceVertexIndex + 3] = modelLibrary.normals[face.normalB].x;
+									normals[computedFaceVertexIndex + 4] = modelLibrary.normals[face.normalB].y;
+									normals[computedFaceVertexIndex + 5] = modelLibrary.normals[face.normalB].z;
+
+									normals[computedFaceVertexIndex + 6] = modelLibrary.normals[face.normalC].x;
+									normals[computedFaceVertexIndex + 7] = modelLibrary.normals[face.normalC].y;
+									normals[computedFaceVertexIndex + 8] = modelLibrary.normals[face.normalC].z;
+								};
+
+								if (face.textureA != null && face.textureB != null && face.textureC != null) {
+
+									uvs[computedFaceTextureIndex + 0] = modelLibrary.textures[face.textureA].u;
+									uvs[computedFaceTextureIndex + 1] = modelLibrary.textures[face.textureA].v;
+
+									uvs[computedFaceTextureIndex + 2] = modelLibrary.textures[face.textureB].u;
+									uvs[computedFaceTextureIndex + 3] = modelLibrary.textures[face.textureB].v;
+
+									uvs[computedFaceTextureIndex + 4] = modelLibrary.textures[face.textureC].u;
+									uvs[computedFaceTextureIndex + 5] = modelLibrary.textures[face.textureC].v;
+								};
+							};
+
+							geometry.setIndex(new _OBJImage.THREE.BufferAttribute(indices, 1));
+							geometry.addAttribute("position", new _OBJImage.THREE.BufferAttribute(positions, 3));
+							geometry.addAttribute("normal", new _OBJImage.THREE.BufferAttribute(normals, 3));
+							geometry.addAttribute("uv", new _OBJImage.THREE.BufferAttribute(uvs, 2));
+
+							var _material = null;
+
+							if (group.material != null && materials[group.material] != undefined) {
+
+								_material = materials[group.material];
+							} else {
+
+								_material = new _OBJImage.THREE.MeshPhongMaterial({
+									color: Math.random() * 0xFFFFFF
+								});
+							};
+
+							var mesh = new _OBJImage.THREE.Mesh(geometry, _material);
+
+							// mesh.geometry.computeFaceNormals();
+							// mesh.geometry.computeVertexNormals();
+
+							if (group.name != null) {
+
+								mesh.name = group.name;
+							};
+
+							objectContainer.add(mesh);
+						}
+					} catch (err) {
+						_didIteratorError3 = true;
+						_iteratorError3 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion3 && _iterator3.return) {
+								_iterator3.return();
+							}
+						} finally {
+							if (_didIteratorError3) {
+								throw _iteratorError3;
+							}
+						}
+					}
+
+					;
+
+					objects.add(objectContainer);
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+
+			;
+
+			return objects;
 		}
 	}]);
 
@@ -1520,75 +1709,76 @@ function ParseMTL(mtl, basePath, onComplete) {
 
 		var info = value.split(/\s+/).filter(Boolean);
 
-		var type = info[0].toLowerCase();
+		if (info.length > 0) {
 
-		// console.log(info);
+			var type = info[0].toLowerCase();
 
-		if (type == "newmtl") {
+			if (type == "newmtl") {
 
-			materialLibrary.addMaterial(info[1]);
-		} else if (type == "s") {
+				materialLibrary.addMaterial(info[1]);
+			} else if (type == "s") {
 
-			materialLibrary.addSmooth(info[1]);
-		} else if (type == "illum") {
+				materialLibrary.addSmooth(info[1]);
+			} else if (type == "illum") {
 
-			materialLibrary.addIllumination(info[1]);
-		} else if (type == "ka") {
+				materialLibrary.addIllumination(info[1]);
+			} else if (type == "ka") {
 
-			materialLibrary.addAmbientColor(info[1], info[2], info[3]);
-		} else if (type == "kd") {
+				materialLibrary.addAmbientColor(info[1], info[2], info[3]);
+			} else if (type == "kd") {
 
-			materialLibrary.addDiffuseColor(info[1], info[2], info[3]);
-		} else if (type == "ks") {
+				materialLibrary.addDiffuseColor(info[1], info[2], info[3]);
+			} else if (type == "ks") {
 
-			materialLibrary.addSpecularColor(info[1], info[2], info[3]);
-		} else if (type == "ns") {
+				materialLibrary.addSpecularColor(info[1], info[2], info[3]);
+			} else if (type == "ns") {
 
-			materialLibrary.addSpecularForce(info[1]);
-		} else if (type == "d") {
+				materialLibrary.addSpecularForce(info[1]);
+			} else if (type == "d") {
 
-			materialLibrary.addOpacity(info[1]);
-		} else if (type == "ne") {
+				materialLibrary.addOpacity(info[1]);
+			} else if (type == "ne") {
 
-			materialLibrary.addEnvionementReflectivity(info[1]);
-		} else if (type.substr(0, 3) == "map") {
+				materialLibrary.addEnvionementReflectivity(info[1]);
+			} else if (type.substr(0, 3) == "map") {
 
-			var mapType = MapType[type];
+				var mapType = MapType[type];
 
-			var path = info.pop();
+				var path = info.pop();
 
-			materialLibrary.addMap(mapType, path);
+				materialLibrary.addMap(mapType, basePath + path);
 
-			for (var optionIndex = 1, length = info.length; optionIndex < length; optionIndex++) {
+				for (var optionIndex = 1, length = info.length; optionIndex < length; optionIndex++) {
 
-				var option = info[optionIndex];
+					var option = info[optionIndex];
 
-				if (option == "-clamp") {
+					if (option == "-clamp") {
 
-					materialLibrary.addMapClamp(mapType, info[++optionIndex]);
-				} else if (option == "-imfchan") {
+						materialLibrary.addMapClamp(mapType, info[++optionIndex]);
+					} else if (option == "-imfchan") {
 
-					materialLibrary.addMapChannel(mapType, info[++optionIndex]);
-				} else if (option == "-test") {
+						materialLibrary.addMapChannel(mapType, info[++optionIndex]);
+					} else if (option == "-test") {
 
-					materialLibrary.addOpacityTest(info[++optionIndex]);
+						materialLibrary.addOpacityTest(info[++optionIndex]);
+					};
 				};
+			} else if (type == "shader_s") {
+
+				materialLibrary.addShaderSide(info[1]);
+			} else if (type == "shader_dt") {
+
+				materialLibrary.addShaderDepthTest(info[1]);
+			} else if (type == "shader_dw") {
+
+				materialLibrary.addShaderDepthWrite(info[1]);
+			} else if (type == "shader_v") {
+
+				materialLibrary.addShaderVertex(info[1]);
+			} else if (type == "shader_f") {
+
+				materialLibrary.addShaderFragment(info[1]);
 			};
-		} else if (type == "shader_s") {
-
-			materialLibrary.addShaderSide(info[1]);
-		} else if (type == "shader_dt") {
-
-			materialLibrary.addShaderDepthTest(info[1]);
-		} else if (type == "shader_dw") {
-
-			materialLibrary.addShaderDepthWrite(info[1]);
-		} else if (type == "shader_v") {
-
-			materialLibrary.addShaderVertex(info[1]);
-		} else if (type == "shader_f") {
-
-			materialLibrary.addShaderFragment(info[1]);
 		};
 	});
 
@@ -1649,11 +1839,11 @@ function ParseOBJ(obj, basePath, onComplete) {
 			model.addVertex(x, y, z);
 		} else if (type == "vn") {
 
-			var x = info[1];
-			var y = info[2];
-			var z = info[3];
+			var _x = info[1];
+			var _y = info[2];
+			var _z = info[3];
 
-			model.addNormal(x, y, z);
+			model.addNormal(_x, _y, _z);
 		} else if (type == "vt") {
 
 			var u = info[1];
@@ -1670,24 +1860,24 @@ function ParseOBJ(obj, basePath, onComplete) {
 			var vertexB = b[0];
 			var vertexC = c[0];
 
-			var normalA = a[1];
-			var normalB = b[1];
-			var normalC = c[1];
-
 			var textureA = a[1];
 			var textureB = b[1];
 			var textureC = c[1];
+
+			var normalA = a[2];
+			var normalB = b[2];
+			var normalC = c[2];
 
 			model.addFace(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC);
 		} else if (type == "mtllib") {
 
 			parseMTLComplete = false;
 
-			var materialLibraryPath = basePath + "/" + info[1];
+			var materialLibraryPath = basePath + info[1];
 
-			var file = new _FileLoader2.default(materialLibraryPath, function (fileData, type, path) {
+			new _FileLoader2.default(materialLibraryPath).then(function (file) {
 
-				(0, _ParseMTL2.default)(fileData, file.getBasePath(), function (materialLibrary) {
+				(0, _ParseMTL2.default)(file.data, file.basePath, function (materialLibrary) {
 
 					parseMTLComplete = true;
 
@@ -1695,9 +1885,12 @@ function ParseOBJ(obj, basePath, onComplete) {
 
 					if (parseOBJComplete == true && parseMTLComplete == true) {
 
-						console.log("FINISH", model);
+						onComplete(model);
 					};
 				});
+			}).catch(function (error) {
+
+				throw error;
 			});
 		} else if (type == "usemtl") {
 

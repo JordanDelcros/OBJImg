@@ -29,10 +29,12 @@ export default class Model {
 		else {
 
 			this.groups.push({
+				name: null,
 				vertices: new Array(),
 				normals: new Array(),
 				textures: new Array(),
-				faces: new Array()
+				faces: new Array(),
+				material: null
 			});
 
 		};

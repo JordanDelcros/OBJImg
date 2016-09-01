@@ -2,7 +2,7 @@
 # Material Count: 11
 
 newmtl LaraClothes
-Ns 94.117647
+Ns 1.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -19,7 +19,7 @@ shader_v shader-vertex.glsl
 shader_f shader-fragment.glsl
 
 newmtl LaraEquipment
-Ns 94.117647
+Ns 20.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -32,7 +32,7 @@ map_Kd lara_equipment_diffuse.png
 map_Ks lara_equipment_specular.png
 
 newmtl LaraEye
-Ns 94.117647
+Ns 100.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -46,7 +46,7 @@ map_Ks lara_eye_specular.png
 map_Kn lara_eye_normal.png
 
 newmtl LaraEyeRefl
-Ns 94.117647
+Ns 100.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -58,7 +58,7 @@ s on
 map_Kd lara_eye_reflection.png
 
 newmtl LaraEyebrowEyelash
-Ns 94.117647
+Ns 15.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -72,7 +72,7 @@ map_Ks lara_eyelashes_specular.png
 map_Kn lara_eyelashes_normal.png
 
 newmtl LaraHair
-Ns 10.000000
+Ns 15.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -86,7 +86,7 @@ map_Ks -clamp off lara_hair_specular.png
 map_Kn lara_hair_normal.png
 
 newmtl LaraHairTie
-Ns 10.000000
+Ns 15.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -100,7 +100,7 @@ map_Ks -clamp off lara_hair_specular.png
 map_Kn lara_hair_normal.png
 
 newmtl LaraHead
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000
@@ -115,7 +115,7 @@ map_Ks lara_head_specular.png
 map_Kn lara_head_normal.png
 
 newmtl LaraSkin
-Ns 94.117647
+Ns 10.000000
 Ka 0.000000 0.000000 0.000000
 Kd 0.640000 0.640000 0.640000
 Ks 0.000000 0.000000 0.000000

@@ -31,11 +31,21 @@
 
 			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+			camera.position.set(0, 1.8, 5);
+
+			var light = new THREE.DirectionalLight();
+
+			light.position.set(0, 1, 1);
+
+			scene.add(light);
+
 			// MAGIC THINGS
+
+			var magicMesh = null;
 
 			OBJImage.defineTHREE(THREE);
 
-			new OBJImage("models/cube/cube.obj", {
+			new OBJImage("models/lara/lara.obj", {
 				onLoad: function( file ){
 
 					console.log("ON LOAD", file);
@@ -43,9 +53,11 @@
 				},
 				onParse: function( modelLibrary ){
 
-					console.log("ON PARSE", modelLibrary, model);
+					console.log("ON PARSE", modelLibrary);
 
-					var model = new OBJImage.MeshGenerator(modelLibrary);
+					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
+
+					scene.add(magicMesh);
 
 				}
 			});
@@ -55,6 +67,12 @@
 			function update(){
 
 				window.requestAnimationFrame(update);
+
+				if( magicMesh != null ){
+
+					magicMesh.rotateY(Math.PI / 180);
+
+				};
 
 				renderer.render(scene, camera);
 

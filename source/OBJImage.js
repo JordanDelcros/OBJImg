@@ -42,7 +42,6 @@ export default class OBJImage {
 
 							options.onParse(modelLibrary);
 
-
 						};
 
 					});
@@ -76,8 +75,6 @@ export default class OBJImage {
 }
 
 OBJImage.defineTHREE = ( THREELibrary )=>{
-
-	console.log("define three", THREELibrary);
 
 	THREE = THREELibrary;
 

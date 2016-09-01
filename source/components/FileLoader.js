@@ -16,7 +16,7 @@ export default class FileLoader {
 
 		this.path = path;
 
-		this.basePath = this.path.split(/\//).slice(0, -1).join("/");
+		this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
 
 		this.data = null;
 

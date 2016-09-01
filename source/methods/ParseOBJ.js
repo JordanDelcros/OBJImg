@@ -28,47 +28,47 @@ export default function ParseOBJ( obj, basePath, onComplete ){
 		}
 		else if( type == "v" ){
 
-			var x = info[1];
-			var y = info[2];
-			var z = info[3];
+			let x = info[1];
+			let y = info[2];
+			let z = info[3];
 
 			model.addVertex(x, y, z);
 
 		}
 		else if( type == "vn" ){
 
-			var x = info[1];
-			var y = info[2];
-			var z = info[3];
+			let x = info[1];
+			let y = info[2];
+			let z = info[3];
 
 			model.addNormal(x, y, z);
 
 		}
 		else if( type == "vt" ){
 
-			var u = info[1];
-			var v = info[2];
+			let u = info[1];
+			let v = info[2];
 
 			model.addTexture(u, v);
 
 		}
 		else if( type == "f" ){
 
-			var a = info[1].split(/\//);
-			var b = info[2].split(/\//);
-			var c = info[3].split(/\//);
+			let a = info[1].split(/\//);
+			let b = info[2].split(/\//);
+			let c = info[3].split(/\//);
 
-			var vertexA = a[0];
-			var vertexB = b[0];
-			var vertexC = c[0];
+			let vertexA = a[0];
+			let vertexB = b[0];
+			let vertexC = c[0];
 
-			var normalA = a[1];
-			var normalB = b[1];
-			var normalC = c[1];
+			let textureA = a[1];
+			let textureB = b[1];
+			let textureC = c[1];
 
-			var textureA = a[1];
-			var textureB = b[1];
-			var textureC = c[1];
+			let normalA = a[2];
+			let normalB = b[2];
+			let normalC = c[2];
 
 			model.addFace(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC);
 
@@ -77,25 +77,31 @@ export default function ParseOBJ( obj, basePath, onComplete ){
 
 			parseMTLComplete = false;
 
-			var materialLibraryPath = basePath + "/" + info[1];
+			let materialLibraryPath = basePath + info[1];
 
-			var file = new FileLoader(materialLibraryPath, ( fileData, type, path )=>{
+			new FileLoader(materialLibraryPath)
+				.then(( file )=>{
 
-				ParseMTL(fileData, file.getBasePath(), ( materialLibrary )=>{
+					ParseMTL(file.data, file.basePath, ( materialLibrary )=>{
 
-					parseMTLComplete = true;
+						parseMTLComplete = true;
 
-					model.setMaterialLibrary(materialLibrary);
+						model.setMaterialLibrary(materialLibrary);
 
-					if( parseOBJComplete == true && parseMTLComplete == true ){
+						if( parseOBJComplete == true && parseMTLComplete == true ){
 
-						console.log("FINISH", model)
+							onComplete(model);
 
-					};
+						};
+
+					})
+
+				})
+				.catch(( error )=>{
+
+					throw error;
 
 				});
-
-			});
 
 		}
 		else if( type == "usemtl" ){
