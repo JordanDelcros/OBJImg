@@ -43,6 +43,15 @@ export default class Material {
 			channel: ChannelType.rgb
 		};
 
+		this.bump = {
+			red: 1,
+			green: 1,
+			blue: 1,
+			map: null,
+			clamp: false,
+			channel: ChannelType.rgb
+		};
+
 		this.specular = {
 			red: 1,
 			green: 1,

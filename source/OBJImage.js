@@ -1,10 +1,11 @@
 "use strict";
 
 import FileLoader, {FileType} from "./components/FileLoader.js";
+import MeshGenerator from "./components/MeshGenerator.js";
+
 import ParseImage from "./methods/ParseImage.js";
 import ParseOBJ from "./methods/ParseOBJ.js";
 import ParseJSON from "./methods/ParseJSON.js";
-import MeshGenerator from "./methods/MeshGenerator.js";
 
 export var THREE = null;
 

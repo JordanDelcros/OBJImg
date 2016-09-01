@@ -6,17 +6,17 @@ export default class Face {
 	}
 	initialize( vertexA, vertexB, vertexC, normalA = null, normalB = null, normalC = null, textureA = null, textureB = null, textureC = null ){
 
-		this.vertexA = parseInt(vertexA) - 1;
-		this.vertexB = parseInt(vertexB) - 1;
-		this.vertexC = parseInt(vertexC) - 1;
+		this.vertexA = null || parseInt(vertexA) - 1;
+		this.vertexB = null || parseInt(vertexB) - 1;
+		this.vertexC = null || parseInt(vertexC) - 1;
 
-		this.normalA = parseInt(normalA) - 1 || null;
-		this.normalB = parseInt(normalB) - 1 || null;
-		this.normalC = parseInt(normalC) - 1 || null;
+		this.normalA = null || parseInt(normalA) - 1;
+		this.normalB = null || parseInt(normalB) - 1;
+		this.normalC = null || parseInt(normalC) - 1;
 
-		this.textureA = parseInt(textureA) - 1 || null;
-		this.textureB = parseInt(textureB) - 1 || null;
-		this.textureC = parseInt(textureC) - 1 || null;
+		this.textureA = null || parseInt(textureA) - 1;
+		this.textureB = null || parseInt(textureB) - 1;
+		this.textureC = null || parseInt(textureC) - 1;
 
 		return this;
 

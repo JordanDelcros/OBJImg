@@ -12,6 +12,10 @@ var _FileLoader = require("./components/FileLoader.js");
 
 var _FileLoader2 = _interopRequireDefault(_FileLoader);
 
+var _MeshGenerator = require("./components/MeshGenerator.js");
+
+var _MeshGenerator2 = _interopRequireDefault(_MeshGenerator);
+
 var _ParseImage = require("./methods/ParseImage.js");
 
 var _ParseImage2 = _interopRequireDefault(_ParseImage);
@@ -23,10 +27,6 @@ var _ParseOBJ2 = _interopRequireDefault(_ParseOBJ);
 var _ParseJSON = require("./methods/ParseJSON.js");
 
 var _ParseJSON2 = _interopRequireDefault(_ParseJSON);
-
-var _MeshGenerator = require("./methods/MeshGenerator.js");
-
-var _MeshGenerator2 = _interopRequireDefault(_MeshGenerator);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -104,7 +104,7 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":4,"./methods/MeshGenerator.js":12,"./methods/ParseImage.js":13,"./methods/ParseJSON.js":14,"./methods/ParseOBJ.js":16}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":4,"./components/MeshGenerator.js":7,"./methods/ParseImage.js":13,"./methods/ParseJSON.js":14,"./methods/ParseOBJ.js":16}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -238,17 +238,17 @@ var Face = function () {
 			var textureC = arguments.length <= 8 || arguments[8] === undefined ? null : arguments[8];
 
 
-			this.vertexA = parseInt(vertexA) - 1;
-			this.vertexB = parseInt(vertexB) - 1;
-			this.vertexC = parseInt(vertexC) - 1;
+			this.vertexA = null || parseInt(vertexA) - 1;
+			this.vertexB = null || parseInt(vertexB) - 1;
+			this.vertexC = null || parseInt(vertexC) - 1;
 
-			this.normalA = parseInt(normalA) - 1 || null;
-			this.normalB = parseInt(normalB) - 1 || null;
-			this.normalC = parseInt(normalC) - 1 || null;
+			this.normalA = null || parseInt(normalA) - 1;
+			this.normalB = null || parseInt(normalB) - 1;
+			this.normalC = null || parseInt(normalC) - 1;
 
-			this.textureA = parseInt(textureA) - 1 || null;
-			this.textureB = parseInt(textureB) - 1 || null;
-			this.textureC = parseInt(textureC) - 1 || null;
+			this.textureA = null || parseInt(textureA) - 1;
+			this.textureB = null || parseInt(textureB) - 1;
+			this.textureC = null || parseInt(textureC) - 1;
 
 			return this;
 		}
@@ -468,6 +468,15 @@ var Material = function () {
 			};
 
 			this.diffuse = {
+				red: 1,
+				green: 1,
+				blue: 1,
+				map: null,
+				clamp: false,
+				channel: ChannelType.rgb
+			};
+
+			this.bump = {
 				red: 1,
 				green: 1,
 				blue: 1,
@@ -970,6 +979,244 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _OBJImage = require("../OBJImage.js");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TRIANGLE = 3;
+var VERTEX = 3;
+var TEXTURE = 2;
+
+var MeshGenerator = function () {
+	function MeshGenerator(modelLibrary) {
+		_classCallCheck(this, MeshGenerator);
+
+		return this.initialize(modelLibrary);
+	}
+
+	_createClass(MeshGenerator, [{
+		key: "initialize",
+		value: function initialize(modelLibrary) {
+
+			console.warn("MESH GENERATOR", modelLibrary);
+
+			var materials = new Object();
+
+			if (modelLibrary.materialLibrary != null) {
+
+				var textureLoader = new _OBJImage.THREE.TextureLoader();
+
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = modelLibrary.materialLibrary.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var material = _step.value;
+
+
+						console.log(material);
+
+						materials[material.name] = new _OBJImage.THREE.MeshPhongMaterial({
+							color: new _OBJImage.THREE.Color(material.diffuse.red, material.diffuse.green, material.diffuse.blue),
+							map: material.diffuse.map != null ? textureLoader.load(material.diffuse.map) : null,
+							specular: new _OBJImage.THREE.Color(material.specular.red, material.specular.green, material.specular.blue),
+							specularMap: material.specular.amp != null ? textureLoader.load(material.specular.map) : null,
+							aoMap: material.ambient.amp != null ? textureLoader.load(material.ambient.map) : null,
+							aoMapIntensity: 1,
+							bumpMap: material.bump.amp != null ? textureLoader.load(material.bump.map) : null,
+							shininess: material.specular.force,
+							opacity: material.opacity.value,
+							transparent: material.opacity.value < 1 ? true : false,
+							side: _OBJImage.THREE.DoubleSide
+						});
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				;
+			};
+
+			var objects = new _OBJImage.THREE.Object3D();
+
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
+
+			try {
+				for (var _iterator2 = modelLibrary.objects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var object = _step2.value;
+
+
+					var objectContainer = new _OBJImage.THREE.Object3D();
+
+					var _iteratorNormalCompletion3 = true;
+					var _didIteratorError3 = false;
+					var _iteratorError3 = undefined;
+
+					try {
+						for (var _iterator3 = object.groups[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							var group = _step3.value;
+
+
+							var geometry = new _OBJImage.THREE.BufferGeometry();
+
+							var indices = new Uint32Array(group.faces.length * 3);
+
+							for (var index = 0; index < indices.length; index++) {
+
+								indices[index] = index;
+							};
+
+							var positions = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
+
+							var normals = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
+
+							var uvs = new Float32Array(group.faces.length * TRIANGLE * TEXTURE);
+
+							for (var faceIndex = 0, faceLength = group.faces.length; faceIndex < faceLength; faceIndex++) {
+
+								var face = modelLibrary.faces[group.faces[faceIndex]];
+
+								var computedFaceVertexIndex = faceIndex * TRIANGLE * VERTEX;
+								var computedFaceTextureIndex = faceIndex * TRIANGLE * TEXTURE;
+
+								positions[computedFaceVertexIndex + 0] = modelLibrary.vertices[face.vertexA].x;
+								positions[computedFaceVertexIndex + 1] = modelLibrary.vertices[face.vertexA].y;
+								positions[computedFaceVertexIndex + 2] = modelLibrary.vertices[face.vertexA].z;
+
+								positions[computedFaceVertexIndex + 3] = modelLibrary.vertices[face.vertexB].x;
+								positions[computedFaceVertexIndex + 4] = modelLibrary.vertices[face.vertexB].y;
+								positions[computedFaceVertexIndex + 5] = modelLibrary.vertices[face.vertexB].z;
+
+								positions[computedFaceVertexIndex + 6] = modelLibrary.vertices[face.vertexC].x;
+								positions[computedFaceVertexIndex + 7] = modelLibrary.vertices[face.vertexC].y;
+								positions[computedFaceVertexIndex + 8] = modelLibrary.vertices[face.vertexC].z;
+
+								if (face.normalA != null && face.normalB != null && face.normalC != null) {
+
+									normals[computedFaceVertexIndex + 0] = modelLibrary.normals[face.normalA].x;
+									normals[computedFaceVertexIndex + 1] = modelLibrary.normals[face.normalA].y;
+									normals[computedFaceVertexIndex + 2] = modelLibrary.normals[face.normalA].z;
+
+									normals[computedFaceVertexIndex + 3] = modelLibrary.normals[face.normalB].x;
+									normals[computedFaceVertexIndex + 4] = modelLibrary.normals[face.normalB].y;
+									normals[computedFaceVertexIndex + 5] = modelLibrary.normals[face.normalB].z;
+
+									normals[computedFaceVertexIndex + 6] = modelLibrary.normals[face.normalC].x;
+									normals[computedFaceVertexIndex + 7] = modelLibrary.normals[face.normalC].y;
+									normals[computedFaceVertexIndex + 8] = modelLibrary.normals[face.normalC].z;
+								};
+
+								if (face.textureA != null && face.textureB != null && face.textureC != null) {
+
+									uvs[computedFaceTextureIndex + 0] = modelLibrary.textures[face.textureA].u;
+									uvs[computedFaceTextureIndex + 1] = modelLibrary.textures[face.textureA].v;
+
+									uvs[computedFaceTextureIndex + 2] = modelLibrary.textures[face.textureB].u;
+									uvs[computedFaceTextureIndex + 3] = modelLibrary.textures[face.textureB].v;
+
+									uvs[computedFaceTextureIndex + 4] = modelLibrary.textures[face.textureC].u;
+									uvs[computedFaceTextureIndex + 5] = modelLibrary.textures[face.textureC].v;
+								};
+							};
+
+							geometry.setIndex(new _OBJImage.THREE.BufferAttribute(indices, 1));
+							geometry.addAttribute("position", new _OBJImage.THREE.BufferAttribute(positions, 3));
+							geometry.addAttribute("normal", new _OBJImage.THREE.BufferAttribute(normals, 3));
+							geometry.addAttribute("uv", new _OBJImage.THREE.BufferAttribute(uvs, 2));
+
+							var _material = null;
+
+							if (group.material != null && materials[group.material] != undefined) {
+
+								_material = materials[group.material];
+							} else {
+
+								_material = new _OBJImage.THREE.MeshPhongMaterial({
+									color: Math.random() * 0xFFFFFF
+								});
+							};
+
+							var mesh = new _OBJImage.THREE.Mesh(geometry, _material);
+
+							// mesh.geometry.computeFaceNormals();
+							// mesh.geometry.computeVertexNormals();
+
+							if (group.name != null) {
+
+								mesh.name = group.name;
+							};
+
+							objectContainer.add(mesh);
+						}
+					} catch (err) {
+						_didIteratorError3 = true;
+						_iteratorError3 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion3 && _iterator3.return) {
+								_iterator3.return();
+							}
+						} finally {
+							if (_didIteratorError3) {
+								throw _iteratorError3;
+							}
+						}
+					}
+
+					;
+
+					objects.add(objectContainer);
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+
+			;
+
+			return objects;
+		}
+	}]);
+
+	return MeshGenerator;
+}();
+
+exports.default = MeshGenerator;
+;
+
+},{"../OBJImage.js":1}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Model = function () {
@@ -1118,7 +1365,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1311,7 +1558,7 @@ var ModelLibrary = function () {
 exports.default = ModelLibrary;
 ;
 
-},{"./Face.js":3,"./Model.js":7,"./Normal.js":9,"./Texture.js":10,"./Vertex.js":11}],9:[function(require,module,exports){
+},{"./Face.js":3,"./Model.js":8,"./Normal.js":10,"./Texture.js":11,"./Vertex.js":12}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1347,7 +1594,7 @@ var Normal = function () {
 exports.default = Normal;
 ;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1382,7 +1629,7 @@ var Texture = function () {
 exports.default = Texture;
 ;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1418,239 +1665,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],12:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _OBJImage = require("../OBJImage.js");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var TRIANGLE = 3;
-var VERTEX = 3;
-var TEXTURE = 2;
-
-var MeshGenerator = function () {
-	function MeshGenerator(modelLibrary) {
-		_classCallCheck(this, MeshGenerator);
-
-		return this.initialize(modelLibrary);
-	}
-
-	_createClass(MeshGenerator, [{
-		key: "initialize",
-		value: function initialize(modelLibrary) {
-
-			console.warn("MESH GENERATOR", modelLibrary);
-
-			var materials = new Object();
-
-			if (modelLibrary.materialLibrary != null) {
-
-				var textureLoader = new _OBJImage.THREE.TextureLoader();
-
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
-
-				try {
-					for (var _iterator = modelLibrary.materialLibrary.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var material = _step.value;
-
-
-						console.log(material);
-
-						materials[material.name] = new _OBJImage.THREE.MeshPhongMaterial({
-							color: new _OBJImage.THREE.Color(material.red, material.green, material.blue),
-							map: material.diffuse.map != null ? textureLoader.load(material.diffuse.map) : null,
-							shininess: material.specular.force,
-							opacity: material.opacity.value,
-							transparent: material.opacity.value < 1 ? true : false
-						});
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
-				}
-
-				;
-			};
-
-			var objects = new _OBJImage.THREE.Object3D();
-
-			var _iteratorNormalCompletion2 = true;
-			var _didIteratorError2 = false;
-			var _iteratorError2 = undefined;
-
-			try {
-				for (var _iterator2 = modelLibrary.objects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					var object = _step2.value;
-
-
-					var objectContainer = new _OBJImage.THREE.Object3D();
-
-					var _iteratorNormalCompletion3 = true;
-					var _didIteratorError3 = false;
-					var _iteratorError3 = undefined;
-
-					try {
-						for (var _iterator3 = object.groups[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-							var group = _step3.value;
-
-
-							var geometry = new _OBJImage.THREE.BufferGeometry();
-
-							var indices = new Uint32Array(group.faces.length * 3);
-
-							for (var index = 0; index < indices.length; index++) {
-
-								indices[index] = index;
-							};
-
-							var positions = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
-
-							var normals = new Float32Array(group.faces.length * TRIANGLE * VERTEX);
-
-							var uvs = new Float32Array(group.faces.length * TRIANGLE * TEXTURE);
-
-							for (var faceIndex = 0, faceLength = group.faces.length; faceIndex < faceLength; faceIndex++) {
-
-								var face = modelLibrary.faces[group.faces[faceIndex]];
-
-								var computedFaceVertexIndex = faceIndex * TRIANGLE * VERTEX;
-								var computedFaceTextureIndex = faceIndex * TRIANGLE * TEXTURE;
-
-								positions[computedFaceVertexIndex + 0] = modelLibrary.vertices[face.vertexA].x;
-								positions[computedFaceVertexIndex + 1] = modelLibrary.vertices[face.vertexA].y;
-								positions[computedFaceVertexIndex + 2] = modelLibrary.vertices[face.vertexA].z;
-
-								positions[computedFaceVertexIndex + 3] = modelLibrary.vertices[face.vertexB].x;
-								positions[computedFaceVertexIndex + 4] = modelLibrary.vertices[face.vertexB].y;
-								positions[computedFaceVertexIndex + 5] = modelLibrary.vertices[face.vertexB].z;
-
-								positions[computedFaceVertexIndex + 6] = modelLibrary.vertices[face.vertexC].x;
-								positions[computedFaceVertexIndex + 7] = modelLibrary.vertices[face.vertexC].y;
-								positions[computedFaceVertexIndex + 8] = modelLibrary.vertices[face.vertexC].z;
-
-								if (face.normalA != null && face.normalB != null && face.normalC != null) {
-
-									normals[computedFaceVertexIndex + 0] = modelLibrary.normals[face.normalA].x;
-									normals[computedFaceVertexIndex + 1] = modelLibrary.normals[face.normalA].y;
-									normals[computedFaceVertexIndex + 2] = modelLibrary.normals[face.normalA].z;
-
-									normals[computedFaceVertexIndex + 3] = modelLibrary.normals[face.normalB].x;
-									normals[computedFaceVertexIndex + 4] = modelLibrary.normals[face.normalB].y;
-									normals[computedFaceVertexIndex + 5] = modelLibrary.normals[face.normalB].z;
-
-									normals[computedFaceVertexIndex + 6] = modelLibrary.normals[face.normalC].x;
-									normals[computedFaceVertexIndex + 7] = modelLibrary.normals[face.normalC].y;
-									normals[computedFaceVertexIndex + 8] = modelLibrary.normals[face.normalC].z;
-								};
-
-								if (face.textureA != null && face.textureB != null && face.textureC != null) {
-
-									uvs[computedFaceTextureIndex + 0] = modelLibrary.textures[face.textureA].u;
-									uvs[computedFaceTextureIndex + 1] = modelLibrary.textures[face.textureA].v;
-
-									uvs[computedFaceTextureIndex + 2] = modelLibrary.textures[face.textureB].u;
-									uvs[computedFaceTextureIndex + 3] = modelLibrary.textures[face.textureB].v;
-
-									uvs[computedFaceTextureIndex + 4] = modelLibrary.textures[face.textureC].u;
-									uvs[computedFaceTextureIndex + 5] = modelLibrary.textures[face.textureC].v;
-								};
-							};
-
-							geometry.setIndex(new _OBJImage.THREE.BufferAttribute(indices, 1));
-							geometry.addAttribute("position", new _OBJImage.THREE.BufferAttribute(positions, 3));
-							geometry.addAttribute("normal", new _OBJImage.THREE.BufferAttribute(normals, 3));
-							geometry.addAttribute("uv", new _OBJImage.THREE.BufferAttribute(uvs, 2));
-
-							var _material = null;
-
-							if (group.material != null && materials[group.material] != undefined) {
-
-								_material = materials[group.material];
-							} else {
-
-								_material = new _OBJImage.THREE.MeshPhongMaterial({
-									color: Math.random() * 0xFFFFFF
-								});
-							};
-
-							var mesh = new _OBJImage.THREE.Mesh(geometry, _material);
-
-							// mesh.geometry.computeFaceNormals();
-							// mesh.geometry.computeVertexNormals();
-
-							if (group.name != null) {
-
-								mesh.name = group.name;
-							};
-
-							objectContainer.add(mesh);
-						}
-					} catch (err) {
-						_didIteratorError3 = true;
-						_iteratorError3 = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion3 && _iterator3.return) {
-								_iterator3.return();
-							}
-						} finally {
-							if (_didIteratorError3) {
-								throw _iteratorError3;
-							}
-						}
-					}
-
-					;
-
-					objects.add(objectContainer);
-				}
-			} catch (err) {
-				_didIteratorError2 = true;
-				_iteratorError2 = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion2 && _iterator2.return) {
-						_iterator2.return();
-					}
-				} finally {
-					if (_didIteratorError2) {
-						throw _iteratorError2;
-					}
-				}
-			}
-
-			;
-
-			return objects;
-		}
-	}]);
-
-	return MeshGenerator;
-}();
-
-exports.default = MeshGenerator;
-;
-
-},{"../OBJImage.js":1}],13:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1906,5 +1921,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":8,"./ParseMTL.js":15}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":9,"./ParseMTL.js":15}]},{},[1])(1)
 });

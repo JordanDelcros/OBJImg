@@ -22,14 +22,20 @@ export default class MeshGenerator {
 
 			for( let material of modelLibrary.materialLibrary.materials ){
 
-				console.log(material)
+				console.log(material);
 
 				materials[material.name] = new THREE.MeshPhongMaterial({
-					color: new THREE.Color(material.red, material.green, material.blue),
+					color: new THREE.Color(material.diffuse.red, material.diffuse.green, material.diffuse.blue),
 					map: (material.diffuse.map != null ? textureLoader.load(material.diffuse.map) : null),
+					specular: new THREE.Color(material.specular.red, material.specular.green, material.specular.blue),
+					specularMap: (material.specular.amp != null ? textureLoader.load(material.specular.map): null),
+					aoMap: (material.ambient.amp != null ? textureLoader.load(material.ambient.map): null),
+					aoMapIntensity: 1,
+					bumpMap: (material.bump.amp != null ? textureLoader.load(material.bump.map): null),
 					shininess: material.specular.force,
 					opacity: material.opacity.value,
-					transparent: (material.opacity.value < 1 ? true : false)
+					transparent: (material.opacity.value < 1 ? true : false),
+					side: THREE.DoubleSide
 				});
 
 			};

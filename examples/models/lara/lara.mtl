@@ -30,6 +30,7 @@ illum 2
 s on
 map_Kd lara_equipment_diffuse.png
 map_Ks lara_equipment_specular.png
+map_bump lara_equipment_bump.png
 
 newmtl LaraEye
 Ns 100.000000
