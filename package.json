@@ -1,6 +1,6 @@
 {
   "name": "objimg",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Convert OBJ/MTL files (exported from a 3D soft) into a lightweight image ready for THREE JS (or native WebGL).",
   "main": "build/objimg.js",
   "scripts": {

@@ -2,6 +2,7 @@
 
 import FileLoader, {FileType} from "./components/FileLoader.js";
 import MeshGenerator from "./components/MeshGenerator.js";
+import ImageGenerator from "./components/ImageGenerator.js";
 
 import ParseImage from "./methods/ParseImage.js";
 import ParseOBJ from "./methods/ParseOBJ.js";
@@ -75,6 +76,8 @@ export default class OBJImage {
 	}
 }
 
+OBJImage.version = 2.0;
+
 OBJImage.defineTHREE = ( THREELibrary )=>{
 
 	THREE = THREELibrary;
@@ -82,6 +85,8 @@ OBJImage.defineTHREE = ( THREELibrary )=>{
 };
 
 OBJImage.MeshGenerator = MeshGenerator;
+
+OBJImage.ImageGenerator = ImageGenerator;
 
 if( typeof define !== "undefined" && define instanceof Function && define.amd !== undefined ){
 

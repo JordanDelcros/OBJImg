@@ -41,9 +41,9 @@
 
 			// MAGIC THINGS
 
-			var magicMesh = null;
-
 			OBJImage.defineTHREE(THREE);
+
+			var magicMesh = null;
 
 			new OBJImage("models/lara/lara.obj", {
 				onLoad: function( file ){
@@ -58,6 +58,10 @@
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
 					scene.add(magicMesh);
+
+					var image = new OBJImage.ImageGenerator(modelLibrary);
+
+					document.body.appendChild(image);
 
 				}
 			});

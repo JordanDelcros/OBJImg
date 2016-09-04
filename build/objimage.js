@@ -16,6 +16,10 @@ var _MeshGenerator = require("./components/MeshGenerator.js");
 
 var _MeshGenerator2 = _interopRequireDefault(_MeshGenerator);
 
+var _ImageGenerator = require("./components/ImageGenerator.js");
+
+var _ImageGenerator2 = _interopRequireDefault(_ImageGenerator);
+
 var _ParseImage = require("./methods/ParseImage.js");
 
 var _ParseImage2 = _interopRequireDefault(_ParseImage);
@@ -83,12 +87,16 @@ var OBJImage = function () {
 exports.default = OBJImage;
 
 
+OBJImage.version = 2.0;
+
 OBJImage.defineTHREE = function (THREELibrary) {
 
 	exports.THREE = THREE = THREELibrary;
 };
 
 OBJImage.MeshGenerator = _MeshGenerator2.default;
+
+OBJImage.ImageGenerator = _ImageGenerator2.default;
 
 if (typeof define !== "undefined" && define instanceof Function && define.amd !== undefined) {
 
@@ -104,7 +112,7 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":4,"./components/MeshGenerator.js":7,"./methods/ParseImage.js":13,"./methods/ParseJSON.js":14,"./methods/ParseOBJ.js":16}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":4,"./components/ImageGenerator.js":5,"./components/MeshGenerator.js":8,"./methods/ParseImage.js":14,"./methods/ParseJSON.js":15,"./methods/ParseOBJ.js":17}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -428,6 +436,86 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var Sizes = exports.Sizes = {
+	max: 255 * 255 + 255
+};
+
+var ImageGenerator = function () {
+	function ImageGenerator(modelLibrary) {
+		_classCallCheck(this, ImageGenerator);
+
+		return this.initialize(modelLibrary);
+	}
+
+	_createClass(ImageGenerator, [{
+		key: "initialize",
+		value: function initialize(modelLibrary) {
+
+			this.pixels = new Array();
+
+			// version
+			this.addPixel(2, 0, 0, 0);
+
+			// compression type
+			this.addPixel(1, 0, 0, 0);
+
+			//
+
+			var canvas = document.createElement("canvas");
+			var context = canvas.getContext("2D");
+
+			var image = new Image();
+
+			image.src = canvas.toDataURL();
+
+			console.log(this.pixels);
+
+			return image;
+		}
+	}, {
+		key: "addPixel",
+		value: function addPixel() {
+			var red = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+			var green = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+			var blue = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+			var alpha = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+
+
+			if (red != null && green != null && blue != null && alpha != null) {
+
+				this.pixels.push(red, green, blue, alpha);
+			} else {
+
+				var value = Math.max(0, Math.min(MAX, red)) || 0;
+
+				var g = Math.min(Math.floor(value / 255), 255);
+				var r = g > 0 ? 255 : 0;
+				var b = Math.floor(value - r * g);
+				var a = r * g + b > 0 ? 255 : 0;
+
+				this.pixels.push(r, g, b, a);
+			};
+
+			return this;
+		}
+	}]);
+
+	return ImageGenerator;
+}();
+
+exports.default = ImageGenerator;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var ChannelType = exports.ChannelType = {
 	rgb: 0,
 	r: 1,
@@ -729,7 +817,7 @@ var Material = function () {
 
 exports.default = Material;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -970,7 +1058,7 @@ var MaterialLibrary = function () {
 exports.default = MaterialLibrary;
 ;
 
-},{"./Material.js":5}],7:[function(require,module,exports){
+},{"./Material.js":6}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -998,8 +1086,6 @@ var MeshGenerator = function () {
 		key: "initialize",
 		value: function initialize(modelLibrary) {
 
-			console.warn("MESH GENERATOR", modelLibrary);
-
 			var materials = new Object();
 
 			if (modelLibrary.materialLibrary != null) {
@@ -1014,8 +1100,6 @@ var MeshGenerator = function () {
 					for (var _iterator = modelLibrary.materialLibrary.materials[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var material = _step.value;
 
-
-						console.log(material);
 
 						materials[material.name] = new _OBJImage.THREE.MeshPhongMaterial({
 							color: new _OBJImage.THREE.Color(material.diffuse.red, material.diffuse.green, material.diffuse.blue),
@@ -1208,7 +1292,7 @@ var MeshGenerator = function () {
 exports.default = MeshGenerator;
 ;
 
-},{"../OBJImage.js":1}],8:[function(require,module,exports){
+},{"../OBJImage.js":1}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1365,7 +1449,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1558,7 +1642,7 @@ var ModelLibrary = function () {
 exports.default = ModelLibrary;
 ;
 
-},{"./Face.js":3,"./Model.js":8,"./Normal.js":10,"./Texture.js":11,"./Vertex.js":12}],10:[function(require,module,exports){
+},{"./Face.js":3,"./Model.js":9,"./Normal.js":11,"./Texture.js":12,"./Vertex.js":13}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1594,7 +1678,7 @@ var Normal = function () {
 exports.default = Normal;
 ;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1629,7 +1713,7 @@ var Texture = function () {
 exports.default = Texture;
 ;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1665,7 +1749,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1674,7 +1758,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = ParseImage;
 function ParseImage(image, onComplete) {};
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1686,7 +1770,7 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1800,7 +1884,7 @@ function ParseMTL(mtl, basePath, onComplete) {
 	onComplete(materialLibrary);
 };
 
-},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":6}],16:[function(require,module,exports){
+},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":7}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1921,5 +2005,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":6,"../components/ModelLibrary.js":9,"./ParseMTL.js":15}]},{},[1])(1)
+},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":7,"../components/ModelLibrary.js":10,"./ParseMTL.js":16}]},{},[1])(1)
 });

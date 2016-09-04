@@ -12,8 +12,6 @@ export default class MeshGenerator {
 	}
 	initialize( modelLibrary ){
 
-		console.warn("MESH GENERATOR", modelLibrary);
-
 		var materials = new Object();
 
 		if( modelLibrary.materialLibrary != null ){
@@ -21,8 +19,6 @@ export default class MeshGenerator {
 			var textureLoader = new THREE.TextureLoader();
 
 			for( let material of modelLibrary.materialLibrary.materials ){
-
-				console.log(material);
 
 				materials[material.name] = new THREE.MeshPhongMaterial({
 					color: new THREE.Color(material.diffuse.red, material.diffuse.green, material.diffuse.blue),
