@@ -112,7 +112,86 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":4,"./components/ImageGenerator.js":5,"./components/MeshGenerator.js":8,"./methods/ParseImage.js":14,"./methods/ParseJSON.js":15,"./methods/ParseOBJ.js":17}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":5,"./components/ImageGenerator.js":6,"./components/MeshGenerator.js":9,"./methods/ParseImage.js":15,"./methods/ParseJSON.js":16,"./methods/ParseOBJ.js":18}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Bounds = function () {
+	function Bounds(size) {
+		_classCallCheck(this, Bounds);
+
+		return this.initialize(size);
+	}
+
+	_createClass(Bounds, [{
+		key: "initialize",
+		value: function initialize(size) {
+
+			this.min = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+
+			this.max = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+
+			return this;
+		}
+	}, {
+		key: "measure",
+		value: function measure(x, y, z) {
+
+			this.min.x = x < this.min.x ? x : this.min.x;
+			this.min.y = y < this.min.y ? y : this.min.y;
+			this.min.z = z < this.min.z ? z : this.min.z;
+
+			this.max.x = x > this.max.x ? x : this.max.x;
+			this.max.y = y > this.max.y ? y : this.max.y;
+			this.max.z = z > this.max.z ? z : this.max.z;
+
+			return this;
+		}
+	}, {
+		key: "getSize",
+		value: function getSize() {
+
+			return {
+				x: this.max.x - this.min.x,
+				y: this.max.y - this.min.y,
+				z: this.max.z - this.min.z
+			};
+		}
+	}, {
+		key: "getMax",
+		value: function getMax() {
+
+			return Math.max(this.max.x, this.max.y, this.max.z);
+		}
+	}, {
+		key: "getMin",
+		value: function getMin() {
+
+			return Math.min(this.min.x, this.min.y, this.min.z);
+		}
+	}]);
+
+	return Bounds;
+}();
+
+exports.default = Bounds;
+
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -217,7 +296,7 @@ var Dictionary = function () {
 
 exports.default = Dictionary;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -268,7 +347,7 @@ var Face = function () {
 exports.default = Face;
 ;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -425,7 +504,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 	return null;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -437,7 +516,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Sizes = exports.Sizes = {
-	max: 255 * 255 + 255
+	max: 255 * 255 * 255
 };
 
 var ImageGenerator = function () {
@@ -451,15 +530,61 @@ var ImageGenerator = function () {
 		key: "initialize",
 		value: function initialize(modelLibrary) {
 
+			console.log("IMAGE GENERATOR");
+
 			this.pixels = new Array();
 
 			// version
-			this.addPixel(2, 0, 0, 0);
+			this.addPixel(2);
 
 			// compression type
-			this.addPixel(1, 0, 0, 0);
+			this.addPixel(1);
 
-			//
+			// multiplicator
+			this.addPixel(66);
+
+			// vertices count
+			this.addPixel(modelLibrary.vertices.length);
+
+			// vertices pivot
+			var vertexMultiplicator = Math.floor(Sizes.max / Math.max(modelLibrary.bounds.getMax() + Math.abs(modelLibrary.bounds.getMin()), 1));
+			this.vm = vertexMultiplicator;
+			this.addPixel(vertexMultiplicator);
+
+			console.log("vertex multi", vertexMultiplicator);
+
+			// vertices
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				for (var _iterator = modelLibrary.vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var vertex = _step.value;
+
+
+					console.log(vertex);
+
+					this.addPixel(vertex.x * vertexMultiplicator);
+					this.addPixel(vertex.y * vertexMultiplicator);
+					this.addPixel(vertex.z * vertexMultiplicator);
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+
+			;
 
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2D");
@@ -486,14 +611,47 @@ var ImageGenerator = function () {
 				this.pixels.push(red, green, blue, alpha);
 			} else {
 
-				var value = Math.max(0, Math.min(MAX, red)) || 0;
+				console.log("from", red);
 
-				var g = Math.min(Math.floor(value / 255), 255);
-				var r = g > 0 ? 255 : 0;
-				var b = Math.floor(value - r * g);
-				var a = r * g + b > 0 ? 255 : 0;
+				var value = Math.max(0, Math.min(Sizes.max, red)) || 0;
+
+				var r = 0;
+				var g = 0;
+				var b = 0;
+				var a = 0;
+
+				if (value <= 255) {
+
+					r = 1;
+					g = 1;
+					b = value;
+					a = 1;
+				} else if (value <= 255 * 255) {
+
+					r = 1;
+					g = value / 255;
+					b = 255;
+					a = 1;
+				} else {
+
+					r = value / 255 / 255;
+					g = 255;
+					b = 255;
+					a = 1;
+				};
+
+				console.log("RGBA", r, g, b, a);
+
+				console.log("to", r * g * b * a, r * g * b * a / this.vm);
 
 				this.pixels.push(r, g, b, a);
+
+				// let g = Math.min(Math.floor(value / 255), 255);
+				// let r = (g > 0 ? 255 : 0);
+				// let b = Math.floor(value - (r * g));
+				// let a = (((r * g) + b) > 0 ? 255 : 0);
+
+				// this.pixels.push(r, g, b, a);
 			};
 
 			return this;
@@ -505,7 +663,7 @@ var ImageGenerator = function () {
 
 exports.default = ImageGenerator;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -817,7 +975,7 @@ var Material = function () {
 
 exports.default = Material;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1058,7 +1216,7 @@ var MaterialLibrary = function () {
 exports.default = MaterialLibrary;
 ;
 
-},{"./Material.js":6}],8:[function(require,module,exports){
+},{"./Material.js":7}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1292,7 +1450,7 @@ var MeshGenerator = function () {
 exports.default = MeshGenerator;
 ;
 
-},{"../OBJImage.js":1}],9:[function(require,module,exports){
+},{"../OBJImage.js":1}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1449,7 +1607,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1478,6 +1636,14 @@ var _Face = require("./Face.js");
 
 var _Face2 = _interopRequireDefault(_Face);
 
+var _Bounds = require("./Bounds.js");
+
+var _Bounds2 = _interopRequireDefault(_Bounds);
+
+var _ImageGenerator = require("./ImageGenerator.js");
+
+var _ImageGenerator2 = _interopRequireDefault(_ImageGenerator);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1502,6 +1668,8 @@ var ModelLibrary = function () {
 			this.textures = new Array();
 
 			this.faces = new Array();
+
+			this.bounds = new _Bounds2.default();
 
 			this.materialLibrary = null;
 
@@ -1586,6 +1754,8 @@ var ModelLibrary = function () {
 
 			this.objects[this.objects.length - 1].addVertex(index);
 
+			this.bounds.measure(x, y, z);
+
 			return this;
 		}
 	}, {
@@ -1634,6 +1804,12 @@ var ModelLibrary = function () {
 
 			return this;
 		}
+	}, {
+		key: "toImage",
+		value: function toImage() {
+
+			return new _ImageGenerator2.default(this);
+		}
 	}]);
 
 	return ModelLibrary;
@@ -1642,7 +1818,7 @@ var ModelLibrary = function () {
 exports.default = ModelLibrary;
 ;
 
-},{"./Face.js":3,"./Model.js":9,"./Normal.js":11,"./Texture.js":12,"./Vertex.js":13}],11:[function(require,module,exports){
+},{"./Bounds.js":2,"./Face.js":4,"./ImageGenerator.js":6,"./Model.js":10,"./Normal.js":12,"./Texture.js":13,"./Vertex.js":14}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1678,7 +1854,7 @@ var Normal = function () {
 exports.default = Normal;
 ;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1713,7 +1889,7 @@ var Texture = function () {
 exports.default = Texture;
 ;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1749,7 +1925,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1758,7 +1934,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = ParseImage;
 function ParseImage(image, onComplete) {};
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1770,7 +1946,7 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1884,7 +2060,7 @@ function ParseMTL(mtl, basePath, onComplete) {
 	onComplete(materialLibrary);
 };
 
-},{"../components/Dictionary.js":2,"../components/MaterialLibrary.js":7}],17:[function(require,module,exports){
+},{"../components/Dictionary.js":3,"../components/MaterialLibrary.js":8}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2005,5 +2181,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":4,"../components/MaterialLibrary.js":7,"../components/ModelLibrary.js":10,"./ParseMTL.js":16}]},{},[1])(1)
+},{"../components/FileLoader.js":5,"../components/MaterialLibrary.js":8,"../components/ModelLibrary.js":11,"./ParseMTL.js":17}]},{},[1])(1)
 });

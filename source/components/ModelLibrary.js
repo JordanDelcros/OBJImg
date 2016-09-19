@@ -3,6 +3,8 @@ import Vertex from "./Vertex.js";
 import Normal from "./Normal.js";
 import Texture from "./Texture.js";
 import Face from "./Face.js";
+import Bounds from "./Bounds.js";
+import ImageGenerator from "./ImageGenerator.js";
 
 export default class ModelLibrary {
 	constructor(){
@@ -21,6 +23,8 @@ export default class ModelLibrary {
 		this.textures = new Array();
 
 		this.faces = new Array();
+
+		this.bounds = new Bounds();
 
 		this.materialLibrary = null;
 
@@ -86,6 +90,8 @@ export default class ModelLibrary {
 
 		this.objects[this.objects.length - 1].addVertex(index);
 
+		this.bounds.measure(x, y, z);
+
 		return this;
 
 	}
@@ -128,6 +134,11 @@ export default class ModelLibrary {
 		this.objects[this.objects.length - 1].setMaterial(name);
 
 		return this;
+
+	}
+	toImage(){
+
+		return new ImageGenerator(this);
 
 	}
 };
