@@ -1,6 +1,9 @@
 import OBJImage from "../OBJImage.js";
 
-export const MAX = (255 * 255 + 255);
+export const SIZES = {
+	high: (255 * 255 + 255),
+	max: (255 * 255 * 255 + 255)
+};
 
 export const COMPRESSION = {
 	default: 0
@@ -24,7 +27,7 @@ export default class ImageGenerator {
 
 		this.compressionType = this.setCompressionType(COMPRESSION.default);
 
-		this.verticesMultiplicator = this.addMultiplicator(Math.floor(MAX / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+		this.verticesMultiplicator = this.addMultiplicator(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
 		this.addPixel(this.modelLibrary.vertices.length);
 
@@ -36,10 +39,9 @@ export default class ImageGenerator {
 		// vertices
 		for( let vertex of modelLibrary.vertices ){
 
-			console.log(vertex.x);
 			this.addPixel((vertex.x + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-			// this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-			// this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+			this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+			this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
 
 		};
 
@@ -97,60 +99,14 @@ export default class ImageGenerator {
 		}
 		else {
 
-			let value = Math.max(0, Math.min(MAX, red));
+			let value = Math.max(0, Math.min(SIZES.max, red));
 
-			let split = Math.max(1, Math.ceil(value / MAX));
-
-			console.log(split)
+			let split = Math.max(1, Math.ceil(value / SIZES.high));
 
 			let g = Math.min(Math.floor((value / split) / 255), 255);
 			let r = (g > 0 ? 255 : 0);
 			let b = Math.floor((value / split) - (r * g));
 			let a = split;
-
-			// let r = null;
-			// let g = null;
-			// let b = null;
-			// let a = null;
-
-			// if( value <= 255 ){
-
-			// 	r = 1;
-			// 	g = 1;
-			// 	b = 1;
-			// 	a = value;
-			
-			// }
-			// else if( value <= (255 * 255) ){
-
-			// 	r = 1;
-			// 	g = Math.min(Math.floor(value / 255), 255);
-			// 	b = 255;
-			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-			// }
-			// else if( value <= (255 * 255 * 255) ){
-
-			// 	console.log("HIGH")
-
-			// 	r = Math.min(Math.floor(value / 255 / 255), 255);
-			// 	g = 255;
-			// 	b = 255;
-			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-			// }
-			// else {
-
-			// 	r = 255;
-			// 	g = 255;
-			// 	b = 255;
-			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-			// };
-
-			console.log(r,g,b,a);
-			console.log( (((r*g+b)*a) / this.verticesMultiplicator).toFixed(6) );
-			console.log("");
 
 			this.pixels.push(r, g, b, a);
 

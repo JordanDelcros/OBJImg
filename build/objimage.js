@@ -510,7 +510,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.COMPRESSION = exports.MAX = undefined;
+exports.COMPRESSION = exports.SIZES = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -522,7 +522,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var MAX = exports.MAX = 255 * 255 + 255;
+var SIZES = exports.SIZES = {
+	high: 255 * 255 + 255,
+	max: 255 * 255 * 255 + 255
+};
 
 var COMPRESSION = exports.COMPRESSION = {
 	default: 0
@@ -549,7 +552,7 @@ var ImageGenerator = function () {
 
 			this.compressionType = this.setCompressionType(COMPRESSION.default);
 
-			this.verticesMultiplicator = this.addMultiplicator(Math.floor(MAX / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+			this.verticesMultiplicator = this.addMultiplicator(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
 			this.addPixel(this.modelLibrary.vertices.length);
 
@@ -568,10 +571,9 @@ var ImageGenerator = function () {
 					var vertex = _step.value;
 
 
-					console.log(vertex.x);
 					this.addPixel((vertex.x + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-					// this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-					// this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+					this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+					this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
 				}
 			} catch (err) {
 				_didIteratorError = true;
@@ -652,60 +654,14 @@ var ImageGenerator = function () {
 				this.pixels.push(red, green, blue, alpha);
 			} else {
 
-				var value = Math.max(0, Math.min(MAX, red));
+				var value = Math.max(0, Math.min(SIZES.max, red));
 
-				var split = Math.max(1, Math.ceil(value / MAX));
-
-				console.log(split);
+				var split = Math.max(1, Math.ceil(value / SIZES.high));
 
 				var g = Math.min(Math.floor(value / split / 255), 255);
 				var r = g > 0 ? 255 : 0;
 				var b = Math.floor(value / split - r * g);
 				var a = split;
-
-				// let r = null;
-				// let g = null;
-				// let b = null;
-				// let a = null;
-
-				// if( value <= 255 ){
-
-				// 	r = 1;
-				// 	g = 1;
-				// 	b = 1;
-				// 	a = value;
-
-				// }
-				// else if( value <= (255 * 255) ){
-
-				// 	r = 1;
-				// 	g = Math.min(Math.floor(value / 255), 255);
-				// 	b = 255;
-				// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-				// }
-				// else if( value <= (255 * 255 * 255) ){
-
-				// 	console.log("HIGH")
-
-				// 	r = Math.min(Math.floor(value / 255 / 255), 255);
-				// 	g = 255;
-				// 	b = 255;
-				// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-				// }
-				// else {
-
-				// 	r = 255;
-				// 	g = 255;
-				// 	b = 255;
-				// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
-
-				// };
-
-				console.log(r, g, b, a);
-				console.log(((r * g + b) * a / this.verticesMultiplicator).toFixed(6));
-				console.log("");
 
 				this.pixels.push(r, g, b, a);
 			};
