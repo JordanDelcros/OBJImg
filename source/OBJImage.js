@@ -76,7 +76,7 @@ export default class OBJImage {
 	}
 }
 
-OBJImage.version = 2.0;
+OBJImage.version = "2.0.0";
 
 OBJImage.defineTHREE = ( THREELibrary )=>{
 

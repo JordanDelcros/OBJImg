@@ -57,9 +57,12 @@
 
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
-					scene.add(magicMesh);
+					// scene.add(magicMesh);
 
 					var image = modelLibrary.toImage();
+
+					image.style.position = "absolute";
+					image.style.bottom = "0px";
 
 					document.body.appendChild(image);
 

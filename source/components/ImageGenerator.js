@@ -1,5 +1,9 @@
-export const Sizes = {
-	max: (255 * 255 * 255)
+import OBJImage from "../OBJImage.js";
+
+export const MAX = (255 * 255 + 255);
+
+export const COMPRESSION = {
+	default: 0
 };
 
 export default class ImageGenerator {
@@ -12,40 +16,35 @@ export default class ImageGenerator {
 
 		console.log("IMAGE GENERATOR");
 
+		this.modelLibrary = modelLibrary;
+
 		this.pixels = new Array();
 
-		// version
-		this.addPixel(2);
+		this.version = this.setVersion(OBJImage.version);
 
-		// compression type
-		this.addPixel(1);
+		this.compressionType = this.setCompressionType(COMPRESSION.default);
 
-		// multiplicator
-		this.addPixel(66);
+		this.verticesMultiplicator = this.addMultiplicator(Math.floor(MAX / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
-		// vertices count
-		this.addPixel(modelLibrary.vertices.length);
+		this.addPixel(this.modelLibrary.vertices.length);
 
 		// vertices pivot
-		var vertexMultiplicator = Math.floor(Sizes.max / Math.max(modelLibrary.bounds.getMax() + Math.abs(modelLibrary.bounds.getMin()), 1));
-		this.vm = vertexMultiplicator;
-		this.addPixel(vertexMultiplicator);
+		this.addPixel(this.verticesMultiplicator);
 
-		console.log("vertex multi", vertexMultiplicator);
+		console.log("vertex multi", this.verticesMultiplicator);
 
 		// vertices
 		for( let vertex of modelLibrary.vertices ){
 
-			console.log(vertex);
-
-			this.addPixel(vertex.x * vertexMultiplicator);
-			this.addPixel(vertex.y * vertexMultiplicator);
-			this.addPixel(vertex.z * vertexMultiplicator);
+			console.log(vertex.x);
+			this.addPixel((vertex.x + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+			// this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+			// this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
 
 		};
 
 		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2D");
+		var context = canvas.getContext("2d");
 
 		var image = new Image();
 
@@ -54,6 +53,39 @@ export default class ImageGenerator {
 		console.log(this.pixels);
 
 		return image;
+
+	}
+	setVersion( version ){
+
+		version = version.toString().split(/\./g);
+
+		this.setPixel(0, parseInt(version[0]), parseInt(version[1]), parseInt(version[2]), 255);
+
+		return version;
+
+	}
+	setCompressionType( type ){
+
+		this.setPixel(1, type, 0, 0, 255);
+
+		return type;
+
+	}
+	setPixel( index, red, green, blue, alpha ){
+
+		this.pixels[index * 4 + 0] = red;
+		this.pixels[index * 4 + 1] = green;
+		this.pixels[index * 4 + 2] = blue;
+		this.pixels[index * 4 + 3] = alpha;
+
+		return this;
+
+	}
+	addMultiplicator( multiplicator ){
+
+		this.addPixel(multiplicator);
+
+		return multiplicator;
 
 	}
 	addPixel( red = null, green = null, blue = null, alpha = null ){
@@ -65,52 +97,62 @@ export default class ImageGenerator {
 		}
 		else {
 
-			console.log("from", red);
+			let value = Math.max(0, Math.min(MAX, red));
 
-			let value = Math.max(0, Math.min(Sizes.max, red)) || 0;
+			let split = Math.max(1, Math.ceil(value / MAX));
 
-			let r = 0;
-			let g = 0;
-			let b = 0;
-			let a = 0;
+			console.log(split)
 
-			if( value <= 255 ){
+			let g = Math.min(Math.floor((value / split) / 255), 255);
+			let r = (g > 0 ? 255 : 0);
+			let b = Math.floor((value / split) - (r * g));
+			let a = split;
 
-				r = 1;
-				g = 1;
-				b = value;
-				a = 1;
+			// let r = null;
+			// let g = null;
+			// let b = null;
+			// let a = null;
 
-			}
-			else if( value <= (255 * 255) ){
+			// if( value <= 255 ){
 
-				r = 1;
-				g = (value / 255);
-				b = 255;
-				a = 1;
+			// 	r = 1;
+			// 	g = 1;
+			// 	b = 1;
+			// 	a = value;
+			
+			// }
+			// else if( value <= (255 * 255) ){
 
-			}
-			else {
+			// 	r = 1;
+			// 	g = Math.min(Math.floor(value / 255), 255);
+			// 	b = 255;
+			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
 
-				r = (value / 255 / 255);
-				g = 255;
-				b = 255;
-				a = 1;
+			// }
+			// else if( value <= (255 * 255 * 255) ){
 
-			};
+			// 	console.log("HIGH")
 
-			console.log("RGBA", r, g, b, a)
+			// 	r = Math.min(Math.floor(value / 255 / 255), 255);
+			// 	g = 255;
+			// 	b = 255;
+			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
 
-			console.log("to", r * g * b * a, (r*g*b*a) / this.vm);
+			// }
+			// else {
+
+			// 	r = 255;
+			// 	g = 255;
+			// 	b = 255;
+			// 	a = Math.max(0, Math.min(Math.floor(value - (r * g * b)), 255));
+
+			// };
+
+			console.log(r,g,b,a);
+			console.log( (((r*g+b)*a) / this.verticesMultiplicator).toFixed(6) );
+			console.log("");
 
 			this.pixels.push(r, g, b, a);
-
-			// let g = Math.min(Math.floor(value / 255), 255);
-			// let r = (g > 0 ? 255 : 0);
-			// let b = Math.floor(value - (r * g));
-			// let a = (((r * g) + b) > 0 ? 255 : 0);
-
-			// this.pixels.push(r, g, b, a);
 
 		};
 
