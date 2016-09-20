@@ -535,45 +535,45 @@ var ImageGenerator = function () {
 	function ImageGenerator(modelLibrary) {
 		_classCallCheck(this, ImageGenerator);
 
-		return this.initialize(modelLibrary);
+		this.pixels = new Array();
+
+		this.modelLibrary = modelLibrary;
+
+		this.version = _OBJImage2.default.version;
+
+		this.compressionType = COMPRESSION.default;
+
+		return this.initialize();
 	}
 
 	_createClass(ImageGenerator, [{
 		key: "initialize",
-		value: function initialize(modelLibrary) {
+		value: function initialize() {
 
 			console.log("IMAGE GENERATOR");
 
-			this.modelLibrary = modelLibrary;
+			this.setVersion(this.version);
 
-			this.pixels = new Array();
+			this.setCompressionType(this.compressionType);
 
-			this.version = this.setVersion(_OBJImage2.default.version);
+			this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
-			this.compressionType = this.setCompressionType(COMPRESSION.default);
+			this.verticesLength = this.addPixel(this.modelLibrary.vertices.length);
 
-			this.verticesMultiplicator = this.addMultiplicator(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+			this.verticesPivot = this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * this.verticesMultiplicator) / this.verticesMultiplicator;
 
-			this.addPixel(this.modelLibrary.vertices.length);
-
-			// vertices pivot
-			this.addPixel(this.verticesMultiplicator);
-
-			console.log("vertex multi", this.verticesMultiplicator);
-
-			// vertices
 			var _iteratorNormalCompletion = true;
 			var _didIteratorError = false;
 			var _iteratorError = undefined;
 
 			try {
-				for (var _iterator = modelLibrary.vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				for (var _iterator = this.modelLibrary.vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 					var vertex = _step.value;
 
 
-					this.addPixel((vertex.x + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-					this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-					this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+					this.addPixel((vertex.x + this.verticesPivot) * this.verticesMultiplicator);
+					this.addPixel((vertex.y + this.verticesPivot) * this.verticesMultiplicator);
+					this.addPixel((vertex.z + this.verticesPivot) * this.verticesMultiplicator);
 				}
 			} catch (err) {
 				_didIteratorError = true;
@@ -592,14 +592,15 @@ var ImageGenerator = function () {
 
 			;
 
+			// STOPED HERE
+			this.normalsMultiplicator = this.addPixel();
+
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2d");
 
 			var image = new Image();
 
 			image.src = canvas.toDataURL();
-
-			console.log(this.pixels);
 
 			return image;
 		}
@@ -633,14 +634,6 @@ var ImageGenerator = function () {
 			return this;
 		}
 	}, {
-		key: "addMultiplicator",
-		value: function addMultiplicator(multiplicator) {
-
-			this.addPixel(multiplicator);
-
-			return multiplicator;
-		}
-	}, {
 		key: "addPixel",
 		value: function addPixel() {
 			var red = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
@@ -649,24 +642,21 @@ var ImageGenerator = function () {
 			var alpha = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
 
-			if (red != null && green != null && blue != null && alpha != null) {
-
-				this.pixels.push(red, green, blue, alpha);
-			} else {
+			if (green == null && blue == null && alpha == null) {
 
 				var value = Math.max(0, Math.min(SIZES.max, red));
 
 				var split = Math.max(1, Math.ceil(value / SIZES.high));
 
-				var g = Math.min(Math.floor(value / split / 255), 255);
-				var r = g > 0 ? 255 : 0;
-				var b = Math.floor(value / split - r * g);
-				var a = split;
-
-				this.pixels.push(r, g, b, a);
+				green = Math.min(Math.floor(value / split / 255), 255);
+				red = green > 0 ? 255 : 0;
+				blue = Math.floor(value / split - red * green);
+				alpha = split;
 			};
 
-			return this;
+			this.pixels.push(red, green, blue, alpha);
+
+			return (red * green + blue) * alpha;
 		}
 	}]);
 
@@ -1766,7 +1756,7 @@ var ModelLibrary = function () {
 
 			this.objects[this.objects.length - 1].addVertex(index);
 
-			this.bounds.measure(x, y, z);
+			this.bounds.measure("vertices", x, y, z);
 
 			return this;
 		}

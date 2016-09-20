@@ -12,38 +12,41 @@ export const COMPRESSION = {
 export default class ImageGenerator {
 	constructor( modelLibrary ){
 
-		return this.initialize(modelLibrary);
-
-	}
-	initialize( modelLibrary ){
-
-		console.log("IMAGE GENERATOR");
+		this.pixels = new Array();
 
 		this.modelLibrary = modelLibrary;
 
-		this.pixels = new Array();
+		this.version = OBJImage.version;
 
-		this.version = this.setVersion(OBJImage.version);
+		this.compressionType = COMPRESSION.default;
 
-		this.compressionType = this.setCompressionType(COMPRESSION.default);
+		return this.initialize();
 
-		this.verticesMultiplicator = this.addMultiplicator(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+	}
+	initialize(){
 
-		this.addPixel(this.modelLibrary.vertices.length);
+		console.log("IMAGE GENERATOR");
 
-		// vertices pivot
-		this.addPixel(this.verticesMultiplicator);
+		this.setVersion(this.version);
 
-		console.log("vertex multi", this.verticesMultiplicator);
+		this.setCompressionType(this.compressionType);
 
-		// vertices
-		for( let vertex of modelLibrary.vertices ){
+		this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
-			this.addPixel((vertex.x + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-			this.addPixel((vertex.y + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
-			this.addPixel((vertex.z + Math.abs(this.modelLibrary.bounds.getMin())) * this.verticesMultiplicator);
+		this.verticesLength = this.addPixel(this.modelLibrary.vertices.length);
+
+		this.verticesPivot = this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * this.verticesMultiplicator) / this.verticesMultiplicator;
+
+		for( let vertex of this.modelLibrary.vertices ){
+
+			this.addPixel((vertex.x + this.verticesPivot) * this.verticesMultiplicator);
+			this.addPixel((vertex.y + this.verticesPivot) * this.verticesMultiplicator);
+			this.addPixel((vertex.z + this.verticesPivot) * this.verticesMultiplicator);
 
 		};
+
+		// STOPED HERE
+		this.normalsMultiplicator = this.addPixel();
 
 		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
@@ -51,8 +54,6 @@ export default class ImageGenerator {
 		var image = new Image();
 
 		image.src = canvas.toDataURL();
-
-		console.log(this.pixels);
 
 		return image;
 
@@ -83,36 +84,24 @@ export default class ImageGenerator {
 		return this;
 
 	}
-	addMultiplicator( multiplicator ){
-
-		this.addPixel(multiplicator);
-
-		return multiplicator;
-
-	}
 	addPixel( red = null, green = null, blue = null, alpha = null ){
 
-		if( red != null && green != null && blue != null && alpha != null ){
-
-			this.pixels.push(red, green, blue, alpha);
-
-		}
-		else {
+		if( green == null && blue == null && alpha == null ){
 
 			let value = Math.max(0, Math.min(SIZES.max, red));
 
 			let split = Math.max(1, Math.ceil(value / SIZES.high));
 
-			let g = Math.min(Math.floor((value / split) / 255), 255);
-			let r = (g > 0 ? 255 : 0);
-			let b = Math.floor((value / split) - (r * g));
-			let a = split;
-
-			this.pixels.push(r, g, b, a);
+			green = Math.min(Math.floor((value / split) / 255), 255);
+			red = (green > 0 ? 255 : 0);
+			blue = Math.floor((value / split) - (red * green));
+			alpha = split;
 
 		};
 
-		return this;
+		this.pixels.push(red, green, blue, alpha);
+
+		return (red * green + blue) * alpha;
 
 	}
 }

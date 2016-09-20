@@ -2,25 +2,28 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
-	<title>OBJimage</title>
+	<title>OBJImage</title>
 	<style type="text/css">
 
 		* {
 			margin: 0;
+			padding: 0;
 			border: 0;
 			outline: 0;
 		}
 
 	</style>
-	<script type="text/javascript" src="../node_modules/three-js/three.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r81/three.min.js"></script>
 	<script type="text/javascript" src="../build/objimage.js"></script>
 	<script type="text/javascript">
 
 		document.addEventListener("DOMContentLoaded", function(){
 
 			var renderer = new THREE.WebGLRenderer({
-				antialias: true
+				// antialias: true
 			});
+
+			renderer.setClearColor(0x000000, 1);
 
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -57,7 +60,9 @@
 
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
-					// scene.add(magicMesh);
+					console.log(magicMesh);
+
+					scene.add(magicMesh);
 
 					var image = modelLibrary.toImage();
 
@@ -91,7 +96,5 @@
 
 	</script>
 </head>
-<body>
-
-</body>
+<body></body>
 </html>
