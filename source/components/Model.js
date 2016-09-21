@@ -4,7 +4,9 @@ export default class Model {
 		return this.initialize( name );
 
 	}
-	initialize( name ){
+	initialize( name = null ){
+
+		this.name = name;
 
 		this.groups = new Array();
 
@@ -12,7 +14,6 @@ export default class Model {
 
 		this.groups[this.groups.length - 1].default = true;
 
-		this.setName(name);
 
 		return this;
 

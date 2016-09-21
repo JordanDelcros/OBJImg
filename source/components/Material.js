@@ -150,7 +150,7 @@ export default class Material {
 	}
 	setOpacity( opacity = 1 ){
 
-		this.opacity.value = opacity;
+		this.opacity.value = parseFloat(opacity);
 
 		return this;
 

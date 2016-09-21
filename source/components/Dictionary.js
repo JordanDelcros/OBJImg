@@ -1,4 +1,4 @@
-export const LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-—_.#0123456789";
+export const LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_—,.#0123456789";
 
 export default class Dictionary {
 	constructor( source ){

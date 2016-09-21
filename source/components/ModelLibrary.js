@@ -41,7 +41,7 @@ export default class ModelLibrary {
 
 			delete this.objects[this.objects.length - 1].default;
 
-			this.objects[this.objects.length - 1].setName(name);
+			this.objects[this.objects.length - 1].name = name;
 
 		}
 		else {

@@ -60,14 +60,13 @@
 
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
-					console.log(magicMesh);
-
 					scene.add(magicMesh);
 
 					var image = modelLibrary.toImage();
 
 					image.style.position = "absolute";
 					image.style.bottom = "0px";
+					image.style.width = image.style.height = "500px";
 
 					document.body.appendChild(image);
 

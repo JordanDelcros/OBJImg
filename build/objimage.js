@@ -210,7 +210,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var LetterLibrary = exports.LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-—_.#0123456789";
+var LetterLibrary = exports.LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_—,.#0123456789";
 
 var Dictionary = function () {
 	function Dictionary(source) {
@@ -526,6 +526,10 @@ var _OBJImage = require("../OBJImage.js");
 
 var _OBJImage2 = _interopRequireDefault(_OBJImage);
 
+var _Dictionary = require("./Dictionary.js");
+
+var _Dictionary2 = _interopRequireDefault(_Dictionary);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -564,7 +568,7 @@ var ImageGenerator = function () {
 
 			this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
-			this.verticesLength = this.addPixel(this.modelLibrary.vertices.length);
+			this.addPixel(this.modelLibrary.vertices.length);
 
 			this.verticesPivot = this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * this.verticesMultiplicator) / this.verticesMultiplicator;
 
@@ -632,7 +636,7 @@ var ImageGenerator = function () {
 
 			;
 
-			this.texturesLength = this.addPixel(this.modelLibrary.textures.length);
+			this.addPixel(this.modelLibrary.textures.length);
 
 			var _iteratorNormalCompletion3 = true;
 			var _didIteratorError3 = false;
@@ -663,10 +667,758 @@ var ImageGenerator = function () {
 
 			;
 
-			console.log(this.pixels);
+			this.addPixel(this.modelLibrary.faces.length);
+
+			var _iteratorNormalCompletion4 = true;
+			var _didIteratorError4 = false;
+			var _iteratorError4 = undefined;
+
+			try {
+				for (var _iterator4 = this.modelLibrary.faces[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					var face = _step4.value;
+
+
+					this.addPixel(face.normalA);
+					this.addPixel(face.normalB);
+					this.addPixel(face.normalC);
+
+					this.addPixel(face.textureA);
+					this.addPixel(face.textureB);
+					this.addPixel(face.textureC);
+
+					this.addPixel(face.vertexA);
+					this.addPixel(face.vertexB);
+					this.addPixel(face.vertexC);
+				}
+			} catch (err) {
+				_didIteratorError4 = true;
+				_iteratorError4 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion4 && _iterator4.return) {
+						_iterator4.return();
+					}
+				} finally {
+					if (_didIteratorError4) {
+						throw _iteratorError4;
+					}
+				}
+			}
+
+			;
+
+			this.addPixel(this.modelLibrary.materialLibrary.materials.length);
+
+			var _iteratorNormalCompletion5 = true;
+			var _didIteratorError5 = false;
+			var _iteratorError5 = undefined;
+
+			try {
+				for (var _iterator5 = this.modelLibrary.materialLibrary.materials[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+					var material = _step5.value;
+
+
+					var nameDictionary = new _Dictionary2.default(material.name);
+
+					this.addPixel(nameDictionary.letters.length);
+
+					var _iteratorNormalCompletion7 = true;
+					var _didIteratorError7 = false;
+					var _iteratorError7 = undefined;
+
+					try {
+						for (var _iterator7 = nameDictionary.letters[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+							var _letter7 = _step7.value;
+
+
+							this.addPixel(_letter7);
+						}
+					} catch (err) {
+						_didIteratorError7 = true;
+						_iteratorError7 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion7 && _iterator7.return) {
+								_iterator7.return();
+							}
+						} finally {
+							if (_didIteratorError7) {
+								throw _iteratorError7;
+							}
+						}
+					}
+
+					;
+
+					this.addPixel(material.illumination);
+
+					this.addPixel(material.smooth);
+
+					this.addPixel(material.ambient.red * 255, material.ambient.green * 255, material.ambient.blue * 255, 1);
+
+					this.addPixel(material.ambient.map == null ? false : true);
+
+					if (material.ambient.map != null) {
+
+						this.addPixel(material.ambient.map == null ? false : true);
+
+						this.addPixel(material.ambient.channel);
+
+						var mapDictionnary = new _Dictionary2.default(material.ambient.map);
+
+						this.addPixel(mapDictionnary.letters.length);
+
+						var _iteratorNormalCompletion8 = true;
+						var _didIteratorError8 = false;
+						var _iteratorError8 = undefined;
+
+						try {
+							for (var _iterator8 = mapDictionnary.letters[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+								var letter = _step8.value;
+
+
+								this.addPixel(letter);
+							}
+						} catch (err) {
+							_didIteratorError8 = true;
+							_iteratorError8 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion8 && _iterator8.return) {
+									_iterator8.return();
+								}
+							} finally {
+								if (_didIteratorError8) {
+									throw _iteratorError8;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.diffuse.red * 255, material.diffuse.green * 255, material.diffuse.blue * 255, 1);
+
+					this.addPixel(material.diffuse.map == null ? false : true);
+
+					if (material.diffuse.map != null) {
+
+						this.addPixel(material.diffuse.clamp == null ? false : true);
+
+						this.addPixel(material.diffuse.channel);
+
+						var _mapDictionnary = new _Dictionary2.default(material.diffuse.map);
+
+						this.addPixel(_mapDictionnary.letters.length);
+
+						var _iteratorNormalCompletion9 = true;
+						var _didIteratorError9 = false;
+						var _iteratorError9 = undefined;
+
+						try {
+							for (var _iterator9 = _mapDictionnary.letters[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+								var _letter = _step9.value;
+
+
+								this.addPixel(_letter);
+							}
+						} catch (err) {
+							_didIteratorError9 = true;
+							_iteratorError9 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion9 && _iterator9.return) {
+									_iterator9.return();
+								}
+							} finally {
+								if (_didIteratorError9) {
+									throw _iteratorError9;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.bump.red * 255, material.bump.green * 255, material.bump.blue * 255, 1);
+
+					this.addPixel(material.bump.map == null ? false : true);
+
+					if (material.bump.map != null) {
+
+						this.addPixel(material.bump.clamp == null ? false : true);
+
+						this.addPixel(material.bump.channel);
+
+						var _mapDictionnary2 = new _Dictionary2.default(material.bump.map);
+
+						this.addPixel(_mapDictionnary2.letters.length);
+
+						var _iteratorNormalCompletion10 = true;
+						var _didIteratorError10 = false;
+						var _iteratorError10 = undefined;
+
+						try {
+							for (var _iterator10 = _mapDictionnary2.letters[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+								var _letter2 = _step10.value;
+
+
+								this.addPixel(_letter2);
+							}
+						} catch (err) {
+							_didIteratorError10 = true;
+							_iteratorError10 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion10 && _iterator10.return) {
+									_iterator10.return();
+								}
+							} finally {
+								if (_didIteratorError10) {
+									throw _iteratorError10;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.specular.red * 255, material.specular.green * 255, material.specular.blue * 255, 1);
+
+					this.addPixel(material.specular.force * (SIZES.max / 1000));
+
+					this.addPixel(material.specular.map == null ? false : true);
+
+					if (material.specular.map != null) {
+
+						this.addPixel(material.specular.clamp == null ? false : true);
+
+						this.addPixel(material.specular.channel);
+
+						var _mapDictionnary3 = new _Dictionary2.default(material.specular.map);
+
+						this.addPixel(_mapDictionnary3.letters.length);
+
+						var _iteratorNormalCompletion11 = true;
+						var _didIteratorError11 = false;
+						var _iteratorError11 = undefined;
+
+						try {
+							for (var _iterator11 = _mapDictionnary3.letters[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+								var _letter3 = _step11.value;
+
+
+								this.addPixel(_letter3);
+							}
+						} catch (err) {
+							_didIteratorError11 = true;
+							_iteratorError11 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion11 && _iterator11.return) {
+									_iterator11.return();
+								}
+							} finally {
+								if (_didIteratorError11) {
+									throw _iteratorError11;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.specularForce.map == null ? false : true);
+
+					if (material.specularForce.map != null) {
+
+						this.addPixel(material.specular.value * SIZES.max);
+
+						this.addPixel(material.specularForce.clamp == null ? false : true);
+
+						this.addPixel(material.specularForce.channel);
+
+						var _mapDictionnary4 = new _Dictionary2.default(material.specularForce.map);
+
+						this.addPixel(_mapDictionnary4.letters.length);
+
+						var _iteratorNormalCompletion12 = true;
+						var _didIteratorError12 = false;
+						var _iteratorError12 = undefined;
+
+						try {
+							for (var _iterator12 = _mapDictionnary4.letters[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+								var _letter4 = _step12.value;
+
+
+								this.addPixel(_letter4);
+							}
+						} catch (err) {
+							_didIteratorError12 = true;
+							_iteratorError12 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion12 && _iterator12.return) {
+									_iterator12.return();
+								}
+							} finally {
+								if (_didIteratorError12) {
+									throw _iteratorError12;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.environement.map == null ? false : true);
+
+					if (material.environement.map != null) {
+
+						this.addPixel(material.specular.force * (SIZES.max / 1000));
+
+						this.addPixel(material.environement.clamp == null ? false : true);
+
+						this.addPixel(material.environement.channel);
+
+						var _mapDictionnary5 = new _Dictionary2.default(material.environement.map);
+
+						this.addPixel(_mapDictionnary5.letters.length);
+
+						var _iteratorNormalCompletion13 = true;
+						var _didIteratorError13 = false;
+						var _iteratorError13 = undefined;
+
+						try {
+							for (var _iterator13 = _mapDictionnary5.letters[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+								var _letter5 = _step13.value;
+
+
+								this.addPixel(_letter5);
+							}
+						} catch (err) {
+							_didIteratorError13 = true;
+							_iteratorError13 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion13 && _iterator13.return) {
+									_iterator13.return();
+								}
+							} finally {
+								if (_didIteratorError13) {
+									throw _iteratorError13;
+								}
+							}
+						}
+
+						;
+					};
+
+					this.addPixel(material.specular.value * SIZES.max);
+
+					this.addPixel(material.opacity.map == null ? false : true);
+
+					if (material.opacity.map != null) {
+
+						this.addPixel(material.opacity.clamp == null ? false : true);
+
+						this.addPixel(material.opacity.channel);
+
+						var _mapDictionnary6 = new _Dictionary2.default(material.opacity.map);
+
+						this.addPixel(_mapDictionnary6.letters.length);
+
+						var _iteratorNormalCompletion14 = true;
+						var _didIteratorError14 = false;
+						var _iteratorError14 = undefined;
+
+						try {
+							for (var _iterator14 = _mapDictionnary6.letters[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+								var _letter6 = _step14.value;
+
+
+								this.addPixel(_letter6);
+							}
+						} catch (err) {
+							_didIteratorError14 = true;
+							_iteratorError14 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion14 && _iterator14.return) {
+									_iterator14.return();
+								}
+							} finally {
+								if (_didIteratorError14) {
+									throw _iteratorError14;
+								}
+							}
+						}
+
+						;
+					};
+				}
+			} catch (err) {
+				_didIteratorError5 = true;
+				_iteratorError5 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion5 && _iterator5.return) {
+						_iterator5.return();
+					}
+				} finally {
+					if (_didIteratorError5) {
+						throw _iteratorError5;
+					}
+				}
+			}
+
+			;
+
+			this.addPixel(this.modelLibrary.objects.length);
+
+			var _iteratorNormalCompletion6 = true;
+			var _didIteratorError6 = false;
+			var _iteratorError6 = undefined;
+
+			try {
+				for (var _iterator6 = this.modelLibrary.objects[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+					var object = _step6.value;
+
+
+					var objectDictionary = new _Dictionary2.default(object.name);
+
+					this.addPixel(objectDictionary.letters.length);
+
+					var _iteratorNormalCompletion15 = true;
+					var _didIteratorError15 = false;
+					var _iteratorError15 = undefined;
+
+					try {
+						for (var _iterator15 = objectDictionary.letters[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+							var _letter8 = _step15.value;
+
+
+							this.addPixel(_letter8);
+						}
+					} catch (err) {
+						_didIteratorError15 = true;
+						_iteratorError15 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion15 && _iterator15.return) {
+								_iterator15.return();
+							}
+						} finally {
+							if (_didIteratorError15) {
+								throw _iteratorError15;
+							}
+						}
+					}
+
+					;
+
+					this.addPixel(object.groups.length);
+
+					var _iteratorNormalCompletion16 = true;
+					var _didIteratorError16 = false;
+					var _iteratorError16 = undefined;
+
+					try {
+						for (var _iterator16 = object.groups[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+							var group = _step16.value;
+
+
+							var groupDictionary = new _Dictionary2.default(group.name);
+
+							this.addPixel(groupDictionary.letters.length);
+
+							var _iteratorNormalCompletion17 = true;
+							var _didIteratorError17 = false;
+							var _iteratorError17 = undefined;
+
+							try {
+								for (var _iterator17 = groupDictionary.letters[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+									var _letter9 = _step17.value;
+
+
+									this.addPixel(_letter9);
+								}
+							} catch (err) {
+								_didIteratorError17 = true;
+								_iteratorError17 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion17 && _iterator17.return) {
+										_iterator17.return();
+									}
+								} finally {
+									if (_didIteratorError17) {
+										throw _iteratorError17;
+									}
+								}
+							}
+
+							;
+
+							this.addPixel(group.vertices.length);
+
+							var previousVertex = null;
+							var vertexFastPass = false;
+
+							var _iteratorNormalCompletion18 = true;
+							var _didIteratorError18 = false;
+							var _iteratorError18 = undefined;
+
+							try {
+								for (var _iterator18 = group.vertices[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+									var _vertex = _step18.value;
+
+
+									if (vertexFastPass == true) {
+
+										if (previousVertex + 1 != _vertex) {
+
+											vertexFastPass = false;
+
+											this.addPixel(_vertex);
+										};
+									} else if (vertexFastPass == false) {
+
+										if (previousVertex != null && previousVertex + 1 == _vertex) {
+
+											vertexFastPass = true;
+
+											this.addPixel(0);
+										} else {
+
+											this.addPixel(_vertex);
+										};
+									};
+
+									previousVertex = _vertex;
+								}
+							} catch (err) {
+								_didIteratorError18 = true;
+								_iteratorError18 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion18 && _iterator18.return) {
+										_iterator18.return();
+									}
+								} finally {
+									if (_didIteratorError18) {
+										throw _iteratorError18;
+									}
+								}
+							}
+
+							;
+
+							var previousNormal = null;
+							var normalFastPass = false;
+
+							var _iteratorNormalCompletion19 = true;
+							var _didIteratorError19 = false;
+							var _iteratorError19 = undefined;
+
+							try {
+								for (var _iterator19 = group.normals[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+									var _normal = _step19.value;
+
+
+									if (normalFastPass == true) {
+
+										if (previousNormal + 1 != _normal) {
+
+											normalFastPass = false;
+
+											this.addPixel(_normal);
+										};
+									} else if (normalFastPass == false) {
+
+										if (previousNormal != null && previousNormal + 1 == _normal) {
+
+											normalFastPass = true;
+
+											this.addPixel(0);
+										} else {
+
+											this.addPixel(_normal);
+										};
+									};
+
+									previousNormal = _normal;
+								}
+							} catch (err) {
+								_didIteratorError19 = true;
+								_iteratorError19 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion19 && _iterator19.return) {
+										_iterator19.return();
+									}
+								} finally {
+									if (_didIteratorError19) {
+										throw _iteratorError19;
+									}
+								}
+							}
+
+							;
+
+							var previousTexture = null;
+							var textureFastPass = false;
+
+							var _iteratorNormalCompletion20 = true;
+							var _didIteratorError20 = false;
+							var _iteratorError20 = undefined;
+
+							try {
+								for (var _iterator20 = group.textures[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {
+									var _texture = _step20.value;
+
+
+									if (textureFastPass == true) {
+
+										if (previousTexture + 1 != _texture) {
+
+											textureFastPass = false;
+
+											this.addPixel(_texture);
+										};
+									} else if (textureFastPass == false) {
+
+										if (previousTexture != null && previousTexture + 1 == _texture) {
+
+											textureFastPass = true;
+
+											this.addPixel(0);
+										} else {
+
+											this.addPixel(_texture);
+										};
+									};
+
+									previousTexture = _texture;
+								}
+							} catch (err) {
+								_didIteratorError20 = true;
+								_iteratorError20 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion20 && _iterator20.return) {
+										_iterator20.return();
+									}
+								} finally {
+									if (_didIteratorError20) {
+										throw _iteratorError20;
+									}
+								}
+							}
+
+							;
+
+							var previousFace = null;
+							var faceFastPass = false;
+
+							var _iteratorNormalCompletion21 = true;
+							var _didIteratorError21 = false;
+							var _iteratorError21 = undefined;
+
+							try {
+								for (var _iterator21 = group.faces[Symbol.iterator](), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {
+									var _face = _step21.value;
+
+
+									if (faceFastPass == true) {
+
+										if (previousFace + 1 != _face) {
+
+											faceFastPass = false;
+
+											this.addPixel(_face);
+										};
+									} else if (faceFastPass == false) {
+
+										if (previousFace != null && previousFace + 1 == _face) {
+
+											faceFastPass = true;
+
+											this.addPixel(0);
+										} else {
+
+											this.addPixel(_face);
+										};
+									};
+
+									previousFace = _face;
+								}
+							} catch (err) {
+								_didIteratorError21 = true;
+								_iteratorError21 = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion21 && _iterator21.return) {
+										_iterator21.return();
+									}
+								} finally {
+									if (_didIteratorError21) {
+										throw _iteratorError21;
+									}
+								}
+							}
+
+							;
+						}
+					} catch (err) {
+						_didIteratorError16 = true;
+						_iteratorError16 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion16 && _iterator16.return) {
+								_iterator16.return();
+							}
+						} finally {
+							if (_didIteratorError16) {
+								throw _iteratorError16;
+							}
+						}
+					}
+
+					;
+				}
+			} catch (err) {
+				_didIteratorError6 = true;
+				_iteratorError6 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion6 && _iterator6.return) {
+						_iterator6.return();
+					}
+				} finally {
+					if (_didIteratorError6) {
+						throw _iteratorError6;
+					}
+				}
+			}
+
+			;
+
+			var square = Math.ceil(Math.sqrt(this.pixels.length / 4));
 
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2d");
+
+			canvas.width = canvas.height = square;
+
+			var imageData = context.getImageData(0, 0, square, square);
+
+			for (var pixelData = 0, pixelsDataLength = this.pixels.length; pixelData < pixelsDataLength; pixelData++) {
+
+				imageData.data[pixelData] = this.pixels[pixelData];
+			};
+
+			context.putImageData(imageData, 0, 0);
 
 			var image = new Image();
 
@@ -683,7 +1435,7 @@ var ImageGenerator = function () {
 			var alpha = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
 
-			if (green === null && blue === null && alpha === null) {
+			if (green == null && blue == null && alpha == null) {
 
 				var value = Math.max(0, Math.min(SIZES.max, red));
 
@@ -706,7 +1458,7 @@ var ImageGenerator = function () {
 
 exports.default = ImageGenerator;
 
-},{"../OBJImage.js":1}],7:[function(require,module,exports){
+},{"../OBJImage.js":1,"./Dictionary.js":3}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -902,7 +1654,7 @@ var Material = function () {
 			var opacity = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
 
 
-			this.opacity.value = opacity;
+			this.opacity.value = parseFloat(opacity);
 
 			return this;
 		}
@@ -1513,15 +2265,17 @@ var Model = function () {
 
 	_createClass(Model, [{
 		key: "initialize",
-		value: function initialize(name) {
+		value: function initialize() {
+			var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+
+			this.name = name;
 
 			this.groups = new Array();
 
 			this.addGroup(null);
 
 			this.groups[this.groups.length - 1].default = true;
-
-			this.setName(name);
 
 			return this;
 		}
@@ -1729,7 +2483,7 @@ var ModelLibrary = function () {
 
 				delete this.objects[this.objects.length - 1].default;
 
-				this.objects[this.objects.length - 1].setName(name);
+				this.objects[this.objects.length - 1].name = name;
 			} else {
 
 				this.objects.push(new _Model2.default(name));
