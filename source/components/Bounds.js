@@ -7,9 +7,9 @@ export default class Bounds {
 	initialize( size ){
 
 		this.min = {
-			x: 0,
-			y: 0,
-			z: 0
+			x: -0,
+			y: -0,
+			z: -0
 		};
 
 		this.max = {
@@ -22,6 +22,10 @@ export default class Bounds {
 
 	}
 	measure( x, y, z ){
+
+		x = parseFloat(x);
+		y = parseFloat(y);
+		z = parseFloat(z);
 
 		this.min.x = (x < this.min.x ? x : this.min.x);
 		this.min.y = (y < this.min.y ? y : this.min.y);

@@ -87,7 +87,11 @@ var OBJImage = function () {
 exports.default = OBJImage;
 
 
-OBJImage.version = "2.0.0";
+OBJImage.version = {
+	major: 2,
+	minor: 0,
+	patch: 0
+};
 
 OBJImage.defineTHREE = function (THREELibrary) {
 
@@ -135,9 +139,9 @@ var Bounds = function () {
 		value: function initialize(size) {
 
 			this.min = {
-				x: 0,
-				y: 0,
-				z: 0
+				x: -0,
+				y: -0,
+				z: -0
 			};
 
 			this.max = {
@@ -151,6 +155,10 @@ var Bounds = function () {
 	}, {
 		key: "measure",
 		value: function measure(x, y, z) {
+
+			x = parseFloat(x);
+			y = parseFloat(y);
+			z = parseFloat(z);
 
 			this.min.x = x < this.min.x ? x : this.min.x;
 			this.min.y = y < this.min.y ? y : this.min.y;
@@ -539,8 +547,6 @@ var ImageGenerator = function () {
 
 		this.modelLibrary = modelLibrary;
 
-		this.version = _OBJImage2.default.version;
-
 		this.compressionType = COMPRESSION.default;
 
 		return this.initialize();
@@ -552,9 +558,9 @@ var ImageGenerator = function () {
 
 			console.log("IMAGE GENERATOR");
 
-			this.setVersion(this.version);
+			this.addPixel(_OBJImage2.default.version.major, _OBJImage2.default.version.minor, _OBJImage2.default.version.patch, 1);
 
-			this.setCompressionType(this.compressionType);
+			this.addPixel(this.compressionType);
 
 			this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
@@ -592,8 +598,72 @@ var ImageGenerator = function () {
 
 			;
 
-			// STOPED HERE
-			this.normalsMultiplicator = this.addPixel();
+			var normalsMultiplicator = Math.floor(SIZES.max / 2);
+
+			this.normalsLength = this.addPixel(this.modelLibrary.normals.length);
+
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
+
+			try {
+				for (var _iterator2 = this.modelLibrary.normals[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var normal = _step2.value;
+
+
+					this.addPixel((normal.x + 1) * normalsMultiplicator);
+					this.addPixel((normal.y + 1) * normalsMultiplicator);
+					this.addPixel((normal.z + 1) * normalsMultiplicator);
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+
+			;
+
+			this.texturesLength = this.addPixel(this.modelLibrary.textures.length);
+
+			var _iteratorNormalCompletion3 = true;
+			var _didIteratorError3 = false;
+			var _iteratorError3 = undefined;
+
+			try {
+				for (var _iterator3 = this.modelLibrary.textures[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					var texture = _step3.value;
+
+
+					this.addPixel(texture.u * SIZES.max);
+					this.addPixel(texture.v * SIZES.max);
+				}
+			} catch (err) {
+				_didIteratorError3 = true;
+				_iteratorError3 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion3 && _iterator3.return) {
+						_iterator3.return();
+					}
+				} finally {
+					if (_didIteratorError3) {
+						throw _iteratorError3;
+					}
+				}
+			}
+
+			;
+
+			console.log(this.pixels);
 
 			var canvas = document.createElement("canvas");
 			var context = canvas.getContext("2d");
@@ -605,35 +675,6 @@ var ImageGenerator = function () {
 			return image;
 		}
 	}, {
-		key: "setVersion",
-		value: function setVersion(version) {
-
-			version = version.toString().split(/\./g);
-
-			this.setPixel(0, parseInt(version[0]), parseInt(version[1]), parseInt(version[2]), 255);
-
-			return version;
-		}
-	}, {
-		key: "setCompressionType",
-		value: function setCompressionType(type) {
-
-			this.setPixel(1, type, 0, 0, 255);
-
-			return type;
-		}
-	}, {
-		key: "setPixel",
-		value: function setPixel(index, red, green, blue, alpha) {
-
-			this.pixels[index * 4 + 0] = red;
-			this.pixels[index * 4 + 1] = green;
-			this.pixels[index * 4 + 2] = blue;
-			this.pixels[index * 4 + 3] = alpha;
-
-			return this;
-		}
-	}, {
 		key: "addPixel",
 		value: function addPixel() {
 			var red = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
@@ -642,7 +683,7 @@ var ImageGenerator = function () {
 			var alpha = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
 
-			if (green == null && blue == null && alpha == null) {
+			if (green === null && blue === null && alpha === null) {
 
 				var value = Math.max(0, Math.min(SIZES.max, red));
 
@@ -1664,14 +1705,13 @@ var ModelLibrary = function () {
 			this.objects = new Array();
 
 			this.vertices = new Array();
+			this.bounds = new _Bounds2.default();
 
 			this.normals = new Array();
 
 			this.textures = new Array();
 
 			this.faces = new Array();
-
-			this.bounds = new _Bounds2.default();
 
 			this.materialLibrary = null;
 
@@ -1756,7 +1796,7 @@ var ModelLibrary = function () {
 
 			this.objects[this.objects.length - 1].addVertex(index);
 
-			this.bounds.measure("vertices", x, y, z);
+			this.bounds.measure(x, y, z);
 
 			return this;
 		}

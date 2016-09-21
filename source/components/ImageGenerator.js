@@ -16,8 +16,6 @@ export default class ImageGenerator {
 
 		this.modelLibrary = modelLibrary;
 
-		this.version = OBJImage.version;
-
 		this.compressionType = COMPRESSION.default;
 
 		return this.initialize();
@@ -27,9 +25,9 @@ export default class ImageGenerator {
 
 		console.log("IMAGE GENERATOR");
 
-		this.setVersion(this.version);
+		this.addPixel(OBJImage.version.major, OBJImage.version.minor, OBJImage.version.patch, 1);
 
-		this.setCompressionType(this.compressionType);
+		this.addPixel(this.compressionType);
 
 		this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
 
@@ -45,8 +43,28 @@ export default class ImageGenerator {
 
 		};
 
-		// STOPED HERE
-		this.normalsMultiplicator = this.addPixel();
+		var normalsMultiplicator = Math.floor(SIZES.max / 2);
+
+		this.normalsLength = this.addPixel(this.modelLibrary.normals.length);
+
+		for( let normal of this.modelLibrary.normals ){
+
+			this.addPixel((normal.x + 1) * normalsMultiplicator);
+			this.addPixel((normal.y + 1) * normalsMultiplicator);
+			this.addPixel((normal.z + 1) * normalsMultiplicator);
+
+		};
+
+		this.texturesLength = this.addPixel(this.modelLibrary.textures.length);
+
+		for( let texture of this.modelLibrary.textures ){
+
+			this.addPixel(texture.u * SIZES.max);
+			this.addPixel(texture.v * SIZES.max);
+
+		};
+
+		console.log(this.pixels);
 
 		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
@@ -58,35 +76,9 @@ export default class ImageGenerator {
 		return image;
 
 	}
-	setVersion( version ){
-
-		version = version.toString().split(/\./g);
-
-		this.setPixel(0, parseInt(version[0]), parseInt(version[1]), parseInt(version[2]), 255);
-
-		return version;
-
-	}
-	setCompressionType( type ){
-
-		this.setPixel(1, type, 0, 0, 255);
-
-		return type;
-
-	}
-	setPixel( index, red, green, blue, alpha ){
-
-		this.pixels[index * 4 + 0] = red;
-		this.pixels[index * 4 + 1] = green;
-		this.pixels[index * 4 + 2] = blue;
-		this.pixels[index * 4 + 3] = alpha;
-
-		return this;
-
-	}
 	addPixel( red = null, green = null, blue = null, alpha = null ){
 
-		if( green == null && blue == null && alpha == null ){
+		if( green === null && blue === null && alpha === null ){
 
 			let value = Math.max(0, Math.min(SIZES.max, red));
 

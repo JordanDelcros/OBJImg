@@ -17,6 +17,7 @@ export default class ModelLibrary {
 		this.objects = new Array();
 
 		this.vertices = new Array();
+		this.bounds = new Bounds();
 
 		this.normals = new Array();
 
@@ -24,7 +25,6 @@ export default class ModelLibrary {
 
 		this.faces = new Array();
 
-		this.bounds = new Bounds();
 
 		this.materialLibrary = null;
 
