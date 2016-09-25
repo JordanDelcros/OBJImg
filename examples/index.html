@@ -51,12 +51,10 @@
 			new OBJImage("models/lara/lara.obj", {
 				onLoad: function( file ){
 
-					console.log("ON LOAD", file);
+					// console.log("ON LOAD", file);
 
 				},
 				onParse: function( modelLibrary ){
-
-					console.log("ON PARSE", modelLibrary);
 
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
@@ -66,9 +64,21 @@
 
 					image.style.position = "absolute";
 					image.style.bottom = "0px";
+					image.style.left = "0px";
 					image.style.width = image.style.height = "500px";
 
-					document.body.appendChild(image);
+				}
+			});
+
+			new OBJImage("models/lara/lara.png", {
+				onLoad: function( file ){
+
+					console.log("ON LOAD IMG", file);
+
+				},
+				onParse: function( modelLibrary ){
+
+					console.log("PARSED IMAGE");
 
 				}
 			});

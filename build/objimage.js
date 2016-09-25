@@ -58,7 +58,15 @@ var OBJImage = function () {
 
 				if (file.type == _FileLoader.FileType.image) {
 
-					(0, _ParseImage2.default)(file.data, file.basePath, function () {});
+					(0, _ParseImage2.default)(file.data, file.basePath, function (modelLibrary) {
+
+						// if( options.onParse instanceof Function ){
+
+						// 	options.onParse(modelLibrary);
+
+						// };
+
+					});
 				} else if (file.type == _FileLoader.FileType.obj) {
 
 					(0, _ParseOBJ2.default)(file.data, file.basePath, function (modelLibrary) {
@@ -560,17 +568,19 @@ var ImageGenerator = function () {
 		key: "initialize",
 		value: function initialize() {
 
-			console.log("IMAGE GENERATOR");
-
 			this.addPixel(_OBJImage2.default.version.major, _OBJImage2.default.version.minor, _OBJImage2.default.version.patch, 1);
 
 			this.addPixel(this.compressionType);
 
-			this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+			var verticesMultiplicator = Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1));
+
+			this.addPixel(verticesMultiplicator);
 
 			this.addPixel(this.modelLibrary.vertices.length);
 
-			this.verticesPivot = this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * this.verticesMultiplicator) / this.verticesMultiplicator;
+			var verticesPivot = Math.abs(this.modelLibrary.bounds.getMin());
+
+			this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * verticesMultiplicator);
 
 			var _iteratorNormalCompletion = true;
 			var _didIteratorError = false;
@@ -581,9 +591,9 @@ var ImageGenerator = function () {
 					var vertex = _step.value;
 
 
-					this.addPixel((vertex.x + this.verticesPivot) * this.verticesMultiplicator);
-					this.addPixel((vertex.y + this.verticesPivot) * this.verticesMultiplicator);
-					this.addPixel((vertex.z + this.verticesPivot) * this.verticesMultiplicator);
+					this.addPixel((vertex.x + verticesPivot) * verticesMultiplicator);
+					this.addPixel((vertex.y + verticesPivot) * verticesMultiplicator);
+					this.addPixel((vertex.z + verticesPivot) * verticesMultiplicator);
 				}
 			} catch (err) {
 				_didIteratorError = true;
@@ -1411,16 +1421,17 @@ var ImageGenerator = function () {
 
 			canvas.width = canvas.height = square;
 
-			var imageData = context.getImageData(0, 0, square, square);
+			var imageData = new ImageData(square, square);
 
-			for (var pixelData = 0, pixelsDataLength = this.pixels.length; pixelData < pixelsDataLength; pixelData++) {
+			imageData.data.set(this.pixels);
 
-				imageData.data[pixelData] = this.pixels[pixelData];
-			};
+			console.log(imageData);
 
 			context.putImageData(imageData, 0, 0);
 
 			var image = new Image();
+
+			image.width = image.height = square;
 
 			image.src = canvas.toDataURL();
 
@@ -1449,7 +1460,7 @@ var ImageGenerator = function () {
 
 			this.pixels.push(red, green, blue, alpha);
 
-			return (red * green + blue) * alpha;
+			return this;
 		}
 	}]);
 
@@ -2725,12 +2736,38 @@ exports.default = Vertex;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
 exports.default = ParseImage;
-function ParseImage(image, onComplete) {};
 
-},{}],16:[function(require,module,exports){
+var _ModelLibrary = require("../components/ModelLibrary.js");
+
+var _ModelLibrary2 = _interopRequireDefault(_ModelLibrary);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ParseImage(image, basePath, onComplete) {
+
+	console.log("PARSE IMAGE", image);
+
+	var model = new _ModelLibrary2.default();
+
+	var canvas = document.createElement("canvas");
+	var context = canvas.getContext("2d");
+
+	canvas.width = image.width;
+	canvas.height = image.height;
+
+	context.drawImage(image, 0, 0);
+
+	var pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+
+	console.log(pixels);
+
+	onComplete(model);
+};
+
+},{"../components/ModelLibrary.js":11}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

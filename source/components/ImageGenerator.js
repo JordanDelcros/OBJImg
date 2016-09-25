@@ -24,23 +24,25 @@ export default class ImageGenerator {
 	}
 	initialize(){
 
-		console.log("IMAGE GENERATOR");
-
 		this.addPixel(OBJImage.version.major, OBJImage.version.minor, OBJImage.version.patch, 1);
 
 		this.addPixel(this.compressionType);
 
-		this.verticesMultiplicator = this.addPixel(Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1)));
+		var verticesMultiplicator = Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1));
+
+		this.addPixel(verticesMultiplicator);
 
 		this.addPixel(this.modelLibrary.vertices.length);
 
-		this.verticesPivot = this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * this.verticesMultiplicator) / this.verticesMultiplicator;
+		var verticesPivot = Math.abs(this.modelLibrary.bounds.getMin());
+
+		this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * verticesMultiplicator);
 
 		for( let vertex of this.modelLibrary.vertices ){
 
-			this.addPixel((vertex.x + this.verticesPivot) * this.verticesMultiplicator);
-			this.addPixel((vertex.y + this.verticesPivot) * this.verticesMultiplicator);
-			this.addPixel((vertex.z + this.verticesPivot) * this.verticesMultiplicator);
+			this.addPixel((vertex.x + verticesPivot) * verticesMultiplicator);
+			this.addPixel((vertex.y + verticesPivot) * verticesMultiplicator);
+			this.addPixel((vertex.z + verticesPivot) * verticesMultiplicator);
 
 		};
 
@@ -441,24 +443,24 @@ export default class ImageGenerator {
 
 		};
 
-		var square = Math.ceil(Math.sqrt(this.pixels.length / 4)); 
+		var square = Math.ceil(Math.sqrt(this.pixels.length / 4));
 
 		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
 
 		canvas.width = canvas.height = square;
 
-		var imageData = context.getImageData(0, 0, square, square);
+		var imageData = new ImageData(square, square);
 
-		for( let pixelData = 0, pixelsDataLength = this.pixels.length; pixelData < pixelsDataLength; pixelData++ ){
+		imageData.data.set(this.pixels);
 
-			imageData.data[pixelData] = this.pixels[pixelData];
-
-		};
+		console.log(imageData);
 
 		context.putImageData(imageData, 0, 0);
 
 		var image = new Image();
+
+		image.width = image.height = square;
 
 		image.src = canvas.toDataURL();
 
@@ -482,7 +484,7 @@ export default class ImageGenerator {
 
 		this.pixels.push(red, green, blue, alpha);
 
-		return (red * green + blue) * alpha;
+		return this;
 
 	}
 }

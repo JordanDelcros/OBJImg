@@ -29,9 +29,13 @@ export default class OBJImage {
 
 				if( file.type == FileType.image ){
 
-					ParseImage(file.data, file.basePath, ()=>{
+					ParseImage(file.data, file.basePath, ( modelLibrary )=>{
 
-						
+						// if( options.onParse instanceof Function ){
+
+						// 	options.onParse(modelLibrary);
+
+						// };
 
 					});
 
