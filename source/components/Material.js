@@ -184,7 +184,7 @@ export default class Material {
 
 		if( this[map] != undefined ){
 
-			this[map].clamp = (clamp == true || parseInt(clamp) == 1 || clamp == "on");
+			this[map].clamp = (clamp == true || parseInt(clamp) == 1 || clamp == "on" ? true : false);
 
 		};
 

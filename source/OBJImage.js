@@ -1,6 +1,6 @@
 "use strict";
 
-import FileLoader, {FileType} from "./components/FileLoader.js";
+import FileLoader, { FileType } from "./components/FileLoader.js";
 import MeshGenerator from "./components/MeshGenerator.js";
 import ImageGenerator from "./components/ImageGenerator.js";
 

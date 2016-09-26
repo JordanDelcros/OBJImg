@@ -38,7 +38,7 @@ export default class Dictionary {
 
 		};
 
-		return letter;
+		return string;
 
 	}
 }

@@ -56,32 +56,49 @@
 				},
 				onParse: function( modelLibrary ){
 
+					console.log("FROM", modelLibrary);
+
 					magicMesh = new OBJImage.MeshGenerator(modelLibrary);
 
-					scene.add(magicMesh);
+					// scene.add(magicMesh);
 
 					var image = modelLibrary.toImage();
 
 					image.style.position = "absolute";
 					image.style.bottom = "0px";
 					image.style.left = "0px";
-					image.style.width = image.style.height = "500px";
+					image.style.width = image.style.height = "100px";
+
+					document.body.appendChild(image);
+
+					new OBJImage(image, {
+						onLoad: function( file ){
+
+							// console.log("ON LOAD IMG", file);
+
+						},
+						onParse: function( modelLibrary ){
+
+							// console.log("PARSED IMAGE");
+
+						}
+					});
 
 				}
 			});
 
-			new OBJImage("models/lara/lara.png", {
-				onLoad: function( file ){
+			// new OBJImage("models/lara/lara.png", {
+			// 	onLoad: function( file ){
 
-					console.log("ON LOAD IMG", file);
+			// 		console.log("ON LOAD IMG", file);
 
-				},
-				onParse: function( modelLibrary ){
+			// 	},
+			// 	onParse: function( modelLibrary ){
 
-					console.log("PARSED IMAGE");
+			// 		console.log("PARSED IMAGE");
 
-				}
-			});
+			// 	}
+			// });
 
 			//
 

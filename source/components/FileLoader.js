@@ -14,62 +14,77 @@ export default class FileLoader {
 	}
 	initialize( path ){
 
-		this.path = path;
+		if( path instanceof Image ){
 
-		this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
-
-		this.data = null;
-
-		if( /\.(png|jpe?g|gif|bmp)$/.test(this.path) ){
+			this.skipLoading = true;
 
 			this.type = FileType.image;
 
-			this.content = FileLoader.loadImage.call(this, this.path, ( data, type )=>{
+			this.path = path.src;
 
-				this.data = data;
-
-				this.completeHandler(this);
-
-			}, this.errorHandler);
+			this.data = path;
 
 		}
-		else if( /\.obj$/g.test(this.path) ){
+		else {
 
-			this.type = FileType.obj;
+			this.path = path;
 
-			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+			this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
 
-				this.data = data;
+			this.data = null;
 
-				this.completeHandler(this);
+			if( /\.(png|jpe?g|gif|bmp)$/.test(this.path) ){
 
-			}, this.errorHandler);
+				this.type = FileType.image;
 
-		}
-		else if( /\.mtl$/g.test(this.path) ){
+				FileLoader.loadImage.call(this, this.path, ( data, type )=>{
 
-			this.type = FileType.mtl;
+					this.data = data;
 
-			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+					this.completeHandler(this);
 
-				this.data = data;
+				}, this.errorHandler);
 
-				this.completeHandler(this);
+			}
+			else if( /\.obj$/g.test(this.path) ){
 
-			}, this.errorHandler);
+				this.type = FileType.obj;
 
-		}
-		else if( /\.json$/g.test(this.path) ){
+				FileLoader.loadText.call(this, this.path, ( data, type )=>{
 
-			this.type = FileType.json;
+					this.data = data;
 
-			this.content = FileLoader.loadText.call(this, this.path, ( data, type )=>{
+					this.completeHandler(this);
 
-				this.data = JSON.parse(data);
+				}, this.errorHandler);
 
-				this.completeHandler(this);
+			}
+			else if( /\.mtl$/g.test(this.path) ){
 
-			}, this.errorHandler);
+				this.type = FileType.mtl;
+
+				FileLoader.loadText.call(this, this.path, ( data, type )=>{
+
+					this.data = data;
+
+					this.completeHandler(this);
+
+				}, this.errorHandler);
+
+			}
+			else if( /\.json$/g.test(this.path) ){
+
+				this.type = FileType.json;
+
+				FileLoader.loadText.call(this, this.path, ( data, type )=>{
+
+					this.data = JSON.parse(data);
+
+					this.completeHandler(this);
+
+				}, this.errorHandler);
+
+			};
 
 		};
 
@@ -95,12 +110,18 @@ export default class FileLoader {
 
 		};
 
+		if( this.skipLoading == true ){
+
+			this.completeHandler(this);
+
+		};
+
 		return this;
 
 	}
 };
 
-FileLoader.loadImage = function FileLoaderLoadImage( path, onComplete, onFail ){
+FileLoader.loadImage = function ImageFileLoader( path, onComplete, onFail ){
 
 	var image = new Image();
 
@@ -118,13 +139,15 @@ FileLoader.loadImage = function FileLoaderLoadImage( path, onComplete, onFail ){
 
 	image.src = path;
 
-	return null;
+	return image;
 
 };
 
-FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
+FileLoader.loadText = function TextFileLoader( path, onComplete, onFail ){
 
 	var request = new XMLHttpRequest();
+
+	var text = new String();
 
 	request.addEventListener("readystatechange", ( event )=>{
 
@@ -144,7 +167,9 @@ FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
 			if( event.target.status >= 200 && event.target.status < 400 ){
 
-				onComplete(event.target.responseText, (this.type || FileType.TEXT), path);
+				text += event.target.responseText;
+
+				onComplete(text, (this.type || FileType.TEXT), path);
 
 			}
 			else if( event.target.status >= 400 ){
@@ -161,6 +186,6 @@ FileLoader.loadText = function FileLoaderLoadText( path, onComplete, onFail ){
 
 	request.send(null);
 
-	return null;
+	return text;
 
 };

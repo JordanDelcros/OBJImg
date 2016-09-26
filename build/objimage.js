@@ -124,7 +124,7 @@ if (typeof define !== "undefined" && define instanceof Function && define.amd !=
 	self.OBJImage = OBJImage;
 };
 
-},{"./components/FileLoader.js":5,"./components/ImageGenerator.js":6,"./components/MeshGenerator.js":9,"./methods/ParseImage.js":15,"./methods/ParseJSON.js":16,"./methods/ParseOBJ.js":18}],2:[function(require,module,exports){
+},{"./components/FileLoader.js":5,"./components/ImageGenerator.js":6,"./components/MeshGenerator.js":10,"./methods/ParseImage.js":16,"./methods/ParseJSON.js":17,"./methods/ParseOBJ.js":19}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -241,10 +241,10 @@ var Dictionary = function () {
 				try {
 
 					for (var _iterator = source[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var _letter = _step.value;
+						var letter = _step.value;
 
 
-						this.letters.push(LetterLibrary.indexOf(_letter));
+						this.letters.push(LetterLibrary.indexOf(letter));
 					}
 				} catch (err) {
 					_didIteratorError = true;
@@ -281,10 +281,10 @@ var Dictionary = function () {
 
 			try {
 				for (var _iterator2 = this.letters[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					var _letter2 = _step2.value;
+					var letter = _step2.value;
 
 
-					string += LetterLibrary[_letter2];
+					string += LetterLibrary[letter];
 				}
 			} catch (err) {
 				_didIteratorError2 = true;
@@ -303,7 +303,7 @@ var Dictionary = function () {
 
 			;
 
-			return letter;
+			return string;
 		}
 	}]);
 
@@ -394,52 +394,64 @@ var FileLoader = function () {
 		value: function initialize(path) {
 			var _this = this;
 
-			this.path = path;
+			if (path instanceof Image) {
 
-			this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
-
-			this.data = null;
-
-			if (/\.(png|jpe?g|gif|bmp)$/.test(this.path)) {
+				this.skipLoading = true;
 
 				this.type = FileType.image;
 
-				this.content = FileLoader.loadImage.call(this, this.path, function (data, type) {
+				this.path = path.src;
 
-					_this.data = data;
+				this.data = path;
+			} else {
 
-					_this.completeHandler(_this);
-				}, this.errorHandler);
-			} else if (/\.obj$/g.test(this.path)) {
+				this.path = path;
 
-				this.type = FileType.obj;
+				this.basePath = this.path.split(/\//).slice(0, -1).join("/") + "/";
 
-				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
+				this.data = null;
 
-					_this.data = data;
+				if (/\.(png|jpe?g|gif|bmp)$/.test(this.path)) {
 
-					_this.completeHandler(_this);
-				}, this.errorHandler);
-			} else if (/\.mtl$/g.test(this.path)) {
+					this.type = FileType.image;
 
-				this.type = FileType.mtl;
+					FileLoader.loadImage.call(this, this.path, function (data, type) {
 
-				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
+						_this.data = data;
 
-					_this.data = data;
+						_this.completeHandler(_this);
+					}, this.errorHandler);
+				} else if (/\.obj$/g.test(this.path)) {
 
-					_this.completeHandler(_this);
-				}, this.errorHandler);
-			} else if (/\.json$/g.test(this.path)) {
+					this.type = FileType.obj;
 
-				this.type = FileType.json;
+					FileLoader.loadText.call(this, this.path, function (data, type) {
 
-				this.content = FileLoader.loadText.call(this, this.path, function (data, type) {
+						_this.data = data;
 
-					_this.data = JSON.parse(data);
+						_this.completeHandler(_this);
+					}, this.errorHandler);
+				} else if (/\.mtl$/g.test(this.path)) {
 
-					_this.completeHandler(_this);
-				}, this.errorHandler);
+					this.type = FileType.mtl;
+
+					FileLoader.loadText.call(this, this.path, function (data, type) {
+
+						_this.data = data;
+
+						_this.completeHandler(_this);
+					}, this.errorHandler);
+				} else if (/\.json$/g.test(this.path)) {
+
+					this.type = FileType.json;
+
+					FileLoader.loadText.call(this, this.path, function (data, type) {
+
+						_this.data = JSON.parse(data);
+
+						_this.completeHandler(_this);
+					}, this.errorHandler);
+				};
 			};
 
 			return this;
@@ -464,6 +476,11 @@ var FileLoader = function () {
 				console.info("OBJImage — FileLoader", file);
 			};
 
+			if (this.skipLoading == true) {
+
+				this.completeHandler(this);
+			};
+
 			return this;
 		}
 	}]);
@@ -474,7 +491,7 @@ var FileLoader = function () {
 exports.default = FileLoader;
 ;
 
-FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
+FileLoader.loadImage = function ImageFileLoader(path, onComplete, onFail) {
 	var _this2 = this;
 
 	var image = new Image();
@@ -491,13 +508,15 @@ FileLoader.loadImage = function FileLoaderLoadImage(path, onComplete, onFail) {
 
 	image.src = path;
 
-	return null;
+	return image;
 };
 
-FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
+FileLoader.loadText = function TextFileLoader(path, onComplete, onFail) {
 	var _this3 = this;
 
 	var request = new XMLHttpRequest();
+
+	var text = new String();
 
 	request.addEventListener("readystatechange", function (event) {
 
@@ -505,7 +524,9 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 
 			if (event.target.status >= 200 && event.target.status < 400) {
 
-				onComplete(event.target.responseText, _this3.type || FileType.TEXT, path);
+				text += event.target.responseText;
+
+				onComplete(text, _this3.type || FileType.TEXT, path);
 			} else if (event.target.status >= 400) {
 
 				onFail();
@@ -517,7 +538,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 
 	request.send(null);
 
-	return null;
+	return text;
 };
 
 },{}],6:[function(require,module,exports){
@@ -526,7 +547,7 @@ FileLoader.loadText = function FileLoaderLoadText(path, onComplete, onFail) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.COMPRESSION = exports.SIZES = undefined;
+exports.CompressionType = exports.Max = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -542,12 +563,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var SIZES = exports.SIZES = {
-	high: 255 * 255 + 255,
-	max: 255 * 255 * 255 + 255
-};
+var Max = exports.Max = 255 * 255 + 255;
 
-var COMPRESSION = exports.COMPRESSION = {
+var CompressionType = exports.CompressionType = {
 	default: 0
 };
 
@@ -559,7 +577,7 @@ var ImageGenerator = function () {
 
 		this.modelLibrary = modelLibrary;
 
-		this.compressionType = COMPRESSION.default;
+		this.compressionType = CompressionType.default;
 
 		return this.initialize();
 	}
@@ -568,19 +586,23 @@ var ImageGenerator = function () {
 		key: "initialize",
 		value: function initialize() {
 
-			this.addPixel(_OBJImage2.default.version.major, _OBJImage2.default.version.minor, _OBJImage2.default.version.patch, 1);
+			this.addPixel(1, _OBJImage2.default.version.major, _OBJImage2.default.version.minor, _OBJImage2.default.version.patch, 255);
 
-			this.addPixel(this.compressionType);
+			this.addPixel(1, this.compressionType);
 
-			var verticesMultiplicator = Math.floor(SIZES.max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1));
-
-			this.addPixel(verticesMultiplicator);
-
-			this.addPixel(this.modelLibrary.vertices.length);
+			var verticesCountSplitting = Math.ceil(this.modelLibrary.vertices.length / Max);
 
 			var verticesPivot = Math.abs(this.modelLibrary.bounds.getMin());
 
-			this.addPixel(Math.abs(this.modelLibrary.bounds.getMin()) * verticesMultiplicator);
+			var verticesMultiplicator = Math.floor(Max / Math.max(this.modelLibrary.bounds.getMax() + Math.abs(this.modelLibrary.bounds.getMin()), 1));
+
+			this.addPixel(1, verticesMultiplicator);
+
+			this.addPixel(1, verticesPivot * verticesMultiplicator);
+
+			this.addPixel(1, verticesCountSplitting);
+
+			this.addPixel(verticesCountSplitting, this.modelLibrary.vertices.length);
 
 			var _iteratorNormalCompletion = true;
 			var _didIteratorError = false;
@@ -591,9 +613,9 @@ var ImageGenerator = function () {
 					var vertex = _step.value;
 
 
-					this.addPixel((vertex.x + verticesPivot) * verticesMultiplicator);
-					this.addPixel((vertex.y + verticesPivot) * verticesMultiplicator);
-					this.addPixel((vertex.z + verticesPivot) * verticesMultiplicator);
+					this.addPixel(1, (vertex.x + verticesPivot) * verticesMultiplicator);
+					this.addPixel(1, (vertex.y + verticesPivot) * verticesMultiplicator);
+					this.addPixel(1, (vertex.z + verticesPivot) * verticesMultiplicator);
 				}
 			} catch (err) {
 				_didIteratorError = true;
@@ -612,9 +634,13 @@ var ImageGenerator = function () {
 
 			;
 
-			var normalsMultiplicator = Math.floor(SIZES.max / 2);
+			var normalsMultiplicator = Math.floor(Max / 2);
 
-			this.normalsLength = this.addPixel(this.modelLibrary.normals.length);
+			var normalsCountSplitting = Math.ceil(this.modelLibrary.normals.length / Max);
+
+			this.addPixel(1, normalsCountSplitting);
+
+			this.addPixel(normalsCountSplitting, this.modelLibrary.normals.length);
 
 			var _iteratorNormalCompletion2 = true;
 			var _didIteratorError2 = false;
@@ -625,9 +651,9 @@ var ImageGenerator = function () {
 					var normal = _step2.value;
 
 
-					this.addPixel((normal.x + 1) * normalsMultiplicator);
-					this.addPixel((normal.y + 1) * normalsMultiplicator);
-					this.addPixel((normal.z + 1) * normalsMultiplicator);
+					this.addPixel(1, (normal.x + 1) * normalsMultiplicator);
+					this.addPixel(1, (normal.y + 1) * normalsMultiplicator);
+					this.addPixel(1, (normal.z + 1) * normalsMultiplicator);
 				}
 			} catch (err) {
 				_didIteratorError2 = true;
@@ -646,7 +672,11 @@ var ImageGenerator = function () {
 
 			;
 
-			this.addPixel(this.modelLibrary.textures.length);
+			var texturesCountSplitting = Math.ceil(this.modelLibrary.textures.length / Max);
+
+			this.addPixel(1, texturesCountSplitting);
+
+			this.addPixel(texturesCountSplitting, this.modelLibrary.textures.length);
 
 			var _iteratorNormalCompletion3 = true;
 			var _didIteratorError3 = false;
@@ -657,8 +687,8 @@ var ImageGenerator = function () {
 					var texture = _step3.value;
 
 
-					this.addPixel(texture.u * SIZES.max);
-					this.addPixel(texture.v * SIZES.max);
+					this.addPixel(1, texture.u % 1 * Max);
+					this.addPixel(1, texture.v % 1 * Max);
 				}
 			} catch (err) {
 				_didIteratorError3 = true;
@@ -677,7 +707,11 @@ var ImageGenerator = function () {
 
 			;
 
-			this.addPixel(this.modelLibrary.faces.length);
+			var facesCountSplitting = Math.ceil(this.modelLibrary.faces.length / Max);
+
+			this.addPixel(1, facesCountSplitting);
+
+			this.addPixel(facesCountSplitting, this.modelLibrary.faces.length);
 
 			var _iteratorNormalCompletion4 = true;
 			var _didIteratorError4 = false;
@@ -688,17 +722,17 @@ var ImageGenerator = function () {
 					var face = _step4.value;
 
 
-					this.addPixel(face.normalA);
-					this.addPixel(face.normalB);
-					this.addPixel(face.normalC);
+					this.addPixel(verticesCountSplitting, face.vertexA);
+					this.addPixel(verticesCountSplitting, face.vertexB);
+					this.addPixel(verticesCountSplitting, face.vertexC);
 
-					this.addPixel(face.textureA);
-					this.addPixel(face.textureB);
-					this.addPixel(face.textureC);
+					this.addPixel(normalsCountSplitting, face.normalA);
+					this.addPixel(normalsCountSplitting, face.normalB);
+					this.addPixel(normalsCountSplitting, face.normalC);
 
-					this.addPixel(face.vertexA);
-					this.addPixel(face.vertexB);
-					this.addPixel(face.vertexC);
+					this.addPixel(texturesCountSplitting, face.textureA);
+					this.addPixel(texturesCountSplitting, face.textureB);
+					this.addPixel(texturesCountSplitting, face.textureC);
 				}
 			} catch (err) {
 				_didIteratorError4 = true;
@@ -717,7 +751,11 @@ var ImageGenerator = function () {
 
 			;
 
-			this.addPixel(this.modelLibrary.materialLibrary.materials.length);
+			var materialsCountSplitting = Math.ceil(this.modelLibrary.materialLibrary.materials.length / Max);
+
+			this.addPixel(1, materialsCountSplitting);
+
+			this.addPixel(materialsCountSplitting, this.modelLibrary.materialLibrary.materials.length);
 
 			var _iteratorNormalCompletion5 = true;
 			var _didIteratorError5 = false;
@@ -730,7 +768,7 @@ var ImageGenerator = function () {
 
 					var nameDictionary = new _Dictionary2.default(material.name);
 
-					this.addPixel(nameDictionary.letters.length);
+					this.addPixel(1, nameDictionary.letters.length);
 
 					var _iteratorNormalCompletion7 = true;
 					var _didIteratorError7 = false;
@@ -741,7 +779,7 @@ var ImageGenerator = function () {
 							var _letter7 = _step7.value;
 
 
-							this.addPixel(_letter7);
+							this.addPixel(1, _letter7);
 						}
 					} catch (err) {
 						_didIteratorError7 = true;
@@ -760,23 +798,23 @@ var ImageGenerator = function () {
 
 					;
 
-					this.addPixel(material.illumination);
+					this.addPixel(1, material.illumination);
 
-					this.addPixel(material.smooth);
+					this.addPixel(1, material.smooth);
 
-					this.addPixel(material.ambient.red * 255, material.ambient.green * 255, material.ambient.blue * 255, 1);
+					this.addPixel(1, material.ambient.red * 255, material.ambient.green * 255, material.ambient.blue * 255, 255);
 
-					this.addPixel(material.ambient.map == null ? false : true);
+					this.addPixel(1, material.ambient.map == null ? false : true);
 
 					if (material.ambient.map != null) {
 
-						this.addPixel(material.ambient.map == null ? false : true);
+						this.addPixel(1, material.ambient.clamp);
 
-						this.addPixel(material.ambient.channel);
+						this.addPixel(1, material.ambient.channel);
 
 						var mapDictionnary = new _Dictionary2.default(material.ambient.map);
 
-						this.addPixel(mapDictionnary.letters.length);
+						this.addPixel(1, mapDictionnary.letters.length);
 
 						var _iteratorNormalCompletion8 = true;
 						var _didIteratorError8 = false;
@@ -787,7 +825,7 @@ var ImageGenerator = function () {
 								var letter = _step8.value;
 
 
-								this.addPixel(letter);
+								this.addPixel(1, letter);
 							}
 						} catch (err) {
 							_didIteratorError8 = true;
@@ -807,19 +845,19 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.diffuse.red * 255, material.diffuse.green * 255, material.diffuse.blue * 255, 1);
+					this.addPixel(1, material.diffuse.red * 255, material.diffuse.green * 255, material.diffuse.blue * 255, 255);
 
-					this.addPixel(material.diffuse.map == null ? false : true);
+					this.addPixel(1, material.diffuse.map == null ? false : true);
 
 					if (material.diffuse.map != null) {
 
-						this.addPixel(material.diffuse.clamp == null ? false : true);
+						this.addPixel(1, material.diffuse.clamp);
 
-						this.addPixel(material.diffuse.channel);
+						this.addPixel(1, material.diffuse.channel);
 
 						var _mapDictionnary = new _Dictionary2.default(material.diffuse.map);
 
-						this.addPixel(_mapDictionnary.letters.length);
+						this.addPixel(1, _mapDictionnary.letters.length);
 
 						var _iteratorNormalCompletion9 = true;
 						var _didIteratorError9 = false;
@@ -830,7 +868,7 @@ var ImageGenerator = function () {
 								var _letter = _step9.value;
 
 
-								this.addPixel(_letter);
+								this.addPixel(1, _letter);
 							}
 						} catch (err) {
 							_didIteratorError9 = true;
@@ -850,19 +888,19 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.bump.red * 255, material.bump.green * 255, material.bump.blue * 255, 1);
+					this.addPixel(1, material.bump.red * 255, material.bump.green * 255, material.bump.blue * 255, 255);
 
-					this.addPixel(material.bump.map == null ? false : true);
+					this.addPixel(1, material.bump.map == null ? false : true);
 
 					if (material.bump.map != null) {
 
-						this.addPixel(material.bump.clamp == null ? false : true);
+						this.addPixel(1, material.bump.clamp == null ? false : true);
 
-						this.addPixel(material.bump.channel);
+						this.addPixel(1, material.bump.channel);
 
 						var _mapDictionnary2 = new _Dictionary2.default(material.bump.map);
 
-						this.addPixel(_mapDictionnary2.letters.length);
+						this.addPixel(1, _mapDictionnary2.letters.length);
 
 						var _iteratorNormalCompletion10 = true;
 						var _didIteratorError10 = false;
@@ -873,7 +911,7 @@ var ImageGenerator = function () {
 								var _letter2 = _step10.value;
 
 
-								this.addPixel(_letter2);
+								this.addPixel(1, _letter2);
 							}
 						} catch (err) {
 							_didIteratorError10 = true;
@@ -893,21 +931,21 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.specular.red * 255, material.specular.green * 255, material.specular.blue * 255, 1);
+					this.addPixel(1, material.specular.red * 255, material.specular.green * 255, material.specular.blue * 255, 255);
 
-					this.addPixel(material.specular.force * (SIZES.max / 1000));
+					this.addPixel(1, material.specular.force * (Max / 1000));
 
-					this.addPixel(material.specular.map == null ? false : true);
+					this.addPixel(1, material.specular.map == null ? false : true);
 
 					if (material.specular.map != null) {
 
-						this.addPixel(material.specular.clamp == null ? false : true);
+						this.addPixel(1, material.specular.clamp == null ? false : true);
 
-						this.addPixel(material.specular.channel);
+						this.addPixel(1, material.specular.channel);
 
 						var _mapDictionnary3 = new _Dictionary2.default(material.specular.map);
 
-						this.addPixel(_mapDictionnary3.letters.length);
+						this.addPixel(1, _mapDictionnary3.letters.length);
 
 						var _iteratorNormalCompletion11 = true;
 						var _didIteratorError11 = false;
@@ -918,7 +956,7 @@ var ImageGenerator = function () {
 								var _letter3 = _step11.value;
 
 
-								this.addPixel(_letter3);
+								this.addPixel(1, _letter3);
 							}
 						} catch (err) {
 							_didIteratorError11 = true;
@@ -938,19 +976,19 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.specularForce.map == null ? false : true);
+					this.addPixel(1, material.specularForce.map == null ? false : true);
 
 					if (material.specularForce.map != null) {
 
-						this.addPixel(material.specular.value * SIZES.max);
+						this.addPixel(1, material.specular.value * Max);
 
-						this.addPixel(material.specularForce.clamp == null ? false : true);
+						this.addPixel(1, material.specularForce.clamp == null ? false : true);
 
-						this.addPixel(material.specularForce.channel);
+						this.addPixel(1, material.specularForce.channel);
 
 						var _mapDictionnary4 = new _Dictionary2.default(material.specularForce.map);
 
-						this.addPixel(_mapDictionnary4.letters.length);
+						this.addPixel(1, _mapDictionnary4.letters.length);
 
 						var _iteratorNormalCompletion12 = true;
 						var _didIteratorError12 = false;
@@ -961,7 +999,7 @@ var ImageGenerator = function () {
 								var _letter4 = _step12.value;
 
 
-								this.addPixel(_letter4);
+								this.addPixel(1, _letter4);
 							}
 						} catch (err) {
 							_didIteratorError12 = true;
@@ -981,19 +1019,19 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.environement.map == null ? false : true);
+					this.addPixel(1, material.environement.map == null ? false : true);
 
 					if (material.environement.map != null) {
 
-						this.addPixel(material.specular.force * (SIZES.max / 1000));
+						this.addPixel(1, material.specular.force * (Max / 1000));
 
-						this.addPixel(material.environement.clamp == null ? false : true);
+						this.addPixel(1, material.environement.clamp == null ? false : true);
 
-						this.addPixel(material.environement.channel);
+						this.addPixel(1, material.environement.channel);
 
 						var _mapDictionnary5 = new _Dictionary2.default(material.environement.map);
 
-						this.addPixel(_mapDictionnary5.letters.length);
+						this.addPixel(1, _mapDictionnary5.letters.length);
 
 						var _iteratorNormalCompletion13 = true;
 						var _didIteratorError13 = false;
@@ -1004,7 +1042,7 @@ var ImageGenerator = function () {
 								var _letter5 = _step13.value;
 
 
-								this.addPixel(_letter5);
+								this.addPixel(1, _letter5);
 							}
 						} catch (err) {
 							_didIteratorError13 = true;
@@ -1024,19 +1062,19 @@ var ImageGenerator = function () {
 						;
 					};
 
-					this.addPixel(material.specular.value * SIZES.max);
+					this.addPixel(1, material.specular.value * Max);
 
-					this.addPixel(material.opacity.map == null ? false : true);
+					this.addPixel(1, material.opacity.map == null ? false : true);
 
 					if (material.opacity.map != null) {
 
-						this.addPixel(material.opacity.clamp == null ? false : true);
+						this.addPixel(1, material.opacity.clamp == null ? false : true);
 
-						this.addPixel(material.opacity.channel);
+						this.addPixel(1, material.opacity.channel);
 
 						var _mapDictionnary6 = new _Dictionary2.default(material.opacity.map);
 
-						this.addPixel(_mapDictionnary6.letters.length);
+						this.addPixel(1, _mapDictionnary6.letters.length);
 
 						var _iteratorNormalCompletion14 = true;
 						var _didIteratorError14 = false;
@@ -1047,7 +1085,7 @@ var ImageGenerator = function () {
 								var _letter6 = _step14.value;
 
 
-								this.addPixel(_letter6);
+								this.addPixel(1, _letter6);
 							}
 						} catch (err) {
 							_didIteratorError14 = true;
@@ -1084,7 +1122,7 @@ var ImageGenerator = function () {
 
 			;
 
-			this.addPixel(this.modelLibrary.objects.length);
+			this.addPixel(1, this.modelLibrary.objects.length);
 
 			var _iteratorNormalCompletion6 = true;
 			var _didIteratorError6 = false;
@@ -1097,7 +1135,7 @@ var ImageGenerator = function () {
 
 					var objectDictionary = new _Dictionary2.default(object.name);
 
-					this.addPixel(objectDictionary.letters.length);
+					this.addPixel(1, objectDictionary.letters.length);
 
 					var _iteratorNormalCompletion15 = true;
 					var _didIteratorError15 = false;
@@ -1108,7 +1146,7 @@ var ImageGenerator = function () {
 							var _letter8 = _step15.value;
 
 
-							this.addPixel(_letter8);
+							this.addPixel(1, _letter8);
 						}
 					} catch (err) {
 						_didIteratorError15 = true;
@@ -1127,7 +1165,7 @@ var ImageGenerator = function () {
 
 					;
 
-					this.addPixel(object.groups.length);
+					this.addPixel(1, object.groups.length);
 
 					var _iteratorNormalCompletion16 = true;
 					var _didIteratorError16 = false;
@@ -1140,7 +1178,7 @@ var ImageGenerator = function () {
 
 							var groupDictionary = new _Dictionary2.default(group.name);
 
-							this.addPixel(groupDictionary.letters.length);
+							this.addPixel(1, groupDictionary.letters.length);
 
 							var _iteratorNormalCompletion17 = true;
 							var _didIteratorError17 = false;
@@ -1151,7 +1189,7 @@ var ImageGenerator = function () {
 									var _letter9 = _step17.value;
 
 
-									this.addPixel(_letter9);
+									this.addPixel(1, _letter9);
 								}
 							} catch (err) {
 								_didIteratorError17 = true;
@@ -1170,7 +1208,7 @@ var ImageGenerator = function () {
 
 							;
 
-							this.addPixel(group.vertices.length);
+							this.addPixel(1, group.vertices.length);
 
 							var previousVertex = null;
 							var vertexFastPass = false;
@@ -1190,7 +1228,7 @@ var ImageGenerator = function () {
 
 											vertexFastPass = false;
 
-											this.addPixel(_vertex);
+											this.addPixel(1, _vertex);
 										};
 									} else if (vertexFastPass == false) {
 
@@ -1198,10 +1236,10 @@ var ImageGenerator = function () {
 
 											vertexFastPass = true;
 
-											this.addPixel(0);
+											this.addPixel(1, 0);
 										} else {
 
-											this.addPixel(_vertex);
+											this.addPixel(1, _vertex);
 										};
 									};
 
@@ -1242,7 +1280,7 @@ var ImageGenerator = function () {
 
 											normalFastPass = false;
 
-											this.addPixel(_normal);
+											this.addPixel(1, _normal);
 										};
 									} else if (normalFastPass == false) {
 
@@ -1250,10 +1288,10 @@ var ImageGenerator = function () {
 
 											normalFastPass = true;
 
-											this.addPixel(0);
+											this.addPixel(1, 0);
 										} else {
 
-											this.addPixel(_normal);
+											this.addPixel(1, _normal);
 										};
 									};
 
@@ -1294,7 +1332,7 @@ var ImageGenerator = function () {
 
 											textureFastPass = false;
 
-											this.addPixel(_texture);
+											this.addPixel(1, _texture);
 										};
 									} else if (textureFastPass == false) {
 
@@ -1302,10 +1340,10 @@ var ImageGenerator = function () {
 
 											textureFastPass = true;
 
-											this.addPixel(0);
+											this.addPixel(1, 0);
 										} else {
 
-											this.addPixel(_texture);
+											this.addPixel(1, _texture);
 										};
 									};
 
@@ -1346,7 +1384,7 @@ var ImageGenerator = function () {
 
 											faceFastPass = false;
 
-											this.addPixel(_face);
+											this.addPixel(1, _face);
 										};
 									} else if (faceFastPass == false) {
 
@@ -1354,10 +1392,10 @@ var ImageGenerator = function () {
 
 											faceFastPass = true;
 
-											this.addPixel(0);
+											this.addPixel(1, 0);
 										} else {
 
-											this.addPixel(_face);
+											this.addPixel(1, _face);
 										};
 									};
 
@@ -1425,7 +1463,7 @@ var ImageGenerator = function () {
 
 			imageData.data.set(this.pixels);
 
-			console.log(imageData);
+			window.generated = imageData.data;
 
 			context.putImageData(imageData, 0, 0);
 
@@ -1433,32 +1471,48 @@ var ImageGenerator = function () {
 
 			image.width = image.height = square;
 
-			image.src = canvas.toDataURL();
+			image.src = canvas.toDataURL("image/png");
 
 			return image;
 		}
 	}, {
 		key: "addPixel",
 		value: function addPixel() {
-			var red = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-			var green = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-			var blue = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-			var alpha = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+			var splitting = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+			var red = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+			var green = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+			var blue = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+			var alpha = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
 
 
-			if (green == null && blue == null && alpha == null) {
+			if (red != null && green != null && blue != null && alpha != null) {
 
-				var value = Math.max(0, Math.min(SIZES.max, red));
+				this.pixels.push(red, green, blue, alpha);
+			} else if (red != null && green == null && blue == null) {
 
-				var split = Math.max(1, Math.ceil(value / SIZES.high));
+				if (this.compressionType == CompressionType.default) {
 
-				green = Math.min(Math.floor(value / split / 255), 255);
-				red = green > 0 ? 255 : 0;
-				blue = Math.floor(value / split - red * green);
-				alpha = split;
+					var value = red;
+
+					// let splitting = Math.max(1, Math.ceil(red / Max));
+
+					for (var split = 0; split < splitting; split++) {
+
+						var splittedValue = Math.max(0, Math.min(Max, value));
+
+						green = Math.min(Math.floor(splittedValue / 255), 255);
+						red = green > 0 ? 255 : 0;
+						blue = Math.floor(splittedValue - red * green);
+
+						this.pixels.push(red, green, blue, 255);
+
+						value -= splittedValue;
+					};
+				};
+			} else {
+
+				throw new Error("No given pixel color data.");
 			};
-
-			this.pixels.push(red, green, blue, alpha);
 
 			return this;
 		}
@@ -1470,6 +1524,248 @@ var ImageGenerator = function () {
 exports.default = ImageGenerator;
 
 },{"../OBJImage.js":1,"./Dictionary.js":3}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ImageGenerator = require("./ImageGenerator.js");
+
+var _ModelLibrary = require("../components/ModelLibrary.js");
+
+var _ModelLibrary2 = _interopRequireDefault(_ModelLibrary);
+
+var _Vertex = require("./Vertex.js");
+
+var _Vertex2 = _interopRequireDefault(_Vertex);
+
+var _Normal = require("./Normal.js");
+
+var _Normal2 = _interopRequireDefault(_Normal);
+
+var _Texture = require("./Texture.js");
+
+var _Texture2 = _interopRequireDefault(_Texture);
+
+var _Face = require("./Face.js");
+
+var _Face2 = _interopRequireDefault(_Face);
+
+var _Material = require("./Material.js");
+
+var _Material2 = _interopRequireDefault(_Material);
+
+var _Dictionary = require("./Dictionary.js");
+
+var _Dictionary2 = _interopRequireDefault(_Dictionary);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ImageReader = function () {
+	function ImageReader(image) {
+		_classCallCheck(this, ImageReader);
+
+		this.pixelIndex = 0;
+
+		return this.initialize(image);
+	}
+
+	_createClass(ImageReader, [{
+		key: "initialize",
+		value: function initialize(image) {
+
+			console.log("IMAGE READER");
+
+			var model = new _ModelLibrary2.default();
+
+			var canvas = document.createElement("canvas");
+			var context = canvas.getContext("2d");
+
+			canvas.width = image.naturalWidth;
+			canvas.height = image.naturalHeight;
+
+			context.drawImage(image, 0, 0);
+
+			this.pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+
+			// for( let pixel = 0; pixel < this.pixels.length; pixel++ ){
+
+			// 	if( this.pixels[pixel] != window.generated[pixel] ){
+
+			// 		console.log("DIFFERENT", pixel, this.pixels[pixel], window.generated[pixel]);
+			// 		break;
+
+			// 	};
+
+			// };
+
+			var version = this.getRawPixel();
+
+			var compressionType = this.getPixel();
+
+			var verticesMultiplicator = this.getPixel();
+
+			var verticesPivot = this.getPixel() / verticesMultiplicator;
+
+			var verticesCountSplitting = this.getPixel();
+
+			var verticesCount = this.getPixel(verticesCountSplitting);
+
+			var vertices = new Array();
+
+			for (var vertexIndex = 0; vertexIndex < verticesCount; vertexIndex++) {
+
+				var x = this.getPixel() / verticesMultiplicator - verticesPivot;
+				var y = this.getPixel() / verticesMultiplicator - verticesPivot;
+				var z = this.getPixel() / verticesMultiplicator - verticesPivot;
+
+				vertices.push(new _Vertex2.default(x, y, z));
+			};
+
+			var normalsMultiplicator = Math.floor(_ImageGenerator.Max / 2);
+
+			var normalsCountSplitting = this.getPixel();
+
+			var normalsCount = this.getPixel(normalsCountSplitting);
+
+			var normals = new Array();
+
+			for (var normalIndex = 0; normalIndex < normalsCount; normalIndex++) {
+
+				var _x = this.getPixel() / normalsMultiplicator - 1;
+				var _y = this.getPixel() / normalsMultiplicator - 1;
+				var _z = this.getPixel() / normalsMultiplicator - 1;
+
+				normals.push(new _Normal2.default(_x, _y, _z));
+			};
+
+			var texturesCountSplitting = this.getPixel();
+
+			var texturesCount = this.getPixel(texturesCountSplitting);
+
+			var textures = new Array();
+
+			for (var textureIndex = 0; textureIndex < texturesCount; textureIndex++) {
+
+				var u = this.getPixel() / _ImageGenerator.Max;
+				var v = this.getPixel() / _ImageGenerator.Max;
+
+				textures.push(new _Texture2.default(u, v));
+			};
+
+			var facesCountSplitting = this.getPixel();
+
+			var facesCount = this.getPixel(facesCountSplitting);
+
+			var faces = new Array();
+
+			for (var faceIndex = 0; faceIndex < facesCount; faceIndex++) {
+
+				var vertexA = this.getPixel(verticesCountSplitting) + 1;
+				var vertexB = this.getPixel(verticesCountSplitting) + 1;
+				var vertexC = this.getPixel(verticesCountSplitting) + 1;
+
+				var normalA = this.getPixel(normalsCountSplitting) + 1;
+				var normalB = this.getPixel(normalsCountSplitting) + 1;
+				var normalC = this.getPixel(normalsCountSplitting) + 1;
+
+				var textureA = this.getPixel(texturesCountSplitting) + 1;
+				var textureB = this.getPixel(texturesCountSplitting) + 1;
+				var textureC = this.getPixel(texturesCountSplitting) + 1;
+
+				faces.push(new _Face2.default(vertexA, vertexB, vertexC, normalA, normalB, normalC, textureA, textureB, textureC));
+			};
+
+			var materialsCountSplitting = this.getPixel();
+
+			var materialsCount = this.getPixel(materialsCountSplitting);
+
+			console.log("mc", materialsCountSplitting, materialsCount);
+
+			var materials = new Array();
+
+			for (var materialIndex = 0; materialIndex < 1; materialIndex++) {
+
+				var material = new _Material2.default();
+
+				var nameLettersCount = this.getPixel();
+
+				var nameLetters = new Array();
+
+				for (var nameLetter = 0; nameLetter < nameLettersCount; nameLetter++) {
+
+					nameLetters.push(this.getPixel());
+				};
+
+				material.setName(new _Dictionary2.default(nameLetters).toString());
+
+				material.setIllumination(this.getPixel());
+
+				material.setSmooth(this.getPixel());
+
+				var ambientColor = this.getRawPixel();
+
+				material.setAmbientColor(ambientColor.red / _ImageGenerator.Max, ambientColor.green / _ImageGenerator.Max, ambientColor.blue / _ImageGenerator.Max);
+
+				var hasAmbientMap = this.getPixel() == 1 ? true : false;
+
+				if (hasAmbientMap == true) {
+
+					material.setMapClamp("ambient", this.getPixel());
+
+					material.setMapChannel("ambient", this.getPixel());
+				};
+
+				materials.push(material);
+			};
+
+			console.log(materials);
+
+			return this;
+		}
+	}, {
+		key: "getRawPixel",
+		value: function getRawPixel() {
+
+			var red = this.pixels[this.pixelIndex * 4 + 0];
+			var green = this.pixels[this.pixelIndex * 4 + 1];
+			var blue = this.pixels[this.pixelIndex * 4 + 2];
+			var alpha = this.pixels[this.pixelIndex * 4 + 3];
+
+			this.pixelIndex++;
+
+			return { red: red, green: green, blue: blue, alpha: alpha };
+		}
+	}, {
+		key: "getPixel",
+		value: function getPixel() {
+			var groupLength = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+
+
+			var result = 0;
+
+			for (var group = 0; group < groupLength; group++) {
+
+				var pixel = this.getRawPixel();
+
+				result += pixel.red * pixel.green + pixel.blue;
+			};
+
+			return result;
+		}
+	}]);
+
+	return ImageReader;
+}();
+
+exports.default = ImageReader;
+
+},{"../components/ModelLibrary.js":12,"./Dictionary.js":3,"./Face.js":4,"./ImageGenerator.js":6,"./Material.js":8,"./Normal.js":13,"./Texture.js":14,"./Vertex.js":15}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1710,7 +2006,7 @@ var Material = function () {
 
 			if (this[map] != undefined) {
 
-				this[map].clamp = clamp == true || parseInt(clamp) == 1 || clamp == "on";
+				this[map].clamp = clamp == true || parseInt(clamp) == 1 || clamp == "on" ? true : false;
 			};
 
 			return this;
@@ -1781,7 +2077,7 @@ var Material = function () {
 
 exports.default = Material;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2022,7 +2318,7 @@ var MaterialLibrary = function () {
 exports.default = MaterialLibrary;
 ;
 
-},{"./Material.js":7}],9:[function(require,module,exports){
+},{"./Material.js":8}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2256,7 +2552,7 @@ var MeshGenerator = function () {
 exports.default = MeshGenerator;
 ;
 
-},{"../OBJImage.js":1}],10:[function(require,module,exports){
+},{"../OBJImage.js":1}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2415,7 +2711,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2470,6 +2766,7 @@ var ModelLibrary = function () {
 			this.objects = new Array();
 
 			this.vertices = new Array();
+
 			this.bounds = new _Bounds2.default();
 
 			this.normals = new Array();
@@ -2625,7 +2922,7 @@ var ModelLibrary = function () {
 exports.default = ModelLibrary;
 ;
 
-},{"./Bounds.js":2,"./Face.js":4,"./ImageGenerator.js":6,"./Model.js":10,"./Normal.js":12,"./Texture.js":13,"./Vertex.js":14}],12:[function(require,module,exports){
+},{"./Bounds.js":2,"./Face.js":4,"./ImageGenerator.js":6,"./Model.js":11,"./Normal.js":13,"./Texture.js":14,"./Vertex.js":15}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2661,7 +2958,7 @@ var Normal = function () {
 exports.default = Normal;
 ;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2696,7 +2993,7 @@ var Texture = function () {
 exports.default = Texture;
 ;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2732,7 +3029,7 @@ var Vertex = function () {
 exports.default = Vertex;
 ;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2740,34 +3037,22 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = ParseImage;
 
-var _ModelLibrary = require("../components/ModelLibrary.js");
+var _ImageReader = require("../components/ImageReader.js");
 
-var _ModelLibrary2 = _interopRequireDefault(_ModelLibrary);
+var _ImageReader2 = _interopRequireDefault(_ImageReader);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ParseImage(image, basePath, onComplete) {
 
-	console.log("PARSE IMAGE", image);
+	console.log("PARSE IMAGE");
 
-	var model = new _ModelLibrary2.default();
-
-	var canvas = document.createElement("canvas");
-	var context = canvas.getContext("2d");
-
-	canvas.width = image.width;
-	canvas.height = image.height;
-
-	context.drawImage(image, 0, 0);
-
-	var pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-
-	console.log(pixels);
+	var model = new _ImageReader2.default(image);
 
 	onComplete(model);
 };
 
-},{"../components/ModelLibrary.js":11}],16:[function(require,module,exports){
+},{"../components/ImageReader.js":7}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2779,7 +3064,7 @@ function ParseJSON(json, onComplete) {
 	console.log("ParseJSON");
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2893,7 +3178,7 @@ function ParseMTL(mtl, basePath, onComplete) {
 	onComplete(materialLibrary);
 };
 
-},{"../components/Dictionary.js":3,"../components/MaterialLibrary.js":8}],18:[function(require,module,exports){
+},{"../components/Dictionary.js":3,"../components/MaterialLibrary.js":9}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3014,5 +3299,5 @@ function ParseOBJ(obj, basePath, onComplete) {
 	};
 };
 
-},{"../components/FileLoader.js":5,"../components/MaterialLibrary.js":8,"../components/ModelLibrary.js":11,"./ParseMTL.js":17}]},{},[1])(1)
+},{"../components/FileLoader.js":5,"../components/MaterialLibrary.js":9,"../components/ModelLibrary.js":12,"./ParseMTL.js":18}]},{},[1])(1)
 });
