@@ -132,6 +132,15 @@ export default class Material {
 		return this;
 
 	}
+	setBumpColor( red = 1, green = 1, blue = 1 ){
+
+		this.bump.red = parseFloat(red);
+		this.bump.green = parseFloat(green);
+		this.bump.blue = parseFloat(blue);
+
+		return this;
+
+	}
 	setSpecularColor( red = 1, green = 1, blue = 1 ){
 
 		this.specular.red = parseFloat(red);
@@ -195,7 +204,16 @@ export default class Material {
 
 		if( this[map] != undefined ){
 
-			this[map].channel = ChannelType[channel];
+			if( typeof channel == "string" ){
+
+				this[map].channel = ChannelType[channel];
+
+			}
+			else {
+
+				this[map].channel = channel;
+
+			};
 
 		};
 

@@ -216,6 +216,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var LetterLibrary = exports.LetterLibrary = "/\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@-_—,.#0123456789";
@@ -233,14 +235,22 @@ var Dictionary = function () {
 
 			this.letters = new Array();
 
-			if (typeof source == "string") {
+			this.add(source);
+
+			return this;
+		}
+	}, {
+		key: "add",
+		value: function add(elements) {
+
+			if (typeof elements == "string") {
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 
 				try {
 
-					for (var _iterator = source[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					for (var _iterator = elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var letter = _step.value;
 
 
@@ -262,9 +272,13 @@ var Dictionary = function () {
 				}
 
 				;
-			} else if (source instanceof Array) {
+			} else if (typeof elements == "number") {
 
-				this.letters = source.slice(0);
+				this.letters.push(elements);
+			} else if (elements instanceof Array) {
+				var _letters;
+
+				(_letters = this.letters).push.apply(_letters, _toConsumableArray(elements.slice(0)));
 			};
 
 			return this;
@@ -894,7 +908,7 @@ var ImageGenerator = function () {
 
 					if (material.bump.map != null) {
 
-						this.addPixel(1, material.bump.clamp == null ? false : true);
+						this.addPixel(1, material.bump.clamp);
 
 						this.addPixel(1, material.bump.channel);
 
@@ -939,7 +953,7 @@ var ImageGenerator = function () {
 
 					if (material.specular.map != null) {
 
-						this.addPixel(1, material.specular.clamp == null ? false : true);
+						this.addPixel(1, material.specular.clamp);
 
 						this.addPixel(1, material.specular.channel);
 
@@ -1695,14 +1709,14 @@ var ImageReader = function () {
 
 				var nameLettersCount = this.getPixel();
 
-				var nameLetters = new Array();
+				var nameDictionary = new _Dictionary2.default();
 
 				for (var nameLetter = 0; nameLetter < nameLettersCount; nameLetter++) {
 
-					nameLetters.push(this.getPixel());
+					nameDictionary.add(this.getPixel());
 				};
 
-				material.setName(new _Dictionary2.default(nameLetters).toString());
+				material.setName(nameDictionary.toString());
 
 				material.setIllumination(this.getPixel());
 
@@ -1719,7 +1733,72 @@ var ImageReader = function () {
 					material.setMapClamp("ambient", this.getPixel());
 
 					material.setMapChannel("ambient", this.getPixel());
+
+					var mapLettersCount = this.getPixel();
+
+					var mapDictionary = new _Dictionary2.default();
+
+					for (var mapLetter = 0; mapLetter < mapLettersCount; mapLetter++) {
+
+						mapDictionary.add(this.getPixel());
+					};
+
+					material.setMap("ambient", mapDictionary.toString());
 				};
+
+				var bumpColor = this.getRawPixel();
+
+				material.setBumpColor(bumpColor.red / _ImageGenerator.Max, bumpColor.green / _ImageGenerator.Max, bumpColor.blue / _ImageGenerator.Max);
+
+				var hasBumpMap = this.getPixel() == 1 ? true : false;
+
+				if (hasBumpMap == true) {
+
+					material.setMapClamp("bump", this.getPixel());
+
+					material.setMapChannel("bump", this.getPixel());
+
+					var _mapLettersCount = this.getPixel();
+
+					var _mapDictionary = new _Dictionary2.default();
+
+					for (var _mapLetter = 0; _mapLetter < _mapLettersCount; _mapLetter++) {
+
+						_mapDictionary.add(this.getPixel());
+					};
+
+					material.setMap("bump", _mapDictionary.toString());
+				};
+
+				var specularColor = this.getRawPixel();
+
+				material.setSpecularColor(specularColor.red / _ImageGenerator.Max, specularColor.green / _ImageGenerator.Max, specularColor.blue / _ImageGenerator.Max);
+
+				material.setSpecularForce(this.getPixel() / (_ImageGenerator.Max / 1000));
+
+				var hasSpecularMap = this.getPixel() == 1 ? true : false;
+
+				if (hasSpecularMap == true) {
+
+					material.setMapClamp("specular", this.getPixel());
+
+					material.setMapChannel("specular", this.getPixel());
+
+					var _mapLettersCount2 = this.getPixel();
+
+					var _mapDictionary2 = new _Dictionary2.default();
+
+					for (var _mapLetter2 = 0; _mapLetter2 < _mapLettersCount2; _mapLetter2++) {
+
+						_mapDictionary2.add(this.getPixel());
+					};
+
+					material.setMap("specular", _mapDictionary2.toString());
+				};
+
+				var hasSpecularForceMap = this.getPixel() == 1 ? true : false;
+
+				if (hasSpecularForceMap == true) {};
 
 				materials.push(material);
 			};
@@ -1932,6 +2011,20 @@ var Material = function () {
 			return this;
 		}
 	}, {
+		key: "setBumpColor",
+		value: function setBumpColor() {
+			var red = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+			var green = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+			var blue = arguments.length <= 2 || arguments[2] === undefined ? 1 : arguments[2];
+
+
+			this.bump.red = parseFloat(red);
+			this.bump.green = parseFloat(green);
+			this.bump.blue = parseFloat(blue);
+
+			return this;
+		}
+	}, {
 		key: "setSpecularColor",
 		value: function setSpecularColor() {
 			var red = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
@@ -2019,7 +2112,13 @@ var Material = function () {
 
 			if (this[map] != undefined) {
 
-				this[map].channel = ChannelType[channel];
+				if (typeof channel == "string") {
+
+					this[map].channel = ChannelType[channel];
+				} else {
+
+					this[map].channel = channel;
+				};
 			};
 
 			return this;

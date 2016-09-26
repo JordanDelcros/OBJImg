@@ -10,18 +10,30 @@ export default class Dictionary {
 
 		this.letters = new Array();
 
-		if( typeof source == "string" ){
+		this.add(source);
 
-			for( let letter of source ){
+		return this;
+
+	}
+	add( elements ){
+
+		if( typeof elements == "string" ){
+
+			for( let letter of elements ){
 
 				this.letters.push(LetterLibrary.indexOf(letter));
 
 			};
 
 		}
-		else if( source instanceof Array ){
+		else if( typeof elements == "number" ){
 
-			this.letters = source.slice(0);
+			this.letters.push(elements);
+
+		}
+		else if( elements instanceof Array ){
+
+			this.letters.push(...elements.slice(0));
 
 		};
 

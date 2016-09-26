@@ -170,7 +170,7 @@ export default class ImageGenerator {
 
 			if( material.bump.map != null ){
 
-				this.addPixel(1, material.bump.clamp == null ? false : true);
+				this.addPixel(1, material.bump.clamp);
 
 				this.addPixel(1, material.bump.channel);
 
@@ -194,7 +194,7 @@ export default class ImageGenerator {
 
 			if( material.specular.map != null ){
 
-				this.addPixel(1, material.specular.clamp == null ? false : true);
+				this.addPixel(1, material.specular.clamp);
 
 				this.addPixel(1, material.specular.channel);
 

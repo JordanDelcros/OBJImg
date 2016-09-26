@@ -137,15 +137,15 @@ export default class ImageReader {
 
 			let nameLettersCount = this.getPixel();
 
-			let nameLetters = new Array();
+			let nameDictionary = new Dictionary();
 
 			for( let nameLetter = 0; nameLetter < nameLettersCount; nameLetter++ ){
 
-				nameLetters.push(this.getPixel());
+				nameDictionary.add(this.getPixel());
 
 			};
 
-			material.setName(new Dictionary(nameLetters).toString());
+			material.setName(nameDictionary.toString());
 
 			material.setIllumination(this.getPixel());
 
@@ -162,6 +162,80 @@ export default class ImageReader {
 				material.setMapClamp("ambient", this.getPixel());
 
 				material.setMapChannel("ambient", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("ambient", mapDictionary.toString());
+
+			};
+
+			let bumpColor = this.getRawPixel();
+
+			material.setBumpColor((bumpColor.red / Max), (bumpColor.green / Max), (bumpColor.blue / Max));
+
+			let hasBumpMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasBumpMap == true ){
+
+				material.setMapClamp("bump", this.getPixel());
+
+				material.setMapChannel("bump", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("bump", mapDictionary.toString());
+
+			};
+
+			let specularColor = this.getRawPixel();
+
+			material.setSpecularColor((specularColor.red / Max), (specularColor.green / Max), (specularColor.blue / Max));
+
+			material.setSpecularForce(this.getPixel() / (Max / 1000));
+
+			let hasSpecularMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasSpecularMap == true ){
+
+				material.setMapClamp("specular", this.getPixel());
+
+				material.setMapChannel("specular", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("specular", mapDictionary.toString());
+
+			};
+
+			let hasSpecularForceMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasSpecularForceMap == true ){
+
+				
 
 			};
 
