@@ -127,11 +127,9 @@ export default class ImageReader {
 
 		var materialsCount = this.getPixel(materialsCountSplitting);
 
-		console.log("mc", materialsCountSplitting, materialsCount);
-
 		var materials = new Array();
 
-		for( let materialIndex = 0; materialIndex < 1; materialIndex++ ){
+		for( let materialIndex = 0; materialIndex < materialsCount; materialIndex++ ){
 
 			var material = new Material();
 
@@ -177,6 +175,32 @@ export default class ImageReader {
 
 			};
 
+			let diffuseColor = this.getRawPixel();
+
+			material.setDiffuseColor((diffuseColor.red / Max), (diffuseColor.green / Max), (diffuseColor.blue / Max));
+
+			let hasDiffuseMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasDiffuseMap == true ){
+
+				material.setMapClamp("diffuse", this.getPixel());
+
+				material.setMapChannel("diffuse", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("diffuse", mapDictionary.toString());
+
+			};
+
 			let bumpColor = this.getRawPixel();
 
 			material.setBumpColor((bumpColor.red / Max), (bumpColor.green / Max), (bumpColor.blue / Max));
@@ -207,8 +231,6 @@ export default class ImageReader {
 
 			material.setSpecularColor((specularColor.red / Max), (specularColor.green / Max), (specularColor.blue / Max));
 
-			material.setSpecularForce(this.getPixel() / (Max / 1000));
-
 			let hasSpecularMap = (this.getPixel() == 1 ? true : false);
 
 			if( hasSpecularMap == true ){
@@ -235,7 +257,69 @@ export default class ImageReader {
 
 			if( hasSpecularForceMap == true ){
 
-				
+				material.setSpecularForce(this.getPixel() / (Max / 1000));
+
+				material.setMapClamp("specularForce", this.getPixel());
+
+				material.setMapChannel("specularForce", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("specularForce", mapDictionary.toString());
+
+			};
+
+			let hasEnvironementMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasEnvironementMap == true ){
+
+				material.setEnvironementReflectivity(this.getPixel() / Max);
+
+				material.setMapClamp("environement", this.getPixel());
+
+				material.setMapChannel("environement", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("environement", mapDictionary.toString());
+
+			};
+
+			let hasOpacityMap = (this.getPixel() == 1 ? true : false);
+
+			if( hasOpacityMap == true ){
+
+				material.setMapClamp("opacity", this.getPixel());
+
+				material.setMapChannel("opacity", this.getPixel());
+
+				let mapLettersCount = this.getPixel();
+
+				let mapDictionary = new Dictionary();
+
+				for( let mapLetter = 0; mapLetter < mapLettersCount; mapLetter++ ){
+
+					mapDictionary.add(this.getPixel());
+
+				};
+
+				material.setMap("opacity", mapDictionary.toString());
 
 			};
 
@@ -243,7 +327,19 @@ export default class ImageReader {
 
 		};
 
-		console.log(materials)
+		var objectsCount = this.getPixel();
+
+		var objects = new Array();
+
+		for( let objectIndex = 0; objectIndex < objectsCount; objectIndex++ ){
+
+			let object = 
+
+			objects.push();
+
+		};
+
+		console.log("oc", objectsCount);
 
 		return this;
 

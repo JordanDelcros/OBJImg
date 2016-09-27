@@ -947,8 +947,6 @@ var ImageGenerator = function () {
 
 					this.addPixel(1, material.specular.red * 255, material.specular.green * 255, material.specular.blue * 255, 255);
 
-					this.addPixel(1, material.specular.force * (Max / 1000));
-
 					this.addPixel(1, material.specular.map == null ? false : true);
 
 					if (material.specular.map != null) {
@@ -994,7 +992,7 @@ var ImageGenerator = function () {
 
 					if (material.specularForce.map != null) {
 
-						this.addPixel(1, material.specular.value * Max);
+						this.addPixel(1, material.speculaForce.value * (Max / 1000));
 
 						this.addPixel(1, material.specularForce.clamp == null ? false : true);
 
@@ -1037,7 +1035,7 @@ var ImageGenerator = function () {
 
 					if (material.environement.map != null) {
 
-						this.addPixel(1, material.specular.force * (Max / 1000));
+						this.addPixel(1, material.environement.reflectivity * Max);
 
 						this.addPixel(1, material.environement.clamp == null ? false : true);
 
@@ -1075,8 +1073,6 @@ var ImageGenerator = function () {
 
 						;
 					};
-
-					this.addPixel(1, material.specular.value * Max);
 
 					this.addPixel(1, material.opacity.map == null ? false : true);
 
@@ -1137,6 +1133,8 @@ var ImageGenerator = function () {
 			;
 
 			this.addPixel(1, this.modelLibrary.objects.length);
+
+			console.log("OC", this.modelLibrary.objects.length);
 
 			var _iteratorNormalCompletion6 = true;
 			var _didIteratorError6 = false;
@@ -1699,11 +1697,9 @@ var ImageReader = function () {
 
 			var materialsCount = this.getPixel(materialsCountSplitting);
 
-			console.log("mc", materialsCountSplitting, materialsCount);
-
 			var materials = new Array();
 
-			for (var materialIndex = 0; materialIndex < 1; materialIndex++) {
+			for (var materialIndex = 0; materialIndex < materialsCount; materialIndex++) {
 
 				var material = new _Material2.default();
 
@@ -1746,6 +1742,30 @@ var ImageReader = function () {
 					material.setMap("ambient", mapDictionary.toString());
 				};
 
+				var diffuseColor = this.getRawPixel();
+
+				material.setDiffuseColor(diffuseColor.red / _ImageGenerator.Max, diffuseColor.green / _ImageGenerator.Max, diffuseColor.blue / _ImageGenerator.Max);
+
+				var hasDiffuseMap = this.getPixel() == 1 ? true : false;
+
+				if (hasDiffuseMap == true) {
+
+					material.setMapClamp("diffuse", this.getPixel());
+
+					material.setMapChannel("diffuse", this.getPixel());
+
+					var _mapLettersCount = this.getPixel();
+
+					var _mapDictionary = new _Dictionary2.default();
+
+					for (var _mapLetter = 0; _mapLetter < _mapLettersCount; _mapLetter++) {
+
+						_mapDictionary.add(this.getPixel());
+					};
+
+					material.setMap("diffuse", _mapDictionary.toString());
+				};
+
 				var bumpColor = this.getRawPixel();
 
 				material.setBumpColor(bumpColor.red / _ImageGenerator.Max, bumpColor.green / _ImageGenerator.Max, bumpColor.blue / _ImageGenerator.Max);
@@ -1758,32 +1778,6 @@ var ImageReader = function () {
 
 					material.setMapChannel("bump", this.getPixel());
 
-					var _mapLettersCount = this.getPixel();
-
-					var _mapDictionary = new _Dictionary2.default();
-
-					for (var _mapLetter = 0; _mapLetter < _mapLettersCount; _mapLetter++) {
-
-						_mapDictionary.add(this.getPixel());
-					};
-
-					material.setMap("bump", _mapDictionary.toString());
-				};
-
-				var specularColor = this.getRawPixel();
-
-				material.setSpecularColor(specularColor.red / _ImageGenerator.Max, specularColor.green / _ImageGenerator.Max, specularColor.blue / _ImageGenerator.Max);
-
-				material.setSpecularForce(this.getPixel() / (_ImageGenerator.Max / 1000));
-
-				var hasSpecularMap = this.getPixel() == 1 ? true : false;
-
-				if (hasSpecularMap == true) {
-
-					material.setMapClamp("specular", this.getPixel());
-
-					material.setMapChannel("specular", this.getPixel());
-
 					var _mapLettersCount2 = this.getPixel();
 
 					var _mapDictionary2 = new _Dictionary2.default();
@@ -1793,17 +1787,110 @@ var ImageReader = function () {
 						_mapDictionary2.add(this.getPixel());
 					};
 
-					material.setMap("specular", _mapDictionary2.toString());
+					material.setMap("bump", _mapDictionary2.toString());
+				};
+
+				var specularColor = this.getRawPixel();
+
+				material.setSpecularColor(specularColor.red / _ImageGenerator.Max, specularColor.green / _ImageGenerator.Max, specularColor.blue / _ImageGenerator.Max);
+
+				var hasSpecularMap = this.getPixel() == 1 ? true : false;
+
+				if (hasSpecularMap == true) {
+
+					material.setMapClamp("specular", this.getPixel());
+
+					material.setMapChannel("specular", this.getPixel());
+
+					var _mapLettersCount3 = this.getPixel();
+
+					var _mapDictionary3 = new _Dictionary2.default();
+
+					for (var _mapLetter3 = 0; _mapLetter3 < _mapLettersCount3; _mapLetter3++) {
+
+						_mapDictionary3.add(this.getPixel());
+					};
+
+					material.setMap("specular", _mapDictionary3.toString());
 				};
 
 				var hasSpecularForceMap = this.getPixel() == 1 ? true : false;
 
-				if (hasSpecularForceMap == true) {};
+				if (hasSpecularForceMap == true) {
+
+					material.setSpecularForce(this.getPixel() / (_ImageGenerator.Max / 1000));
+
+					material.setMapClamp("specularForce", this.getPixel());
+
+					material.setMapChannel("specularForce", this.getPixel());
+
+					var _mapLettersCount4 = this.getPixel();
+
+					var _mapDictionary4 = new _Dictionary2.default();
+
+					for (var _mapLetter4 = 0; _mapLetter4 < _mapLettersCount4; _mapLetter4++) {
+
+						_mapDictionary4.add(this.getPixel());
+					};
+
+					material.setMap("specularForce", _mapDictionary4.toString());
+				};
+
+				var hasEnvironementMap = this.getPixel() == 1 ? true : false;
+
+				if (hasEnvironementMap == true) {
+
+					material.setEnvironementReflectivity(this.getPixel() / _ImageGenerator.Max);
+
+					material.setMapClamp("environement", this.getPixel());
+
+					material.setMapChannel("environement", this.getPixel());
+
+					var _mapLettersCount5 = this.getPixel();
+
+					var _mapDictionary5 = new _Dictionary2.default();
+
+					for (var _mapLetter5 = 0; _mapLetter5 < _mapLettersCount5; _mapLetter5++) {
+
+						_mapDictionary5.add(this.getPixel());
+					};
+
+					material.setMap("environement", _mapDictionary5.toString());
+				};
+
+				var hasOpacityMap = this.getPixel() == 1 ? true : false;
+
+				if (hasOpacityMap == true) {
+
+					material.setMapClamp("opacity", this.getPixel());
+
+					material.setMapChannel("opacity", this.getPixel());
+
+					var _mapLettersCount6 = this.getPixel();
+
+					var _mapDictionary6 = new _Dictionary2.default();
+
+					for (var _mapLetter6 = 0; _mapLetter6 < _mapLettersCount6; _mapLetter6++) {
+
+						_mapDictionary6.add(this.getPixel());
+					};
+
+					material.setMap("opacity", _mapDictionary6.toString());
+				};
 
 				materials.push(material);
 			};
 
-			console.log(materials);
+			var objectsCount = this.getPixel();
+
+			var objects = new Array();
+
+			for (var objectIndex = 0; objectIndex < objectsCount; objectIndex++) {
+
+				var object = objects.push();
+			};
+
+			console.log("oc", objectsCount);
 
 			return this;
 		}
@@ -2044,7 +2131,7 @@ var Material = function () {
 			var force = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
 
 
-			this.specular.force = parseFloat(force);
+			this.specularForce.value = parseFloat(force);
 
 			return this;
 		}
@@ -2468,7 +2555,7 @@ var MeshGenerator = function () {
 							aoMap: material.ambient.amp != null ? textureLoader.load(material.ambient.map) : null,
 							aoMapIntensity: 1,
 							bumpMap: material.bump.amp != null ? textureLoader.load(material.bump.map) : null,
-							shininess: material.specular.force,
+							shininess: material.specularForce.value,
 							opacity: material.opacity.value,
 							transparent: material.opacity.value < 1 ? true : false,
 							side: _OBJImage.THREE.DoubleSide

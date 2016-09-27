@@ -28,7 +28,7 @@ export default class MeshGenerator {
 					aoMap: (material.ambient.amp != null ? textureLoader.load(material.ambient.map): null),
 					aoMapIntensity: 1,
 					bumpMap: (material.bump.amp != null ? textureLoader.load(material.bump.map): null),
-					shininess: material.specular.force,
+					shininess: material.specularForce.value,
 					opacity: material.opacity.value,
 					transparent: (material.opacity.value < 1 ? true : false),
 					side: THREE.DoubleSide

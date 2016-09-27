@@ -152,7 +152,7 @@ export default class Material {
 	}
 	setSpecularForce( force = 1 ){
 
-		this.specular.force = parseFloat(force);
+		this.specularForce.value = parseFloat(force);
 
 		return this;
 

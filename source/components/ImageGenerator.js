@@ -144,7 +144,7 @@ export default class ImageGenerator {
 
 			this.addPixel(1, (material.diffuse.red * 255), (material.diffuse.green * 255), (material.diffuse.blue * 255), 255);
 
-			this.addPixel(1, material.diffuse.map == null ? false : true);
+			this.addPixel(1, (material.diffuse.map == null ? false : true));
 
 			if( material.diffuse.map != null ){
 
@@ -166,7 +166,7 @@ export default class ImageGenerator {
 
 			this.addPixel(1, (material.bump.red * 255), (material.bump.green * 255), (material.bump.blue * 255), 255);
 
-			this.addPixel(1, material.bump.map == null ? false : true);
+			this.addPixel(1, (material.bump.map == null ? false : true));
 
 			if( material.bump.map != null ){
 
@@ -188,8 +188,6 @@ export default class ImageGenerator {
 
 			this.addPixel(1, (material.specular.red * 255), (material.specular.green * 255), (material.specular.blue * 255), 255);
 
-			this.addPixel(1, material.specular.force * (Max / 1000));
-
 			this.addPixel(1, material.specular.map == null ? false : true);
 
 			if( material.specular.map != null ){
@@ -210,13 +208,13 @@ export default class ImageGenerator {
 
 			};
 
-			this.addPixel(1, material.specularForce.map == null ? false : true);
+			this.addPixel(1, (material.specularForce.map == null ? false : true));
 
 			if( material.specularForce.map != null ){
 
-				this.addPixel(1, material.specular.value * Max);
+				this.addPixel(1, (material.speculaForce.value * (Max / 1000)));
 
-				this.addPixel(1, material.specularForce.clamp == null ? false : true);
+				this.addPixel(1, (material.specularForce.clamp == null ? false : true));
 
 				this.addPixel(1, material.specularForce.channel);
 
@@ -232,13 +230,13 @@ export default class ImageGenerator {
 
 			};
 
-			this.addPixel(1, material.environement.map == null ? false : true);
+			this.addPixel(1, (material.environement.map == null ? false : true));
 
 			if( material.environement.map != null ){
 
-				this.addPixel(1, material.specular.force * (Max / 1000));
+				this.addPixel(1, (material.environement.reflectivity * Max));
 
-				this.addPixel(1, material.environement.clamp == null ? false : true);
+				this.addPixel(1, (material.environement.clamp == null ? false : true));
 
 				this.addPixel(1, material.environement.channel);
 
@@ -253,8 +251,6 @@ export default class ImageGenerator {
 				};
 
 			};
-
-			this.addPixel(1, material.specular.value * Max);
 
 			this.addPixel(1, material.opacity.map == null ? false : true);
 
@@ -279,6 +275,8 @@ export default class ImageGenerator {
 		};
 
 		this.addPixel(1, this.modelLibrary.objects.length);
+
+		console.log("OC", this.modelLibrary.objects.length);
 
 		for( let object of this.modelLibrary.objects ){
 
